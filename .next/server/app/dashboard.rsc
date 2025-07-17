@@ -1,0 +1,24 @@
+1:"$Sreact.fragment"
+2:I[1118,["108","static/chunks/108-c4fe448a61a00c58.js","568","static/chunks/568-07c26d79b251c23d.js","177","static/chunks/app/layout-d13a80bb7ca51453.js"],"Providers"]
+3:I[7555,[],""]
+4:I[1295,[],""]
+5:I[7160,["354","static/chunks/354-dd032127c3338f50.js","142","static/chunks/142-8ee8af868fd2dafa.js","647","static/chunks/647-a16953b0505309ae.js","954","static/chunks/app/dashboard/layout-df3bac0cfc7d22c4.js"],"SidebarProvider"]
+6:I[8570,["354","static/chunks/354-dd032127c3338f50.js","142","static/chunks/142-8ee8af868fd2dafa.js","647","static/chunks/647-a16953b0505309ae.js","954","static/chunks/app/dashboard/layout-df3bac0cfc7d22c4.js"],"AppSidebar"]
+7:I[7160,["354","static/chunks/354-dd032127c3338f50.js","142","static/chunks/142-8ee8af868fd2dafa.js","647","static/chunks/647-a16953b0505309ae.js","954","static/chunks/app/dashboard/layout-df3bac0cfc7d22c4.js"],"SidebarInset"]
+8:I[894,[],"ClientPageRoot"]
+9:I[1922,["354","static/chunks/354-dd032127c3338f50.js","108","static/chunks/108-c4fe448a61a00c58.js","583","static/chunks/583-ac8e193e3c603fd0.js","142","static/chunks/142-8ee8af868fd2dafa.js","105","static/chunks/app/dashboard/page-ade15dfc9b361fcd.js"],"default"]
+c:I[9665,[],"OutletBoundary"]
+e:I[4911,[],"AsyncMetadataOutlet"]
+10:I[9665,[],"ViewportBoundary"]
+12:I[9665,[],"MetadataBoundary"]
+13:"$Sreact.suspense"
+15:I[8393,[],""]
+:HL["/_next/static/media/e4af272ccee01ff0-s.p.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/_next/static/css/15f999df38484877.css","style"]
+0:{"P":null,"b":"BuJNfuIj5GK9ja45O1M7t","p":"","c":["","dashboard"],"i":false,"f":[[["",{"children":["dashboard",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],["",["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/css/15f999df38484877.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}]],["$","html",null,{"lang":"en","children":["$","body",null,{"className":"__className_e8ce0c","children":["$","$L2",null,{"children":["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}],["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]}]}]]}],{"children":["dashboard",["$","$1","c",{"children":[null,["$","$L5",null,{"children":[["$","$L6",null,{}],["$","$L7",null,{"children":["$","div",null,{"className":"flex h-screen flex-col","children":["$","$L3",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L4",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]}]}]]}]]}],{"children":["__PAGE__",["$","$1","c",{"children":[["$","$L8",null,{"Component":"$9","searchParams":{},"params":{},"promises":["$@a","$@b"]}],null,["$","$Lc",null,{"children":["$Ld",["$","$Le",null,{"promise":"$@f"}]]}]]}],{},null,false]},null,false]},null,false],["$","$1","h",{"children":[null,[["$","$L10",null,{"children":"$L11"}],["$","meta",null,{"name":"next-size-adjust","content":""}]],["$","$L12",null,{"children":["$","div",null,{"hidden":true,"children":["$","$13",null,{"fallback":null,"children":"$L14"}]}]}]]}],false]],"m":"$undefined","G":["$15",[]],"s":false,"S":true}
+a:{}
+b:"$0:f:0:1:2:children:2:children:1:props:children:0:props:params"
+11:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+d:null
+f:{"metadata":[["$","title","0",{"children":"VentureForge AI"}],["$","meta","1",{"name":"description","content":"Revolutionizing Idea-to-Launch with AI-Powered Business Intelligence"}]],"error":null,"digest":"$undefined"}
+14:"$f:metadata"

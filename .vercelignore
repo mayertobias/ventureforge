@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env.local
+.env
+
+# Development files
+.next/
+.DS_Store
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test files
+test-*
+*.test.*
+
+# IDE
+.vscode/
+.idea/

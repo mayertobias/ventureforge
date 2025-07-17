@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/forge/research-gemini/route.ts": {
+      "maxDuration": 300
+    }
+  },
+  "env": {
+    "DATABASE_URL": "$DATABASE_URL",
+    "NEXTAUTH_SECRET": "$NEXTAUTH_SECRET",
+    "GOOGLE_CLIENT_ID": "$GOOGLE_CLIENT_ID",
+    "GOOGLE_CLIENT_SECRET": "$GOOGLE_CLIENT_SECRET",
+    "OPENAI_API_KEY": "$OPENAI_API_KEY",
+    "GEMINI_API_KEY": "$GEMINI_API_KEY"
+  }
+}
