@@ -1399,21 +1399,21 @@ export default function ProjectPage() {
                     </h4>
                     <div className="grid gap-3 md:grid-cols-3">
                       <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Pre-Launch</div>
+                        <div className="text-sm font-bold text-primary">Month 1</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.preLaunch?.timeline || 'N/A'}
+                          {project.gtmOutput.launchTimeline?.month1 || 'Launch activities and goals'}
                         </div>
                       </div>
                       <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Launch</div>
+                        <div className="text-sm font-bold text-primary">Month 3</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.launch?.timeline || 'N/A'}
+                          {project.gtmOutput.launchTimeline?.month3 || 'Growth milestones'}
                         </div>
                       </div>
                       <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Post-Launch</div>
+                        <div className="text-sm font-bold text-primary">Month 6</div>
                         <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.postLaunch?.timeline || 'N/A'}
+                          {project.gtmOutput.launchTimeline?.month6 || 'Scale targets'}
                         </div>
                       </div>
                     </div>
@@ -1426,58 +1426,32 @@ export default function ProjectPage() {
                         📈 Customer Acquisition
                       </h4>
                       <div className="space-y-3">
-                        {project.gtmOutput.customerAcquisition.primaryChannels && (
+                        {project.gtmOutput.customerAcquisition.targetPersona && (
                           <div>
-                            <p className="text-sm"><strong>Primary Channels:</strong></p>
+                            <p className="text-sm"><strong>Target Persona:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.targetPersona}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.customerAcquisition.acquisitionTactics && (
+                          <div>
+                            <p className="text-sm"><strong>Acquisition Tactics:</strong></p>
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {project.gtmOutput.customerAcquisition.primaryChannels.map((channel: string, index: number) => (
-                                <Badge key={index} variant="secondary" className="text-xs">{channel}</Badge>
+                              {project.gtmOutput.customerAcquisition.acquisitionTactics.map((tactic: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs">{tactic}</Badge>
                               ))}
                             </div>
                           </div>
                         )}
-                        {project.gtmOutput.customerAcquisition.cac && (
+                        {project.gtmOutput.customerAcquisition.acquisitionGoals && (
                           <div>
-                            <p className="text-sm"><strong>Customer Acquisition Cost:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.cac}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.customerAcquisition.monthlyTargets && (
-                          <div>
-                            <p className="text-sm"><strong>Monthly Acquisition Targets:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.monthlyTargets}</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Marketing Strategy */}
-                  {project.gtmOutput.marketingStrategy && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📢 Marketing Strategy
-                      </h4>
-                      <div className="space-y-3">
-                        {project.gtmOutput.marketingStrategy.brandPositioning && (
-                          <div>
-                            <p className="text-sm"><strong>Brand Positioning:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.marketingStrategy.brandPositioning}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.marketingStrategy.contentStrategy && (
-                          <div>
-                            <p className="text-sm"><strong>Content Strategy:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.marketingStrategy.contentStrategy}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.marketingStrategy.marketingChannels && (
-                          <div>
-                            <p className="text-sm"><strong>Marketing Channels:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.gtmOutput.marketingStrategy.marketingChannels.map((channel: string, index: number) => (
-                                <Badge key={index} variant="outline" className="text-xs">{channel}</Badge>
-                              ))}
+                            <p className="text-sm"><strong>Acquisition Goals:</strong></p>
+                            <div className="space-y-1 mt-1">
+                              {project.gtmOutput.customerAcquisition.acquisitionGoals.paidCustomers && (
+                                <p className="text-sm text-muted-foreground">• Paid Customers: {project.gtmOutput.customerAcquisition.acquisitionGoals.paidCustomers}</p>
+                              )}
+                              {project.gtmOutput.customerAcquisition.acquisitionGoals.pipeline && (
+                                <p className="text-sm text-muted-foreground">• Pipeline: {project.gtmOutput.customerAcquisition.acquisitionGoals.pipeline}</p>
+                              )}
                             </div>
                           </div>
                         )}
@@ -1485,87 +1459,95 @@ export default function ProjectPage() {
                     </Card>
                   )}
 
-                  {/* Sales Strategy */}
-                  {project.gtmOutput.salesStrategy && (
+                  {/* Marketing Channels */}
+                  {project.gtmOutput.marketingChannels && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        💼 Sales Strategy
+                        📢 Marketing Channels
                       </h4>
                       <div className="space-y-3">
-                        {project.gtmOutput.salesStrategy.salesProcess && (
+                        {project.gtmOutput.marketingChannels.paidChannels && project.gtmOutput.marketingChannels.paidChannels.length > 0 && (
                           <div>
-                            <p className="text-sm"><strong>Sales Process:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.salesProcess}</p>
+                            <p className="text-sm"><strong>Paid Channels:</strong></p>
+                            <div className="space-y-2 mt-1">
+                              {project.gtmOutput.marketingChannels.paidChannels.map((channel: any, index: number) => (
+                                <div key={index} className="bg-muted rounded-lg p-2">
+                                  <p className="text-sm font-medium">{channel.channel}</p>
+                                  <p className="text-xs text-muted-foreground">Budget: {channel.budget} | Expected ROI: {channel.expectedROI}</p>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
-                        {project.gtmOutput.salesStrategy.salesTeam && (
+                        {project.gtmOutput.marketingChannels.organicChannels && project.gtmOutput.marketingChannels.organicChannels.length > 0 && (
                           <div>
-                            <p className="text-sm"><strong>Sales Team Structure:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.salesTeam}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.salesStrategy.conversionTargets && (
-                          <div>
-                            <p className="text-sm"><strong>Conversion Targets:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.conversionTargets}</p>
+                            <p className="text-sm"><strong>Organic Channels:</strong></p>
+                            <div className="space-y-2 mt-1">
+                              {project.gtmOutput.marketingChannels.organicChannels.map((channel: any, index: number) => (
+                                <div key={index} className="bg-muted rounded-lg p-2">
+                                  <p className="text-sm font-medium">{channel.channel}</p>
+                                  <p className="text-xs text-muted-foreground">Investment: {channel.investment} | Expected: {channel.expectedTraffic}</p>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
                     </Card>
                   )}
 
-                  {/* Metrics & KPIs */}
-                  {project.gtmOutput.metricsAndKPIs && (
+                  {/* Sales Targets */}
+                  {project.gtmOutput.salesTargets && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📊 Key Metrics & KPIs
+                        💼 Sales Targets
                       </h4>
-                      <div className="space-y-3">
-                        {project.gtmOutput.metricsAndKPIs.primaryMetrics && (
-                          <div>
-                            <p className="text-sm"><strong>Primary Metrics:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.gtmOutput.metricsAndKPIs.primaryMetrics.map((metric: string, index: number) => (
-                                <Badge key={index} variant="secondary" className="text-xs">{metric}</Badge>
-                              ))}
-                            </div>
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-bold text-primary">Month 1</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {project.gtmOutput.salesTargets.month1 || 'TBD'}
                           </div>
-                        )}
-                        {project.gtmOutput.metricsAndKPIs.successCriteria && (
-                          <div>
-                            <p className="text-sm"><strong>Success Criteria:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.gtmOutput.metricsAndKPIs.successCriteria.map((criteria: string, index: number) => (
-                                <li key={index}>{criteria}</li>
-                              ))}
-                            </ul>
+                        </div>
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-bold text-primary">Month 3</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {project.gtmOutput.salesTargets.month3 || 'TBD'}
                           </div>
-                        )}
+                        </div>
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-bold text-primary">Month 6</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {project.gtmOutput.salesTargets.month6 || 'TBD'}
+                          </div>
+                        </div>
                       </div>
                     </Card>
                   )}
 
-                  {/* Partnerships */}
-                  {project.gtmOutput.partnerships && (
+                  {/* Key Metrics */}
+                  {project.gtmOutput.keyMetrics && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        🤝 Strategic Partnerships
+                        📊 Key Metrics
                       </h4>
                       <div className="space-y-3">
-                        {project.gtmOutput.partnerships.keyPartners && (
+                        {project.gtmOutput.keyMetrics.CAC && (
                           <div>
-                            <p className="text-sm"><strong>Key Partners:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.gtmOutput.partnerships.keyPartners.map((partner: string, index: number) => (
-                                <Badge key={index} variant="outline" className="text-xs">{partner}</Badge>
-                              ))}
-                            </div>
+                            <p className="text-sm"><strong>Customer Acquisition Cost (CAC):</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.CAC}</p>
                           </div>
                         )}
-                        {project.gtmOutput.partnerships.partnershipStrategy && (
+                        {project.gtmOutput.keyMetrics.LTV && (
                           <div>
-                            <p className="text-sm"><strong>Partnership Strategy:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.partnerships.partnershipStrategy}</p>
+                            <p className="text-sm"><strong>Lifetime Value (LTV):</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.LTV}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.keyMetrics.MRR && (
+                          <div>
+                            <p className="text-sm"><strong>Monthly Recurring Revenue (MRR):</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.MRR}</p>
                           </div>
                         )}
                       </div>

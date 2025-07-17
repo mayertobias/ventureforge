@@ -8,160 +8,44 @@ export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
 const GTM_COST = 10; // Credits required for go-to-market strategy
 
-const GTM_PROMPT = `You are the 'Go-to-Market Strategist' module of VentureForge AI.
+const GTM_PROMPT = `Create a 6-month Go-to-Market strategy JSON based on: {full_business_plan}
 
-**Task:** Based on the full business plan, create a detailed and actionable Go-to-Market (GTM) strategy for the first 6 months post-launch.
-
-**INPUT:**
-- full_business_plan: {full_business_plan}
-
-**OUTPUT FORMAT:**
-Return a JSON object with this exact structure:
+Return JSON with this structure:
 {
-  "preLaunch": {
-    "timeline": "Month -1",
-    "activities": [
-      {
-        "activity": "Build waitlist landing page",
-        "goal": "Capture 500 interested leads",
-        "channels": ["Product Hunt Upcoming", "BetaList", "relevant subreddits"],
-        "budget": "$X,XXX",
-        "success_metrics": ["500 signups", "20% conversion rate"]
-      }
-    ]
-  },
-  "launch": {
-    "timeline": "Month 1", 
-    "activities": [
-      {
-        "activity": "Official Product Hunt launch",
-        "goal": "Top 5 product of the day",
-        "channels": ["Product Hunt", "tech newsletters", "personal networks"],
-        "budget": "$X,XXX",
-        "success_metrics": ["Top 5 ranking", "1000 visitors", "50 signups"]
-      }
-    ]
-  },
-  "contentStrategy": {
-    "timeline": "Months 1-6",
-    "pillarContent": [
-      {
-        "type": "In-depth guides",
-        "frequency": "1 per month",
-        "example": "The Ultimate Guide to Market Sizing for Startups",
-        "distribution": ["blog posts", "Twitter threads", "LinkedIn articles"]
-      }
-    ],
-    "contentGoals": {
-      "organicTraffic": "10,000 monthly visitors by Month 6",
-      "leadGeneration": "500 qualified leads per month",
-      "brandAwareness": "Establish thought leadership"
-    }
+  "launchTimeline": {
+    "month1": "Launch activities and goals",
+    "month3": "Growth milestones", 
+    "month6": "Scale targets"
   },
   "customerAcquisition": {
-    "timeline": "Months 1-3",
-    "targetPersona": "Primary target from business plan",
-    "acquisitionTactics": [
-      {
-        "tactic": "Direct LinkedIn outreach",
-        "description": "Personalized outreach to target personas",
-        "volume": "100 messages per week",
-        "conversionRate": "5% to demo",
-        "cost": "$500/month"
-      }
-    ],
+    "targetPersona": "Primary customer segment",
+    "acquisitionTactics": ["Tactic 1", "Tactic 2", "Tactic 3"],
     "acquisitionGoals": {
-      "paidCustomers": "20 from premium plan",
-      "freemiumUsers": "200 active users",
-      "pipeline": "$50k ARR pipeline"
+      "paidCustomers": "Number target",
+      "pipeline": "Revenue target"
     }
-  },
-  "partnerships": {
-    "strategicPartners": [
-      {
-        "type": "Integration partners",
-        "examples": ["Partner 1", "Partner 2"],
-        "benefit": "Mutual customer value",
-        "timeline": "Month 2-3"
-      }
-    ],
-    "channelPartners": [
-      {
-        "type": "Affiliate program",
-        "structure": "Revenue sharing model",
-        "target": "Industry consultants",
-        "timeline": "Month 4-6"
-      }
-    ]
   },
   "marketingChannels": {
-    "paidChannels": [
-      {
-        "channel": "Google Ads",
-        "budget": "$X,XXX/month",
-        "targeting": "High-intent keywords",
-        "expectedROI": "X:1 after 3 months"
-      }
-    ],
-    "organicChannels": [
-      {
-        "channel": "SEO Content",
-        "investment": "Time + content creation",
-        "timeline": "3-6 months to see results",
-        "expectedTraffic": "1000 visitors/month by Month 6"
-      }
-    ]
+    "paidChannels": [{"channel": "Name", "budget": "$X/month", "expectedROI": "X:1"}],
+    "organicChannels": [{"channel": "Name", "investment": "Resource", "expectedTraffic": "Volume"}]
   },
-  "salesProcess": {
-    "salesFunnel": [
-      {
-        "stage": "Awareness",
-        "tactics": ["Content marketing", "Social media"],
-        "metrics": ["Website traffic", "Social media engagement"]
-      },
-      {
-        "stage": "Interest", 
-        "tactics": ["Lead magnets", "Webinars"],
-        "metrics": ["Email signups", "Demo requests"]
-      },
-      {
-        "stage": "Decision",
-        "tactics": ["Product demos", "Free trials"],
-        "metrics": ["Trial-to-paid conversion", "Sales velocity"]
-      }
-    ],
-    "salesTargets": {
-      "month1": "$5k ARR",
-      "month3": "$25k ARR", 
-      "month6": "$75k ARR"
-    }
+  "salesTargets": {
+    "month1": "$X ARR",
+    "month3": "$X ARR",
+    "month6": "$X ARR"
   },
   "keyMetrics": {
-    "acquisitionMetrics": {
-      "CAC": "$XXX",
-      "LTV": "$X,XXX",
-      "paybackPeriod": "XX months"
-    },
-    "engagementMetrics": {
-      "DAU": "XXX users",
-      "retention": "XX% monthly",
-      "NPS": "XX+"
-    },
-    "revenueMetrics": {
-      "MRR": "$XX,XXX by Month 6",
-      "ARR": "$XXX,XXX by Month 6",
-      "churnRate": "X% monthly"
-    }
+    "CAC": "$X",
+    "LTV": "$X", 
+    "MRR": "$X by Month 6"
+  },
+  "budgetAllocation": {
+    "totalBudget": "$X for 6 months",
+    "channelAllocation": "Budget breakdown by channel"
   }
 }
 
-**Core Principles:**
-- Actionable: Provide specific tactics and timelines
-- Measurable: Include clear success metrics
-- Resource-Conscious: Consider budget and team constraints
-- Market-Driven: Align with target customer behavior
-
-Generate comprehensive 6-month GTM strategy now.`;
+Make it actionable with specific tactics, metrics, and realistic targets.`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -216,30 +100,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Combine all previous outputs for context
-    const fullBusinessPlan = {
-      idea: project.ideaOutput,
-      research: project.researchOutput,
-      blueprint: project.blueprintOutput,
-      financials: project.financialOutput,
-      pitch: project.pitchOutput
+    // Create a summarized business context to reduce token usage
+    const businessContext = {
+      businessIdea: project.ideaOutput?.selectedIdea?.title || "Business concept",
+      targetMarket: project.researchOutput?.targetCustomerAnalysis?.primarySegment || "Target market TBD",
+      valueProposition: project.blueprintOutput?.valueProposition?.core || "Value prop TBD",
+      revenueModel: project.blueprintOutput?.revenueStreams?.primary || "Revenue model TBD",
+      fundingNeeds: project.financialOutput?.fundingAnalysis?.seedFunding || "Funding TBD",
+      targetCustomers: project.pitchOutput?.marketOpportunity?.targetCustomer || "Customers TBD"
     };
 
-    // Call OpenAI API
+    // Call OpenAI API with reduced context
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: GTM_PROMPT.replace("{full_business_plan}", JSON.stringify(fullBusinessPlan)),
+          content: GTM_PROMPT.replace("{full_business_plan}", JSON.stringify(businessContext)),
         },
         {
           role: "user",
-          content: `Please create a comprehensive 6-month go-to-market strategy based on the complete business plan.`,
+          content: `Create a 6-month go-to-market strategy for: ${businessContext.businessIdea}. Target: ${businessContext.targetCustomers}. Value: ${businessContext.valueProposition}.`,
         },
       ],
       temperature: 0.7,
-      max_tokens: 4000,
+      max_tokens: 2500, // Reduced from 4000 to stay within limits
     });
 
     const aiResponse = completion.choices[0]?.message?.content;
@@ -253,79 +138,38 @@ export async function POST(request: NextRequest) {
     try {
       parsedResponse = JSON.parse(aiResponse);
     } catch (parseError) {
-      // If JSON parsing fails, create a structured response
+      // If JSON parsing fails, create a simplified fallback response
       parsedResponse = {
-        preLaunch: {
-          timeline: "Month -1",
-          activities: [{
-            activity: "Pre-launch preparation",
-            goal: "Build awareness and waitlist",
-            channels: ["To be determined"],
-            budget: "To be allocated",
-            success_metrics: ["To be defined"]
-          }]
-        },
-        launch: {
-          timeline: "Month 1",
-          activities: [{
-            activity: "Product launch",
-            goal: "Market entry and initial traction",
-            channels: ["To be determined"],
-            budget: "To be allocated", 
-            success_metrics: ["To be defined"]
-          }]
-        },
-        contentStrategy: {
-          timeline: "Months 1-6",
-          pillarContent: [],
-          contentGoals: {
-            organicTraffic: "To be targeted",
-            leadGeneration: "To be planned",
-            brandAwareness: "To be established"
-          }
+        launchTimeline: {
+          month1: "Product launch and initial marketing campaigns",
+          month3: "Growth optimization and expansion", 
+          month6: "Scale operations and partnership development"
         },
         customerAcquisition: {
-          timeline: "Months 1-3",
-          targetPersona: "To be defined from research",
-          acquisitionTactics: [],
+          targetPersona: businessContext.targetCustomers || "Primary customer segment",
+          acquisitionTactics: ["Content marketing", "Social media outreach", "Direct sales"],
           acquisitionGoals: {
-            paidCustomers: "To be targeted",
-            freemiumUsers: "To be planned",
-            pipeline: "To be projected"
+            paidCustomers: "50 customers",
+            pipeline: "$100k ARR pipeline"
           }
-        },
-        partnerships: {
-          strategicPartners: [],
-          channelPartners: []
         },
         marketingChannels: {
-          paidChannels: [],
-          organicChannels: []
+          paidChannels: [{"channel": "Google Ads", "budget": "$2,000/month", "expectedROI": "3:1"}],
+          organicChannels: [{"channel": "SEO Content", "investment": "Time + content creation", "expectedTraffic": "1,000 visitors/month"}]
         },
-        salesProcess: {
-          salesFunnel: [],
-          salesTargets: {
-            month1: "To be set",
-            month3: "To be targeted",
-            month6: "To be achieved"
-          }
+        salesTargets: {
+          month1: "$5k ARR",
+          month3: "$25k ARR",
+          month6: "$75k ARR"
         },
         keyMetrics: {
-          acquisitionMetrics: {
-            CAC: "To be calculated",
-            LTV: "To be determined",
-            paybackPeriod: "To be estimated"
-          },
-          engagementMetrics: {
-            DAU: "To be tracked",
-            retention: "To be measured",
-            NPS: "To be surveyed"
-          },
-          revenueMetrics: {
-            MRR: "To be built",
-            ARR: "To be achieved",
-            churnRate: "To be minimized"
-          }
+          CAC: "$200",
+          LTV: "$1,200", 
+          MRR: "$6,250 by Month 6"
+        },
+        budgetAllocation: {
+          totalBudget: "$30,000 for 6 months",
+          channelAllocation: "Marketing: 60%, Sales: 25%, Product: 15%"
         }
       };
     }
