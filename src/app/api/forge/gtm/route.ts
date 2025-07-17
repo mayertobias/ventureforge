@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const GTM_COST = 10; // Credits required for go-to-market strategy
 
 const GTM_PROMPT = `You are the 'Go-to-Market Strategist' module of VentureForge AI.

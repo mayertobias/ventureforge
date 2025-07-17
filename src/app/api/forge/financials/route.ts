@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const FINANCIALS_COST = 12; // Credits required for financial projections
 
 const FINANCIALS_PROMPT = `You are the 'Financial Forecaster' module of VentureForge AI.

@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const RESEARCH_COST = 8; // Credits required for deep research (reduced cost)
 
 const RESEARCH_PROMPT = `You are the 'Deep Dive Research' module of VentureForge AI.

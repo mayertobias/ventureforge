@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const PITCH_COST = 8; // Credits required for pitch generation
 
 const PITCH_PROMPT = `You are the 'Pitch Perfect' module of VentureForge AI.

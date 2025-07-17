@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const RESEARCH_COST = 5; // Reduced cost for Gemini (more efficient)
 
 const RESEARCH_PROMPT = `You are the 'Deep Dive Research' module of VentureForge AI.

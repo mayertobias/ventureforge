@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 
+export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
+
 const BLUEPRINT_COST = 15; // Credits required for business blueprint
 
 const BLUEPRINT_PROMPT = `You are the 'Blueprint Architect' module of VentureForge AI.
