@@ -609,22 +609,24 @@ export default function ProjectPage() {
             )}
             
             {project.researchOutput && (
-              <Button 
-                onClick={handleBlueprintGeneration}
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Blueprint...
-                  </>
-                ) : (
-                  <>
-                    📋 Generate Business Blueprint (15 Credits)
-                  </>
-                )}
-              </Button>
+              isGenerating ? (
+                <VentureForgeLoader 
+                  stage="Business Blueprint"
+                  steps={[
+                    { text: "Analyzing market research", completed: true },
+                    { text: "Designing business model", loading: true },
+                    { text: "Crafting value proposition", pending: true },
+                    { text: "Building strategic framework", pending: true }
+                  ]}
+                />
+              ) : (
+                <Button 
+                  onClick={handleBlueprintGeneration}
+                  className="w-full"
+                >
+                  📋 Generate Business Blueprint (15 Credits)
+                </Button>
+              )
             )}
 
             {project.blueprintOutput && (
@@ -840,22 +842,24 @@ export default function ProjectPage() {
             )}
             
             {project.blueprintOutput && (
-              <Button 
-                onClick={handleFinancialsGeneration}
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Projections...
-                  </>
-                ) : (
-                  <>
-                    💰 Generate Financial Projections (12 Credits)
-                  </>
-                )}
-              </Button>
+              isGenerating ? (
+                <VentureForgeLoader 
+                  stage="Financial Projections"
+                  steps={[
+                    { text: "Analyzing business model", completed: true },
+                    { text: "Calculating revenue projections", loading: true },
+                    { text: "Determining funding needs", pending: true },
+                    { text: "Building profit scenarios", pending: true }
+                  ]}
+                />
+              ) : (
+                <Button 
+                  onClick={handleFinancialsGeneration}
+                  className="w-full"
+                >
+                  💰 Generate Financial Projections (12 Credits)
+                </Button>
+              )
             )}
 
             {project.financialOutput && (
@@ -1078,22 +1082,24 @@ export default function ProjectPage() {
             )}
             
             {project.financialOutput && (
-              <Button 
-                onClick={handlePitchGeneration}
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Pitch...
-                  </>
-                ) : (
-                  <>
-                    🎯 Generate Investor Pitch (8 Credits)
-                  </>
-                )}
-              </Button>
+              isGenerating ? (
+                <VentureForgeLoader 
+                  stage="Investor Pitch"
+                  steps={[
+                    { text: "Reviewing business data", completed: true },
+                    { text: "Crafting compelling narrative", loading: true },
+                    { text: "Designing pitch structure", pending: true },
+                    { text: "Optimizing for investors", pending: true }
+                  ]}
+                />
+              ) : (
+                <Button 
+                  onClick={handlePitchGeneration}
+                  className="w-full"
+                >
+                  🎯 Generate Investor Pitch (8 Credits)
+                </Button>
+              )
             )}
 
             {project.pitchOutput && (
@@ -1362,22 +1368,24 @@ export default function ProjectPage() {
             )}
             
             {project.pitchOutput && (
-              <Button 
-                onClick={handleGTMGeneration}
-                disabled={isGenerating}
-                className="w-full"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating Strategy...
-                  </>
-                ) : (
-                  <>
-                    🚀 Generate GTM Strategy (10 Credits)
-                  </>
-                )}
-              </Button>
+              isGenerating ? (
+                <VentureForgeLoader 
+                  stage="Go-to-Market Strategy"
+                  steps={[
+                    { text: "Analyzing target customers", completed: true },
+                    { text: "Mapping launch timeline", loading: true },
+                    { text: "Designing marketing channels", pending: true },
+                    { text: "Setting success metrics", pending: true }
+                  ]}
+                />
+              ) : (
+                <Button 
+                  onClick={handleGTMGeneration}
+                  className="w-full"
+                >
+                  🚀 Generate GTM Strategy (10 Credits)
+                </Button>
+              )
             )}
 
             {project.gtmOutput && (
