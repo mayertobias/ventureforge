@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { ProjectStepper } from "@/components/project-stepper";
 import { CreditDisplay } from "@/components/credit-display";
 import { VentureForgeLoader } from "@/components/ui/venture-forge-loader";
+import { CompleteReportView } from "@/components/complete-report-view";
 import { Loader2, Coins, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -30,7 +31,9 @@ interface Project {
 export default function ProjectPage() {
   const { data: session } = useSession();
   const params = useParams();
+  const searchParams = useSearchParams();
   const projectId = params?.id as string;
+  const stepFromUrl = searchParams?.get('step');
   
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,8 +49,10 @@ export default function ProjectPage() {
         const data = await response.json();
         setProject(data.project);
         
-        // Determine current step based on what's completed
-        if (data.project.gtmOutput) setCurrentStep("gtm");
+        // Determine current step based on URL parameter or what's completed
+        if (stepFromUrl === 'complete' && data.project.gtmOutput) {
+          setCurrentStep("complete");
+        } else if (data.project.gtmOutput) setCurrentStep("gtm");
         else if (data.project.pitchOutput) setCurrentStep("gtm");
         else if (data.project.financialOutput) setCurrentStep("pitch");
         else if (data.project.blueprintOutput) setCurrentStep("financials");
@@ -60,7 +65,7 @@ export default function ProjectPage() {
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, stepFromUrl]);
 
   useEffect(() => {
     if (session) {
@@ -646,10 +651,33 @@ export default function ProjectPage() {
                     </div>
                   </Card>
                 </div>
+                
+                {/* Show complete report button when all steps are done */}
+                <div className="mt-6 pt-6 border-t">
+                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                    <CardContent className="pt-6">
+                      <div className="text-center space-y-3">
+                        <h3 className="text-lg font-semibold text-green-800">🎉 Business Plan Complete!</h3>
+                        <p className="text-sm text-green-700">All sections have been generated. View your complete business plan and export it.</p>
+                        <Button 
+                          onClick={() => setCurrentStep("complete")}
+                          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                        >
+                          View Complete Report & Export →
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Complete Report View */}
+      {currentStep === "complete" && (
+        <CompleteReportView project={project} />
       )}
     </div>
   );

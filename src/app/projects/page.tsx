@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Calendar, BarChart3, ArrowRight, Trash2 } from "lucide-react";
+import { PlusCircle, Calendar, BarChart3, ArrowRight, Trash2, Download, Eye, CheckCircle } from "lucide-react";
 import { NewProjectDialog } from "@/components/new-project-dialog";
 import Link from "next/link";
 
@@ -61,9 +61,21 @@ export default function ProjectsPage() {
 
   const getProjectStatus = (project: Project) => {
     const progress = getProjectProgress(project);
-    if (progress.completed === 0) return { label: "Not Started", color: "bg-gray-100 text-gray-600" };
-    if (progress.completed === 6) return { label: "Completed", color: "bg-green-100 text-green-600" };
-    return { label: "In Progress", color: "bg-blue-100 text-blue-600" };
+    if (progress.completed === 0) return { label: "Not Started", color: "bg-gray-100 text-gray-600", icon: null };
+    if (progress.completed === 6) return { label: "Completed", color: "bg-green-100 text-green-600", icon: CheckCircle };
+    return { label: "In Progress", color: "bg-blue-100 text-blue-600", icon: null };
+  };
+
+  const getCompletedStepNames = (project: Project) => {
+    const steps = [
+      { name: "Idea", completed: !!project.ideaOutput },
+      { name: "Research", completed: !!project.researchOutput },
+      { name: "Blueprint", completed: !!project.blueprintOutput },
+      { name: "Financials", completed: !!project.financialOutput },
+      { name: "Pitch", completed: !!project.pitchOutput },
+      { name: "GTM", completed: !!project.gtmOutput },
+    ];
+    return steps.filter(step => step.completed).map(step => step.name);
   };
 
   if (loading) {
@@ -93,6 +105,8 @@ export default function ProjectsPage() {
           {projects.map((project) => {
             const progress = getProjectProgress(project);
             const status = getProjectStatus(project);
+            const completedSteps = getCompletedStepNames(project);
+            const isCompleted = progress.completed === 6;
             
             return (
               <Card key={project.id} className="hover:shadow-lg transition-shadow">
@@ -106,6 +120,7 @@ export default function ProjectsPage() {
                       </CardDescription>
                     </div>
                     <Badge className={status.color}>
+                      {status.icon && <status.icon className="h-3 w-3 mr-1" />}
                       {status.label}
                     </Badge>
                   </div>
@@ -119,21 +134,53 @@ export default function ProjectsPage() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          isCompleted ? 'bg-green-600' : 'bg-blue-600'
+                        }`}
                         style={{ width: `${progress.percentage}%` }}
                       />
                     </div>
                   </div>
 
+                  {/* Completed Steps */}
+                  {completedSteps.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium">Completed Sections:</div>
+                      <div className="flex flex-wrap gap-1">
+                        {completedSteps.map((step) => (
+                          <Badge key={step} variant="outline" className="text-xs">
+                            {step}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="flex gap-2">
-                    <Button asChild className="flex-1">
-                      <Link href={`/projects/${project.id}`}>
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        Continue
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Link>
-                    </Button>
+                    {isCompleted ? (
+                      <>
+                        <Button asChild className="flex-1">
+                          <Link href={`/projects/${project.id}?step=complete`}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Report
+                          </Link>
+                        </Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/projects/${project.id}?step=complete`}>
+                            <Download className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button asChild className="flex-1">
+                        <Link href={`/projects/${project.id}`}>
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Continue
+                          <ArrowRight className="h-4 w-4 ml-2" />
+                        </Link>
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm">
                       <Trash2 className="h-4 w-4" />
                     </Button>

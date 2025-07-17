@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Circle, Sparkles, Search, FileText, Calculator, Presentation, Target } from "lucide-react";
+import { CheckCircle2, Circle, Sparkles, Search, FileText, Calculator, Presentation, Target, Trophy } from "lucide-react";
 
 const steps = [
   {
@@ -39,6 +39,12 @@ const steps = [
     title: "Go-to-Market",
     description: "Launch strategy & tactics",
     icon: Target,
+  },
+  {
+    id: "complete",
+    title: "Complete",
+    description: "View & export report",
+    icon: Trophy,
   },
 ];
 
