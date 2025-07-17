@@ -41,8 +41,26 @@ interface CompleteReportViewProps {
 }
 
 export function CompleteReportView({ project }: CompleteReportViewProps) {
+  console.log("CompleteReportView component rendered with project:", project);
   const [activeTab, setActiveTab] = useState("overview");
   const [isExporting, setIsExporting] = useState(false);
+
+  if (!project) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading Report...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const handleExportPDF = async () => {
     setIsExporting(true);

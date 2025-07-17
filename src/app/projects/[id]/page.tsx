@@ -1596,7 +1596,12 @@ export default function ProjectPage() {
                         <h3 className="text-lg font-semibold text-green-800">🎉 Business Plan Complete!</h3>
                         <p className="text-sm text-green-700">All sections have been generated. View your complete business plan and export it.</p>
                         <Button 
-                          onClick={() => setCurrentStep("complete")}
+                          onClick={() => {
+                            console.log("Complete report button clicked");
+                            console.log("Current step before:", currentStep);
+                            setCurrentStep("complete");
+                            console.log("Set current step to: complete");
+                          }}
                           className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                         >
                           View Complete Report & Export →
@@ -1612,8 +1617,16 @@ export default function ProjectPage() {
       )}
 
       {/* Complete Report View */}
-      {currentStep === "complete" && (
-        <CompleteReportView project={project} />
+      {currentStep === "complete" && project && (
+        <>
+          {console.log("Rendering complete report view, project:", project)}
+          <CompleteReportView project={project} />
+        </>
+      )}
+
+      {/* Debug info */}
+      {currentStep === "complete" && !project && (
+        <div>Debug: currentStep is complete but project is null</div>
       )}
     </div>
   );
