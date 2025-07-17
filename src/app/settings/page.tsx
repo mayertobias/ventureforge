@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { 
   Settings, 
   User, 
@@ -17,7 +18,8 @@ import {
   LogOut, 
   Coins,
   Crown,
-  Zap
+  Zap,
+  Palette
 } from "lucide-react";
 
 export default function SettingsPage() {
@@ -190,6 +192,30 @@ export default function SettingsPage() {
                 onChange={(e) => handleNotificationChange('marketing', e.target.checked)}
                 className="rounded border-gray-300"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Appearance */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Appearance
+            </CardTitle>
+            <CardDescription>
+              Customize the look and feel of your workspace
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <Label>Theme</Label>
+                <p className="text-sm text-muted-foreground">
+                  Choose your preferred color scheme
+                </p>
+              </div>
+              <ThemeToggle />
             </div>
           </CardContent>
         </Card>
