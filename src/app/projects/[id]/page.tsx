@@ -417,19 +417,163 @@ export default function ProjectPage() {
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Market Research Results:</h3>
                 <div className="grid gap-4">
+                  {/* Market Landscape */}
                   <Card className="p-4">
-                    <h4 className="font-medium mb-2">Market Landscape</h4>
-                    <div className="text-sm space-y-1">
-                      <p><strong>TAM:</strong> {project.researchOutput.marketLandscape?.totalAddressableMarket}</p>
-                      <p><strong>SAM:</strong> {project.researchOutput.marketLandscape?.serviceableAddressableMarket}</p>
-                      <p><strong>Growth Rate:</strong> {project.researchOutput.marketLandscape?.marketGrowthRate}</p>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      📊 Market Landscape
+                    </h4>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.researchOutput.marketLandscape?.totalAddressableMarket || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Total Addressable Market</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.researchOutput.marketLandscape?.serviceableAddressableMarket || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Serviceable Addressable Market</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.researchOutput.marketLandscape?.marketGrowthRate || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Market Growth Rate</div>
+                      </div>
                     </div>
+                    {project.researchOutput.marketLandscape?.keyTrends && (
+                      <div className="mt-3">
+                        <p className="text-sm"><strong>Key Trends:</strong> {project.researchOutput.marketLandscape.keyTrends}</p>
+                      </div>
+                    )}
                   </Card>
                   
+                  {/* Competitive Landscape */}
                   {project.researchOutput.competitiveLandscape && (
                     <Card className="p-4">
-                      <h4 className="font-medium mb-2">Competitive Analysis</h4>
-                      <p className="text-sm"><strong>Key Opportunity:</strong> {project.researchOutput.competitiveLandscape.competitiveGap}</p>
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🏆 Competitive Analysis
+                      </h4>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm"><strong>Key Opportunity:</strong></p>
+                          <p className="text-sm text-muted-foreground">{project.researchOutput.competitiveLandscape.competitiveGap}</p>
+                        </div>
+                        {project.researchOutput.competitiveLandscape.mainCompetitors && (
+                          <div>
+                            <p className="text-sm"><strong>Main Competitors:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.researchOutput.competitiveLandscape.mainCompetitors.map((competitor: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">{competitor}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {project.researchOutput.competitiveLandscape.competitiveAdvantages && (
+                          <div>
+                            <p className="text-sm"><strong>Competitive Advantages:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.researchOutput.competitiveLandscape.competitiveAdvantages.map((advantage: string, index: number) => (
+                                <li key={index}>{advantage}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Target Customer Analysis */}
+                  {project.researchOutput.targetCustomerAnalysis && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🎯 Target Customer Analysis
+                      </h4>
+                      <div className="space-y-3">
+                        {project.researchOutput.targetCustomerAnalysis.primarySegment && (
+                          <div>
+                            <p className="text-sm"><strong>Primary Segment:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.researchOutput.targetCustomerAnalysis.primarySegment}</p>
+                          </div>
+                        )}
+                        {project.researchOutput.targetCustomerAnalysis.customerPainPoints && (
+                          <div>
+                            <p className="text-sm"><strong>Pain Points:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.researchOutput.targetCustomerAnalysis.customerPainPoints.map((pain: string, index: number) => (
+                                <li key={index}>{pain}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.researchOutput.targetCustomerAnalysis.buyingBehavior && (
+                          <div>
+                            <p className="text-sm"><strong>Buying Behavior:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.researchOutput.targetCustomerAnalysis.buyingBehavior}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Technology Analysis */}
+                  {project.researchOutput.technologyAnalysis && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚡ Technology Analysis
+                      </h4>
+                      <div className="space-y-3">
+                        {project.researchOutput.technologyAnalysis.requiredTechnologies && (
+                          <div>
+                            <p className="text-sm"><strong>Required Technologies:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.researchOutput.technologyAnalysis.requiredTechnologies.map((tech: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs">{tech}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {project.researchOutput.technologyAnalysis.implementationComplexity && (
+                          <div>
+                            <p className="text-sm"><strong>Implementation Complexity:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.researchOutput.technologyAnalysis.implementationComplexity}</p>
+                          </div>
+                        )}
+                        {project.researchOutput.technologyAnalysis.developmentTimeline && (
+                          <div>
+                            <p className="text-sm"><strong>Development Timeline:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.researchOutput.technologyAnalysis.developmentTimeline}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Regulatory Considerations */}
+                  {project.researchOutput.regulatoryConsiderations && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚖️ Regulatory Considerations
+                      </h4>
+                      <div className="space-y-3">
+                        {project.researchOutput.regulatoryConsiderations.relevantRegulations && (
+                          <div>
+                            <p className="text-sm"><strong>Relevant Regulations:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.researchOutput.regulatoryConsiderations.relevantRegulations.map((reg: string, index: number) => (
+                                <li key={index}>{reg}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.researchOutput.regulatoryConsiderations.complianceRequirements && (
+                          <div>
+                            <p className="text-sm"><strong>Compliance Requirements:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.researchOutput.regulatoryConsiderations.complianceRequirements}</p>
+                          </div>
+                        )}
+                      </div>
                     </Card>
                   )}
                 </div>
@@ -486,11 +630,191 @@ export default function ProjectPage() {
             {project.blueprintOutput && (
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Business Blueprint:</h3>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Core Business Model</h4>
-                  <p className="text-sm"><strong>Model:</strong> {project.blueprintOutput.coreBusinessModel?.model}</p>
-                  <p className="text-sm mt-2">{project.blueprintOutput.coreBusinessModel?.rationale}</p>
-                </Card>
+                <div className="grid gap-4">
+                  {/* Core Business Model */}
+                  <Card className="p-4">
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      🏗️ Core Business Model
+                    </h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm"><strong>Business Model:</strong></p>
+                        <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel?.model}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm"><strong>Rationale:</strong></p>
+                        <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel?.rationale}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* Revenue Streams */}
+                  {project.blueprintOutput.revenueStreams && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        💰 Revenue Streams
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.revenueStreams.primary && (
+                          <div>
+                            <p className="text-sm"><strong>Primary Revenue Stream:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueStreams.primary}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.revenueStreams.secondary && project.blueprintOutput.revenueStreams.secondary.length > 0 && (
+                          <div>
+                            <p className="text-sm"><strong>Secondary Revenue Streams:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.revenueStreams.secondary.map((stream: string, index: number) => (
+                                <li key={index}>{stream}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.blueprintOutput.revenueStreams.pricingStrategy && (
+                          <div>
+                            <p className="text-sm"><strong>Pricing Strategy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueStreams.pricingStrategy}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Value Proposition */}
+                  {project.blueprintOutput.valueProposition && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⭐ Value Proposition
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.valueProposition.core && (
+                          <div>
+                            <p className="text-sm"><strong>Core Value Proposition:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.valueProposition.core}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.valueProposition.keyBenefits && (
+                          <div>
+                            <p className="text-sm"><strong>Key Benefits:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.valueProposition.keyBenefits.map((benefit: string, index: number) => (
+                                <li key={index}>{benefit}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.blueprintOutput.valueProposition.differentiation && (
+                          <div>
+                            <p className="text-sm"><strong>Differentiation:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.valueProposition.differentiation}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Operations Plan */}
+                  {project.blueprintOutput.operationsPlan && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚙️ Operations Plan
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.operationsPlan.keyActivities && (
+                          <div>
+                            <p className="text-sm"><strong>Key Activities:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.operationsPlan.keyActivities.map((activity: string, index: number) => (
+                                <li key={index}>{activity}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.blueprintOutput.operationsPlan.keyResources && (
+                          <div>
+                            <p className="text-sm"><strong>Key Resources:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.operationsPlan.keyResources.map((resource: string, index: number) => (
+                                <li key={index}>{resource}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.blueprintOutput.operationsPlan.keyPartners && (
+                          <div>
+                            <p className="text-sm"><strong>Key Partners:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.blueprintOutput.operationsPlan.keyPartners.map((partner: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">{partner}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Market Entry Strategy */}
+                  {project.blueprintOutput.marketEntryStrategy && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🎯 Market Entry Strategy
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.marketEntryStrategy.approach && (
+                          <div>
+                            <p className="text-sm"><strong>Entry Approach:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.approach}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.marketEntryStrategy.initialMarket && (
+                          <div>
+                            <p className="text-sm"><strong>Initial Target Market:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.initialMarket}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.marketEntryStrategy.expansionPlan && (
+                          <div>
+                            <p className="text-sm"><strong>Expansion Plan:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.expansionPlan}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Risk Analysis */}
+                  {project.blueprintOutput.riskAnalysis && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚠️ Risk Analysis
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.riskAnalysis.keyRisks && (
+                          <div>
+                            <p className="text-sm"><strong>Key Risks:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.riskAnalysis.keyRisks.map((risk: string, index: number) => (
+                                <li key={index}>{risk}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {project.blueprintOutput.riskAnalysis.mitigationStrategies && (
+                          <div>
+                            <p className="text-sm"><strong>Mitigation Strategies:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.blueprintOutput.riskAnalysis.mitigationStrategies.map((strategy: string, index: number) => (
+                                <li key={index}>{strategy}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>
@@ -538,13 +862,196 @@ export default function ProjectPage() {
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Financial Projections:</h3>
                 <div className="grid gap-4">
+                  {/* Funding Analysis */}
                   <Card className="p-4">
-                    <h4 className="font-medium mb-2">Funding Analysis</h4>
-                    <div className="text-sm space-y-1">
-                      <p><strong>Seed Funding:</strong> {project.financialOutput.fundingAnalysis?.seedFunding}</p>
-                      <p><strong>Runway:</strong> {project.financialOutput.fundingAnalysis?.runwayMonths}</p>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      💰 Funding Analysis
+                    </h4>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.financialOutput.fundingAnalysis?.seedFunding || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Seed Funding Required</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.financialOutput.fundingAnalysis?.runwayMonths || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Runway (Months)</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-lg font-bold text-primary">
+                          {project.financialOutput.fundingAnalysis?.pathToProfitability || 'N/A'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Path to Profitability</div>
+                      </div>
                     </div>
+                    {project.financialOutput.fundingAnalysis?.useOfFunds && (
+                      <div className="mt-3">
+                        <p className="text-sm"><strong>Use of Funds:</strong></p>
+                        <p className="text-sm text-muted-foreground">{project.financialOutput.fundingAnalysis.useOfFunds}</p>
+                      </div>
+                    )}
                   </Card>
+
+                  {/* Revenue Projections */}
+                  {project.financialOutput.revenueProjections && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📈 Revenue Projections
+                      </h4>
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-bold text-primary">
+                            {project.financialOutput.revenueProjections.year1 || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Year 1 Revenue</div>
+                        </div>
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-bold text-primary">
+                            {project.financialOutput.revenueProjections.year2 || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Year 2 Revenue</div>
+                        </div>
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-bold text-primary">
+                            {project.financialOutput.revenueProjections.year3 || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Year 3 Revenue</div>
+                        </div>
+                      </div>
+                      {project.financialOutput.revenueProjections.assumptions && (
+                        <div className="mt-3">
+                          <p className="text-sm"><strong>Key Assumptions:</strong></p>
+                          <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                            {project.financialOutput.revenueProjections.assumptions.map((assumption: string, index: number) => (
+                              <li key={index}>{assumption}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </Card>
+                  )}
+
+                  {/* Cost Structure */}
+                  {project.financialOutput.costStructure && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📊 Cost Structure
+                      </h4>
+                      <div className="space-y-3">
+                        {project.financialOutput.costStructure.fixedCosts && (
+                          <div>
+                            <p className="text-sm"><strong>Fixed Costs (Monthly):</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.costStructure.fixedCosts}</p>
+                          </div>
+                        )}
+                        {project.financialOutput.costStructure.variableCosts && (
+                          <div>
+                            <p className="text-sm"><strong>Variable Costs:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.costStructure.variableCosts}</p>
+                          </div>
+                        )}
+                        {project.financialOutput.costStructure.majorExpenses && (
+                          <div>
+                            <p className="text-sm"><strong>Major Expense Categories:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.financialOutput.costStructure.majorExpenses.map((expense: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">{expense}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Unit Economics */}
+                  {project.financialOutput.unitEconomics && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🎯 Unit Economics
+                      </h4>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {project.financialOutput.unitEconomics.cac && (
+                          <div className="text-center p-3 bg-muted rounded-lg">
+                            <div className="text-lg font-bold text-primary">
+                              {project.financialOutput.unitEconomics.cac}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Customer Acquisition Cost</div>
+                          </div>
+                        )}
+                        {project.financialOutput.unitEconomics.ltv && (
+                          <div className="text-center p-3 bg-muted rounded-lg">
+                            <div className="text-lg font-bold text-primary">
+                              {project.financialOutput.unitEconomics.ltv}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Customer Lifetime Value</div>
+                          </div>
+                        )}
+                        {project.financialOutput.unitEconomics.ltvCacRatio && (
+                          <div className="text-center p-3 bg-muted rounded-lg">
+                            <div className="text-lg font-bold text-primary">
+                              {project.financialOutput.unitEconomics.ltvCacRatio}
+                            </div>
+                            <div className="text-xs text-muted-foreground">LTV:CAC Ratio</div>
+                          </div>
+                        )}
+                        {project.financialOutput.unitEconomics.paybackPeriod && (
+                          <div className="text-center p-3 bg-muted rounded-lg">
+                            <div className="text-lg font-bold text-primary">
+                              {project.financialOutput.unitEconomics.paybackPeriod}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Payback Period</div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Break-even Analysis */}
+                  {project.financialOutput.breakEvenAnalysis && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚖️ Break-even Analysis
+                      </h4>
+                      <div className="space-y-3">
+                        {project.financialOutput.breakEvenAnalysis.breakEvenPoint && (
+                          <div>
+                            <p className="text-sm"><strong>Break-even Point:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.breakEvenPoint}</p>
+                          </div>
+                        )}
+                        {project.financialOutput.breakEvenAnalysis.monthsToBreakEven && (
+                          <div>
+                            <p className="text-sm"><strong>Months to Break-even:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.monthsToBreakEven}</p>
+                          </div>
+                        )}
+                        {project.financialOutput.breakEvenAnalysis.sensitivity && (
+                          <div>
+                            <p className="text-sm"><strong>Sensitivity Analysis:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.sensitivity}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Financial Assumptions */}
+                  {project.financialOutput.keyAssumptions && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📋 Key Financial Assumptions
+                      </h4>
+                      <ul className="text-sm text-muted-foreground list-disc list-inside">
+                        {project.financialOutput.keyAssumptions.map((assumption: string, index: number) => (
+                          <li key={index}>{assumption}</li>
+                        ))}
+                      </ul>
+                    </Card>
+                  )}
                 </div>
               </div>
             )}
@@ -592,10 +1099,244 @@ export default function ProjectPage() {
             {project.pitchOutput && (
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Investor Pitch:</h3>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Executive Summary</h4>
-                  <p className="text-sm">{project.pitchOutput.executiveSummary}</p>
-                </Card>
+                <div className="grid gap-4">
+                  {/* Executive Summary */}
+                  <Card className="p-4">
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      📄 Executive Summary
+                    </h4>
+                    <p className="text-sm leading-relaxed">{project.pitchOutput.executiveSummary}</p>
+                  </Card>
+
+                  {/* Pitch Deck Content */}
+                  {project.pitchOutput.pitchDeckContent && (
+                    <>
+                      {/* Problem & Solution */}
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {project.pitchOutput.pitchDeckContent.problem && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              ❗ The Problem
+                            </h4>
+                            <div className="space-y-2">
+                              <p className="text-sm">{project.pitchOutput.pitchDeckContent.problem.content}</p>
+                              {project.pitchOutput.pitchDeckContent.problem.marketSize && (
+                                <div className="text-center p-2 bg-muted rounded">
+                                  <div className="font-bold text-primary">{project.pitchOutput.pitchDeckContent.problem.marketSize}</div>
+                                  <div className="text-xs text-muted-foreground">Market Size Affected</div>
+                                </div>
+                              )}
+                            </div>
+                          </Card>
+                        )}
+
+                        {project.pitchOutput.pitchDeckContent.solution && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              💡 The Solution
+                            </h4>
+                            <div className="space-y-2">
+                              <p className="text-sm">{project.pitchOutput.pitchDeckContent.solution.content}</p>
+                              {project.pitchOutput.pitchDeckContent.solution.keyFeatures && (
+                                <div>
+                                  <p className="text-sm font-medium">Key Features:</p>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {project.pitchOutput.pitchDeckContent.solution.keyFeatures.map((feature: string, index: number) => (
+                                      <Badge key={index} variant="secondary" className="text-xs">{feature}</Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </Card>
+                        )}
+                      </div>
+
+                      {/* Market Opportunity */}
+                      {project.pitchOutput.pitchDeckContent.marketOpportunity && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            🌍 Market Opportunity
+                          </h4>
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <div className="text-center p-3 bg-muted rounded-lg">
+                              <div className="text-lg font-bold text-primary">
+                                {project.pitchOutput.pitchDeckContent.marketOpportunity.tam || 'N/A'}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Total Addressable Market</div>
+                            </div>
+                            <div className="text-center p-3 bg-muted rounded-lg">
+                              <div className="text-lg font-bold text-primary">
+                                {project.pitchOutput.pitchDeckContent.marketOpportunity.sam || 'N/A'}
+                              </div>
+                              <div className="text-xs text-muted-foreground">Serviceable Addressable Market</div>
+                            </div>
+                          </div>
+                          {project.pitchOutput.pitchDeckContent.marketOpportunity.marketTrends && (
+                            <div className="mt-3">
+                              <p className="text-sm"><strong>Market Trends:</strong></p>
+                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.marketOpportunity.marketTrends}</p>
+                            </div>
+                          )}
+                        </Card>
+                      )}
+
+                      {/* Business Model & Traction */}
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {project.pitchOutput.pitchDeckContent.businessModel && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              💼 Business Model
+                            </h4>
+                            <div className="space-y-2">
+                              <div>
+                                <p className="text-sm"><strong>Revenue Streams:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.revenueStreams}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm"><strong>Pricing Strategy:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.pricingStrategy}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm"><strong>Unit Economics:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.unitEconomics}</p>
+                              </div>
+                            </div>
+                          </Card>
+                        )}
+
+                        {project.pitchOutput.pitchDeckContent.traction && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              🚀 Traction
+                            </h4>
+                            <div className="space-y-2">
+                              {project.pitchOutput.pitchDeckContent.traction.keyMilestones && (
+                                <div>
+                                  <p className="text-sm"><strong>Key Milestones:</strong></p>
+                                  <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                                    {project.pitchOutput.pitchDeckContent.traction.keyMilestones.map((milestone: string, index: number) => (
+                                      <li key={index}>{milestone}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckContent.traction.proofPoints && (
+                                <div>
+                                  <p className="text-sm"><strong>Proof Points:</strong></p>
+                                  <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.traction.proofPoints}</p>
+                                </div>
+                              )}
+                            </div>
+                          </Card>
+                        )}
+                      </div>
+
+                      {/* The Ask */}
+                      {project.pitchOutput.pitchDeckContent.theAsk && (
+                        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            💰 The Ask
+                          </h4>
+                          <div className="grid gap-3 md:grid-cols-2">
+                            <div className="text-center p-3 bg-white rounded-lg">
+                              <div className="text-2xl font-bold text-primary">
+                                {project.pitchOutput.pitchDeckContent.theAsk.fundingAmount || 'N/A'}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Funding Amount</div>
+                            </div>
+                            <div className="text-center p-3 bg-white rounded-lg">
+                              <div className="text-2xl font-bold text-primary">
+                                {project.pitchOutput.pitchDeckContent.theAsk.timeline || 'N/A'}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Runway</div>
+                            </div>
+                          </div>
+                          <div className="mt-3 space-y-2">
+                            <div>
+                              <p className="text-sm"><strong>Use of Funds:</strong></p>
+                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.theAsk.useOfFunds}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm"><strong>Key Milestone:</strong></p>
+                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.theAsk.keyMilestone}</p>
+                            </div>
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Team & Exit Strategy */}
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {project.pitchOutput.pitchDeckContent.team && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              👥 The Team
+                            </h4>
+                            <div className="space-y-2">
+                              <div>
+                                <p className="text-sm"><strong>Team Strength:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.teamStrength}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm"><strong>Advisors:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.advisors}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm"><strong>Hiring Plan:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.hiringPlan}</p>
+                              </div>
+                            </div>
+                          </Card>
+                        )}
+
+                        {project.pitchOutput.pitchDeckContent.exitStrategy && (
+                          <Card className="p-4">
+                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                              🏁 Exit Strategy
+                            </h4>
+                            <div className="space-y-2">
+                              {project.pitchOutput.pitchDeckContent.exitStrategy.potentialAcquirers && (
+                                <div>
+                                  <p className="text-sm"><strong>Potential Acquirers:</strong></p>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {project.pitchOutput.pitchDeckContent.exitStrategy.potentialAcquirers.map((acquirer: string, index: number) => (
+                                      <Badge key={index} variant="outline" className="text-xs">{acquirer}</Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              <div>
+                                <p className="text-sm"><strong>Exit Timeline:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.exitStrategy.exitTimeline}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm"><strong>Valuation Multiple:</strong></p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.exitStrategy.valuationMultiple}</p>
+                              </div>
+                            </div>
+                          </Card>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {/* Investor FAQ */}
+                  {project.pitchOutput.investorFAQ && project.pitchOutput.investorFAQ.length > 0 && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ❓ Investor FAQ
+                      </h4>
+                      <div className="space-y-3">
+                        {project.pitchOutput.investorFAQ.map((faq: any, index: number) => (
+                          <div key={index} className="border-l-2 border-muted pl-4">
+                            <p className="text-sm font-medium mb-1">{faq.question}</p>
+                            <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  )}
+                </div>
               </div>
             )}
           </CardContent>
@@ -643,13 +1384,208 @@ export default function ProjectPage() {
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Go-to-Market Strategy:</h3>
                 <div className="grid gap-4">
+                  {/* Launch Timeline */}
                   <Card className="p-4">
-                    <h4 className="font-medium mb-2">Launch Timeline</h4>
-                    <div className="text-sm space-y-1">
-                      <p><strong>Pre-Launch:</strong> {project.gtmOutput.preLaunch?.timeline}</p>
-                      <p><strong>Launch:</strong> {project.gtmOutput.launch?.timeline}</p>
+                    <h4 className="font-medium mb-3 flex items-center gap-2">
+                      ⏰ Launch Timeline
+                    </h4>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-sm font-bold text-primary">Pre-Launch</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {project.gtmOutput.preLaunch?.timeline || 'N/A'}
+                        </div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-sm font-bold text-primary">Launch</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {project.gtmOutput.launch?.timeline || 'N/A'}
+                        </div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-sm font-bold text-primary">Post-Launch</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {project.gtmOutput.postLaunch?.timeline || 'N/A'}
+                        </div>
+                      </div>
                     </div>
                   </Card>
+
+                  {/* Customer Acquisition */}
+                  {project.gtmOutput.customerAcquisition && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📈 Customer Acquisition
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.customerAcquisition.primaryChannels && (
+                          <div>
+                            <p className="text-sm"><strong>Primary Channels:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.gtmOutput.customerAcquisition.primaryChannels.map((channel: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs">{channel}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {project.gtmOutput.customerAcquisition.cac && (
+                          <div>
+                            <p className="text-sm"><strong>Customer Acquisition Cost:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.cac}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.customerAcquisition.monthlyTargets && (
+                          <div>
+                            <p className="text-sm"><strong>Monthly Acquisition Targets:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.monthlyTargets}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Marketing Strategy */}
+                  {project.gtmOutput.marketingStrategy && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📢 Marketing Strategy
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.marketingStrategy.brandPositioning && (
+                          <div>
+                            <p className="text-sm"><strong>Brand Positioning:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.marketingStrategy.brandPositioning}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.marketingStrategy.contentStrategy && (
+                          <div>
+                            <p className="text-sm"><strong>Content Strategy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.marketingStrategy.contentStrategy}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.marketingStrategy.marketingChannels && (
+                          <div>
+                            <p className="text-sm"><strong>Marketing Channels:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.gtmOutput.marketingStrategy.marketingChannels.map((channel: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">{channel}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Sales Strategy */}
+                  {project.gtmOutput.salesStrategy && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        💼 Sales Strategy
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.salesStrategy.salesProcess && (
+                          <div>
+                            <p className="text-sm"><strong>Sales Process:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.salesProcess}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.salesStrategy.salesTeam && (
+                          <div>
+                            <p className="text-sm"><strong>Sales Team Structure:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.salesTeam}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.salesStrategy.conversionTargets && (
+                          <div>
+                            <p className="text-sm"><strong>Conversion Targets:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.salesStrategy.conversionTargets}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Metrics & KPIs */}
+                  {project.gtmOutput.metricsAndKPIs && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📊 Key Metrics & KPIs
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.metricsAndKPIs.primaryMetrics && (
+                          <div>
+                            <p className="text-sm"><strong>Primary Metrics:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.gtmOutput.metricsAndKPIs.primaryMetrics.map((metric: string, index: number) => (
+                                <Badge key={index} variant="secondary" className="text-xs">{metric}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {project.gtmOutput.metricsAndKPIs.successCriteria && (
+                          <div>
+                            <p className="text-sm"><strong>Success Criteria:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.gtmOutput.metricsAndKPIs.successCriteria.map((criteria: string, index: number) => (
+                                <li key={index}>{criteria}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Partnerships */}
+                  {project.gtmOutput.partnerships && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🤝 Strategic Partnerships
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.partnerships.keyPartners && (
+                          <div>
+                            <p className="text-sm"><strong>Key Partners:</strong></p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {project.gtmOutput.partnerships.keyPartners.map((partner: string, index: number) => (
+                                <Badge key={index} variant="outline" className="text-xs">{partner}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {project.gtmOutput.partnerships.partnershipStrategy && (
+                          <div>
+                            <p className="text-sm"><strong>Partnership Strategy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.partnerships.partnershipStrategy}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Budget Allocation */}
+                  {project.gtmOutput.budgetAllocation && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        💰 Budget Allocation
+                      </h4>
+                      <div className="space-y-3">
+                        {project.gtmOutput.budgetAllocation.totalBudget && (
+                          <div>
+                            <p className="text-sm"><strong>Total GTM Budget:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.budgetAllocation.totalBudget}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.budgetAllocation.channelAllocation && (
+                          <div>
+                            <p className="text-sm"><strong>Channel Allocation:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.budgetAllocation.channelAllocation}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
                 </div>
                 
                 {/* Show complete report button when all steps are done */}
