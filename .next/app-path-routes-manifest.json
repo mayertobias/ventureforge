@@ -8,11 +8,14 @@
   "/api/forge/idea-spark/route": "/api/forge/idea-spark",
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/api/forge/research-gemini/route": "/api/forge/research-gemini",
-  "/api/projects/[id]/route": "/api/projects/[id]",
   "/api/forge/research/route": "/api/forge/research",
+  "/api/projects/[id]/route": "/api/projects/[id]",
   "/api/projects/route": "/api/projects",
   "/api/user/credits/route": "/api/user/credits",
-  "/projects/[id]/page": "/projects/[id]",
   "/page": "/",
-  "/dashboard/page": "/dashboard"
+  "/dashboard/page": "/dashboard",
+  "/marketplace/page": "/marketplace",
+  "/projects/[id]/page": "/projects/[id]",
+  "/projects/page": "/projects",
+  "/settings/page": "/settings"
 }

@@ -50,7 +50,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex-1 space-y-8 p-8 pt-6 bg-gradient-to-br from-gray-50 to-gray-100/50 min-h-screen">
+    <div className="flex-1 space-y-8 p-8 pt-6 bg-gradient-to-br from-gray-50 to-gray-100/50">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
