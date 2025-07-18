@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { openai } from "@/lib/openai";
+import { geminiModel } from "@/lib/gemini";
+import { AIService } from "@/lib/ai-service";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -318,68 +319,40 @@ export async function POST(request: NextRequest) {
       targetCustomers: pitchOutput?.marketOpportunity?.targetCustomer || "Customers TBD"
     };
 
-    // Call OpenAI API with reduced context
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: GTM_PROMPT.replace("{full_business_plan}", JSON.stringify(businessContext)),
-        },
-        {
-          role: "user",
-          content: `Create a 6-month go-to-market strategy for: ${businessContext.businessIdea}. Target: ${businessContext.targetCustomers}. Value: ${businessContext.valueProposition}.`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 2500, // Reduced from 4000 to stay within limits
+    // Use the new AI service with retry mechanism
+    console.log(`[GTM] Starting GTM strategy generation for project ${projectId}`);
+    
+    const prompt = GTM_PROMPT.replace("{full_business_plan}", JSON.stringify(businessContext));
+    const userPrompt = `Create a 6-month go-to-market strategy for: ${businessContext.businessIdea}. Target: ${businessContext.targetCustomers}. Value: ${businessContext.valueProposition}.`;
+
+    const aiResult = await AIService.generateWithRetry({
+      prompt,
+      userPrompt,
+      retryConfig: {
+        maxRetries: 3,
+        timeoutMs: 240000, // 4 minutes
+        backoffMs: 3000    // 3 second initial backoff
+      }
     });
 
-    const aiResponse = completion.choices[0]?.message?.content;
-    
-    if (!aiResponse) {
-      throw new Error("No response from AI");
-    }
-
-    // Parse the JSON response
     let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponse);
-    } catch (parseError) {
-      // If JSON parsing fails, create a simplified fallback response
-      parsedResponse = {
-        launchTimeline: {
-          month1: "Product launch and initial marketing campaigns",
-          month3: "Growth optimization and expansion", 
-          month6: "Scale operations and partnership development"
-        },
-        customerAcquisition: {
-          targetPersona: businessContext.targetCustomers || "Primary customer segment",
-          acquisitionTactics: ["Content marketing", "Social media outreach", "Direct sales"],
-          acquisitionGoals: {
-            paidCustomers: "50 customers",
-            pipeline: "$100k ARR pipeline"
-          }
-        },
-        marketingChannels: {
-          paidChannels: [{"channel": "Google Ads", "budget": "$2,000/month", "expectedROI": "3:1"}],
-          organicChannels: [{"channel": "SEO Content", "investment": "Time + content creation", "expectedTraffic": "1,000 visitors/month"}]
-        },
-        salesTargets: {
-          month1: "$5k ARR",
-          month3: "$25k ARR",
-          month6: "$75k ARR"
-        },
-        keyMetrics: {
-          CAC: "$200",
-          LTV: "$1,200", 
-          MRR: "$6,250 by Month 6"
-        },
-        budgetAllocation: {
-          totalBudget: "$30,000 for 6 months",
-          channelAllocation: "Marketing: 60%, Sales: 25%, Product: 15%"
-        }
-      };
+    
+    if (aiResult.successful) {
+      console.log(`[GTM] AI generation successful after ${aiResult.retryCount} retries`);
+      
+      const jsonResult = AIService.parseJSONResponse(aiResult.content);
+      
+      if (jsonResult.success) {
+        parsedResponse = jsonResult.parsed;
+      } else {
+        console.warn(`[GTM] JSON parsing failed: ${jsonResult.error}`);
+        parsedResponse = AIService.createFallbackResponse('gtm', prompt);
+        parsedResponse._originalResponse = aiResult.content.substring(0, 500);
+      }
+    } else {
+      console.error(`[GTM] AI generation failed after ${aiResult.retryCount} retries`);
+      parsedResponse = AIService.createFallbackResponse('gtm', prompt);
+      parsedResponse._retryCount = aiResult.retryCount;
     }
 
     // Update project with the GTM output and deduct credits

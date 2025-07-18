@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { openai } from "@/lib/openai";
+import { geminiModel } from "@/lib/gemini";
+import { AIService } from "@/lib/ai-service";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -243,89 +244,40 @@ export async function POST(request: NextRequest) {
       blueprint: project.blueprintOutput
     };
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: FINANCIALS_PROMPT.replace("{business_plan}", JSON.stringify(businessPlan)),
-        },
-        {
-          role: "user",
-          content: `Please create comprehensive financial projections based on the business plan data.`,
-        },
-      ],
-      temperature: 0.5,
-      max_tokens: 3500,
+    // Use the new AI service with retry mechanism
+    console.log(`[FINANCIALS] Starting financial projections for project ${projectId}`);
+    
+    const prompt = FINANCIALS_PROMPT.replace("{business_plan}", JSON.stringify(businessPlan));
+    const userPrompt = `Please create comprehensive financial projections based on the business plan data.`;
+
+    const aiResult = await AIService.generateWithRetry({
+      prompt,
+      userPrompt,
+      retryConfig: {
+        maxRetries: 3,
+        timeoutMs: 240000, // 4 minutes
+        backoffMs: 3000    // 3 second initial backoff
+      }
     });
 
-    const aiResponse = completion.choices[0]?.message?.content;
-    
-    if (!aiResponse) {
-      throw new Error("No response from AI");
-    }
-
-    // Parse the JSON response
     let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponse);
-    } catch (parseError) {
-      // If JSON parsing fails, create a structured response
-      parsedResponse = {
-        keyAssumptions: [{
-          assumption: "Customer Acquisition Cost",
-          value: "To be determined",
-          justification: "Industry analysis required"
-        }],
-        fundingAnalysis: {
-          seedFunding: "$1,500,000",
-          avgMonthlyGrossBurn: "To be calculated",
-          avgMonthlyNetBurnYear1: "To be calculated",
-          runwayMonths: "To be determined",
-          runwayCalculation: "Pending burn rate analysis"
-        },
-        threeYearProjections: {
-          year1: {
-            totalRevenue: "To be projected",
-            cogs: "To be calculated",
-            grossMargin: "To be determined",
-            operatingExpenses: "To be estimated",
-            netProfitLoss: "To be calculated"
-          },
-          year2: {
-            totalRevenue: "To be projected",
-            cogs: "To be calculated", 
-            grossMargin: "To be determined",
-            operatingExpenses: "To be estimated",
-            netProfitLoss: "To be calculated"
-          },
-          year3: {
-            totalRevenue: "To be projected",
-            cogs: "To be calculated",
-            grossMargin: "To be determined", 
-            operatingExpenses: "To be estimated",
-            netProfitLoss: "To be calculated"
-          }
-        },
-        revenueBreakdown: {
-          year1: [],
-          year2: [],
-          year3: []
-        },
-        pathToProfitability: {
-          breakEvenMonth: "To be determined",
-          keyMilestones: [],
-          profitabilityStrategy: aiResponse.substring(0, 300) + "..."
-        },
-        keyMetrics: {
-          ltv: "To be calculated",
-          cac: "To be determined",
-          ltvCacRatio: "To be analyzed",
-          paybackPeriod: "To be estimated",
-          arr: "To be projected"
-        }
-      };
+    
+    if (aiResult.successful) {
+      console.log(`[FINANCIALS] AI generation successful after ${aiResult.retryCount} retries`);
+      
+      const jsonResult = AIService.parseJSONResponse(aiResult.content);
+      
+      if (jsonResult.success) {
+        parsedResponse = jsonResult.parsed;
+      } else {
+        console.warn(`[FINANCIALS] JSON parsing failed: ${jsonResult.error}`);
+        parsedResponse = AIService.createFallbackResponse('financials', prompt);
+        parsedResponse._originalResponse = aiResult.content.substring(0, 500);
+      }
+    } else {
+      console.error(`[FINANCIALS] AI generation failed after ${aiResult.retryCount} retries`);
+      parsedResponse = AIService.createFallbackResponse('financials', prompt);
+      parsedResponse._retryCount = aiResult.retryCount;
     }
 
     // Update project with the financial output and deduct credits

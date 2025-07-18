@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/api/admin/update-credits/route": "/api/admin/update-credits",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/api/projects/[id]/route": "/api/projects/[id]",
+  "/api/projects/route": "/api/projects",
+  "/api/user/credits/route": "/api/user/credits",
+  "/api/forge/idea-spark/route": "/api/forge/idea-spark",
+  "/api/forge/financials/route": "/api/forge/financials",
+  "/api/forge/blueprint/route": "/api/forge/blueprint",
+  "/api/forge/gtm/route": "/api/forge/gtm",
+  "/api/forge/research/route": "/api/forge/research",
+  "/api/forge/research-gemini/route": "/api/forge/research-gemini",
+  "/api/forge/pitch/route": "/api/forge/pitch",
+  "/page": "/",
+  "/dashboard/page": "/dashboard",
+  "/marketplace/page": "/marketplace",
+  "/projects/page": "/projects",
+  "/projects/[id]/page": "/projects/[id]",
+  "/settings/page": "/settings"
+}

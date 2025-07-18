@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { openai } from "@/lib/openai";
+import { geminiModel } from "@/lib/gemini";
+import { AIService } from "@/lib/ai-service";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -251,69 +252,74 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(project.researchOutput)),
-        },
-        {
-          role: "user",
-          content: `Please create a comprehensive business blueprint based on the research data.`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 3500,
+    // Use the new AI service with retry mechanism and phased generation for complex blueprints
+    console.log(`[BLUEPRINT] Starting blueprint generation for project ${projectId}`);
+    
+    const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(project.researchOutput));
+    const userPrompt = `Please create a comprehensive business blueprint based on the research data.`;
+
+    // For complex blueprints, use phased generation
+    const phases = [
+      {
+        prompt: prompt + "\n\nPHASE 1: Focus on executive summary, core business model, and revenue architecture only.",
+        userPrompt: userPrompt + " Return only executiveSummary, coreBusinessModel, and revenueArchitecture sections.",
+        context: { phase: 1, research: project.researchOutput }
+      },
+      {
+        prompt: prompt + "\n\nPHASE 2: Focus on customer strategy and operational blueprint.",
+        userPrompt: userPrompt + " Return only customerStrategy and operationalBlueprint sections.",
+        context: { phase: 2 }
+      },
+      {
+        prompt: prompt + "\n\nPHASE 3: Focus on go-to-market execution, competitive strategy, and risk management.",
+        userPrompt: userPrompt + " Return only goToMarketExecution, competitiveStrategy, and riskManagement sections.",
+        context: { phase: 3 }
+      }
+    ];
+
+    const phasedResult = await AIService.generateInPhases(phases, {
+      maxRetries: 3,
+      timeoutMs: 180000, // 3 minutes per phase
+      backoffMs: 2000
     });
 
-    const aiResponse = completion.choices[0]?.message?.content;
-    
-    if (!aiResponse) {
-      throw new Error("No response from AI");
-    }
-
-    // Parse the JSON response
     let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponse);
-    } catch (parseError) {
-      // If JSON parsing fails, create a structured response
-      parsedResponse = {
-        coreBusinessModel: {
-          model: "To be determined",
-          rationale: aiResponse.substring(0, 200) + "..."
-        },
-        revenueStreams: [],
-        valuePropositions: [],
-        operationalPlan: {
-          coreOperations: [],
-          technologyStack: {
-            frontend: "To be determined",
-            backend: "To be determined",
-            database: "To be determined",
-            ai_ml: "To be determined"
-          },
-          qualityControl: {
-            kpis: [],
-            qualityMetrics: "To be defined",
-            scalingPlan: "To be developed"
+
+    if (phasedResult.successful) {
+      console.log(`[BLUEPRINT] Phased generation completed successfully`);
+      
+      // Try to parse each phase and combine them
+      const combinedBlueprint: any = {};
+      
+      for (let i = 0; i < phasedResult.phases.length; i++) {
+        const phase = phasedResult.phases[i];
+        if (phase.successful) {
+          const jsonResult = AIService.parseJSONResponse(phase.content);
+          if (jsonResult.success) {
+            Object.assign(combinedBlueprint, jsonResult.parsed);
           }
-        },
-        goToMarketStrategy: {
-          primaryChannels: [],
-          customerAcquisition: "To be defined",
-          partnerships: "To be explored",
-          marketingStrategy: "To be developed"
-        },
-        competitiveAdvantage: {
-          dataMoat: "To be established",
-          networkEffects: "To be analyzed",
-          switchingCosts: "To be created",
-          uniqueAssets: "To be developed"
         }
-      };
+      }
+
+      // If we have some content, use it; otherwise fall back
+      if (Object.keys(combinedBlueprint).length > 0) {
+        parsedResponse = combinedBlueprint;
+      } else {
+        console.warn(`[BLUEPRINT] Phase parsing failed, trying full response`);
+        const jsonResult = AIService.parseJSONResponse(phasedResult.combinedContent);
+        
+        if (jsonResult.success) {
+          parsedResponse = jsonResult.parsed;
+        } else {
+          parsedResponse = AIService.createFallbackResponse('blueprint', prompt);
+          parsedResponse._originalResponse = phasedResult.combinedContent.substring(0, 500);
+        }
+      }
+    } else {
+      console.error(`[BLUEPRINT] Phased generation failed`);
+      parsedResponse = AIService.createFallbackResponse('blueprint', prompt);
+      parsedResponse._phasedGeneration = true;
+      parsedResponse._phaseResults = phasedResult.phases.map(p => ({ successful: p.successful, retryCount: p.retryCount }));
     }
 
     // Update project with the blueprint output and deduct credits

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
+import { AIService } from "@/lib/ai-service";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -134,66 +135,37 @@ Focus on providing realistic, data-backed insights about:
 
 Return the response as a properly formatted JSON object.`;
 
-    // Call Gemini API with timeout handling
-    const result = await Promise.race([
-      geminiModel.generateContent([prompt, userPrompt]),
-      new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Request timeout")), 280000) // 4 minutes 40 seconds
-      )
-    ]) as any;
-
-    const response = result.response;
-    const aiResponse = response.text();
+    // Use the new AI service with retry mechanism
+    console.log(`[RESEARCH] Starting research generation for project ${projectId}`);
     
-    if (!aiResponse) {
-      throw new Error("No response from Gemini AI");
-    }
+    const aiResult = await AIService.generateWithRetry({
+      prompt,
+      userPrompt,
+      retryConfig: {
+        maxRetries: 3,
+        timeoutMs: 280000, // 4 minutes 40 seconds
+        backoffMs: 3000    // 3 second initial backoff
+      }
+    });
 
-    // Parse the JSON response
     let parsedResponse;
-    try {
-      // Clean the response text (remove any markdown formatting)
-      const cleanResponse = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
-      parsedResponse = JSON.parse(cleanResponse);
-    } catch (parseError) {
-      console.error("JSON parsing error:", parseError);
-      console.error("Raw response:", aiResponse);
+    
+    if (aiResult.successful) {
+      console.log(`[RESEARCH] AI generation successful after ${aiResult.retryCount} retries`);
       
-      // If JSON parsing fails, create a structured response
-      parsedResponse = {
-        marketLandscape: {
-          totalAddressableMarket: "Analysis in progress",
-          serviceableAddressableMarket: "To be determined",
-          marketGrowthRate: "Research ongoing",
-          keyDrivers: ["Market analysis in progress"]
-        },
-        targetSegments: [{
-          segment: "Primary Target Segment",
-          size: "To be determined",
-          characteristics: aiResponse.substring(0, 300) + "...",
-          painPoints: ["Analysis in progress"]
-        }],
-        competitiveLandscape: {
-          directCompetitors: [],
-          indirectCompetitors: [],
-          competitiveGap: "Detailed analysis required"
-        },
-        keyTrends: [{
-          trend: "Market Research",
-          impact: "High",
-          description: "Comprehensive analysis in progress"
-        }],
-        technologyAnalysis: {
-          requiredTechnologies: ["To be determined"],
-          implementationComplexity: "Medium",
-          technologyTrends: "Analysis pending"
-        },
-        riskFactors: [{
-          risk: "Market Analysis",
-          severity: "Medium",
-          mitigation: "Detailed research required"
-        }]
-      };
+      const jsonResult = AIService.parseJSONResponse(aiResult.content);
+      
+      if (jsonResult.success) {
+        parsedResponse = jsonResult.parsed;
+      } else {
+        console.warn(`[RESEARCH] JSON parsing failed: ${jsonResult.error}`);
+        parsedResponse = AIService.createFallbackResponse('research', prompt);
+        parsedResponse._originalResponse = aiResult.content.substring(0, 500);
+      }
+    } else {
+      console.error(`[RESEARCH] AI generation failed after ${aiResult.retryCount} retries`);
+      parsedResponse = AIService.createFallbackResponse('research', prompt);
+      parsedResponse._retryCount = aiResult.retryCount;
     }
 
     // Update project with the research output and deduct credits

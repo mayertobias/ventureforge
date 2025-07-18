@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     // Get request body to determine target user (optional - defaults to self)
     const body = await request.json().catch(() => ({}));
-    const targetEmail = body.targetEmail || session.user.email;
+    const targetEmail = body.targetEmail || body.email || session.user.email;
     const newCredits = body.credits || 100;
 
     // Get current user data

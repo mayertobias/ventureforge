@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { openai } from "@/lib/openai";
+import { geminiModel } from "@/lib/gemini";
+import { AIService } from "@/lib/ai-service";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -247,100 +248,40 @@ export async function POST(request: NextRequest) {
       financials: project.financialOutput
     };
 
-    // Call OpenAI API
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: PITCH_PROMPT.replace("{full_business_plan}", JSON.stringify(fullBusinessPlan)),
-        },
-        {
-          role: "user",
-          content: `Please create a compelling investor pitch based on the complete business plan.`,
-        },
-      ],
-      temperature: 0.6,
-      max_tokens: 4000,
+    // Use the new AI service with retry mechanism
+    console.log(`[PITCH] Starting pitch generation for project ${projectId}`);
+    
+    const prompt = PITCH_PROMPT.replace("{full_business_plan}", JSON.stringify(fullBusinessPlan));
+    const userPrompt = `Please create a compelling investor pitch based on the complete business plan.`;
+
+    const aiResult = await AIService.generateWithRetry({
+      prompt,
+      userPrompt,
+      retryConfig: {
+        maxRetries: 3,
+        timeoutMs: 240000, // 4 minutes
+        backoffMs: 3000    // 3 second initial backoff
+      }
     });
 
-    const aiResponse = completion.choices[0]?.message?.content;
-    
-    if (!aiResponse) {
-      throw new Error("No response from AI");
-    }
-
-    // Parse the JSON response
     let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(aiResponse);
-    } catch (parseError) {
-      // If JSON parsing fails, create a structured response
-      parsedResponse = {
-        executiveSummary: aiResponse.substring(0, 500) + "...",
-        pitchDeckContent: {
-          problem: {
-            title: "The Problem",
-            content: "Problem analysis in progress",
-            marketSize: "To be determined"
-          },
-          solution: {
-            title: "The Solution",
-            content: "Solution description pending",
-            keyFeatures: []
-          },
-          marketOpportunity: {
-            title: "Market Opportunity",
-            tam: "To be calculated",
-            sam: "To be determined",
-            marketTrends: "Analysis pending"
-          },
-          uniqueValue: {
-            title: "Unique Value & Data Moat",
-            dataMoat: "To be defined",
-            defensibility: "To be established",
-            networkEffects: "To be analyzed"
-          },
-          businessModel: {
-            title: "Business Model",
-            revenueStreams: "To be detailed",
-            pricingStrategy: "To be finalized",
-            unitEconomics: "To be calculated"
-          },
-          traction: {
-            title: "Traction",
-            keyMilestones: [],
-            proofPoints: "To be gathered",
-            earlyCustomers: "To be identified"
-          },
-          financialHighlights: {
-            title: "Financial Highlights",
-            revenueProjection: "To be projected",
-            grossMargin: "To be calculated",
-            profitability: "To be determined"
-          },
-          theAsk: {
-            title: "The Ask",
-            fundingAmount: "$1.5M",
-            useOfFunds: "To be detailed",
-            keyMilestone: "To be defined",
-            timeline: "18-month runway"
-          },
-          team: {
-            title: "The Team",
-            teamStrength: "To be described",
-            advisors: "To be recruited",
-            hiringPlan: "To be planned"
-          },
-          exitStrategy: {
-            title: "Exit Strategy",
-            potentialAcquirers: [],
-            exitTimeline: "5-7 years",
-            valuationMultiple: "To be estimated"
-          }
-        },
-        investorFAQ: []
-      };
+    
+    if (aiResult.successful) {
+      console.log(`[PITCH] AI generation successful after ${aiResult.retryCount} retries`);
+      
+      const jsonResult = AIService.parseJSONResponse(aiResult.content);
+      
+      if (jsonResult.success) {
+        parsedResponse = jsonResult.parsed;
+      } else {
+        console.warn(`[PITCH] JSON parsing failed: ${jsonResult.error}`);
+        parsedResponse = AIService.createFallbackResponse('pitch', prompt);
+        parsedResponse._originalResponse = aiResult.content.substring(0, 500);
+      }
+    } else {
+      console.error(`[PITCH] AI generation failed after ${aiResult.retryCount} retries`);
+      parsedResponse = AIService.createFallbackResponse('pitch', prompt);
+      parsedResponse._retryCount = aiResult.retryCount;
     }
 
     // Update project with the pitch output and deduct credits
