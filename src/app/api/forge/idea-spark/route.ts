@@ -149,6 +149,10 @@ export async function POST(request: NextRequest) {
       }),
     ]);
 
+    // Debug logging
+    console.log("AI Response:", aiResponse);
+    console.log("Parsed Response:", JSON.stringify(parsedResponse, null, 2));
+
     return NextResponse.json({
       success: true,
       result: parsedResponse,

@@ -1,16 +1,16 @@
 {
   "version": 1,
   "functions": {
-    "/api/forge/idea-spark": {
-      "maxDuration": 300
-    },
-    "/api/forge/financials": {
-      "maxDuration": 300
-    },
     "/api/forge/blueprint": {
       "maxDuration": 300
     },
+    "/api/forge/idea-spark": {
+      "maxDuration": 300
+    },
     "/api/forge/gtm": {
+      "maxDuration": 300
+    },
+    "/api/forge/financials": {
       "maxDuration": 300
     },
     "/api/forge/research": {
@@ -19,11 +19,11 @@
     "/api/forge/research-gemini": {
       "maxDuration": 300
     },
-    "/api/forge/pitch": {
-      "maxDuration": 300
-    },
     "/api/reports/generate": {
       "maxDuration": 120
+    },
+    "/api/forge/pitch": {
+      "maxDuration": 300
     }
   }
 }
