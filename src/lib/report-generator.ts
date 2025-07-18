@@ -375,7 +375,7 @@ export class ReportGenerator {
                         <li><strong>Customer CAC:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.customerAcquisitionCost || 'Calculating...'}</li>
                         <li><strong>Buying Behavior:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.buyingBehavior || 'Analyzing...'}</li>
                     </ul>
-                    ${projectData.researchOutput.targetCustomerAnalysis?.customerPainPoints ? `
+                    ${projectData.researchOutput.targetCustomerAnalysis?.customerPainPoints && Array.isArray(projectData.researchOutput.targetCustomerAnalysis.customerPainPoints) ? `
                     <h4>Key Pain Points:</h4>
                     <ul>
                         ${projectData.researchOutput.targetCustomerAnalysis.customerPainPoints.map((pain: string) => 
@@ -701,6 +701,206 @@ export class ReportGenerator {
         </div>
         ` : ''}
 
+        ${projectData.pitchOutput ? `
+        <div class="section">
+            <h2 class="section-title">Investor Pitch Deck</h2>
+            
+            ${projectData.pitchOutput.executiveSummary ? `
+            <div class="content-card">
+                <h3>Executive Summary</h3>
+                <p>${projectData.pitchOutput.executiveSummary}</p>
+            </div>
+            ` : ''}
+            
+            ${projectData.pitchOutput.pitchDeckSlides ? `
+            <div class="content-grid">
+                ${projectData.pitchOutput.pitchDeckSlides.problemSlide ? `
+                <div class="content-card">
+                    <h3>Problem Statement</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.problemSlide.headline || 'Problem Analysis'}</h4>
+                    <p>${projectData.pitchOutput.pitchDeckSlides.problemSlide.problemStatement || 'Problem identification in progress'}</p>
+                    ${projectData.pitchOutput.pitchDeckSlides.problemSlide.marketSize ? `
+                    <ul>
+                        <li><strong>Market Size:</strong> ${projectData.pitchOutput.pitchDeckSlides.problemSlide.marketSize}</li>
+                        <li><strong>Pain Points:</strong> ${projectData.pitchOutput.pitchDeckSlides.problemSlide.painPoints || 'Analyzing customer pain points'}</li>
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.pitchOutput.pitchDeckSlides.solutionSlide ? `
+                <div class="content-card">
+                    <h3>Solution Overview</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.solutionSlide.headline || 'Solution Strategy'}</h4>
+                    <p>${projectData.pitchOutput.pitchDeckSlides.solutionSlide.solutionDescription || 'Solution development in progress'}</p>
+                    ${projectData.pitchOutput.pitchDeckSlides.solutionSlide.keyFeatures && Array.isArray(projectData.pitchOutput.pitchDeckSlides.solutionSlide.keyFeatures) ? `
+                    <h4>Key Features:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.solutionSlide.keyFeatures.map((feature: string) => 
+                            `<li>${feature}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="content-grid">
+                ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide ? `
+                <div class="content-card">
+                    <h3>Market Opportunity</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.headline || 'Market Analysis'}</h4>
+                    <ul>
+                        <li><strong>TAM:</strong> ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.tam || 'Calculating...'}</li>
+                        <li><strong>SAM:</strong> ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.sam || 'Calculating...'}</li>
+                        <li><strong>SOM:</strong> ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.som || 'Calculating...'}</li>
+                        <li><strong>Growth Rate:</strong> ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.growthRate || 'Analyzing...'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.keyTrends && Array.isArray(projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.keyTrends) ? `
+                    <h4>Key Market Trends:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.marketOpportunitySlide.keyTrends.map((trend: string) => 
+                            `<li>${trend}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide ? `
+                <div class="content-card">
+                    <h3>Business Model</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.headline || 'Revenue Model'}</h4>
+                    <ul>
+                        <li><strong>Revenue Model:</strong> ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.revenueModel || 'Model development in progress'}</li>
+                        <li><strong>Pricing Strategy:</strong> ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.pricingStrategy || 'Pricing analysis ongoing'}</li>
+                        <li><strong>Customer LTV:</strong> ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.customerLTV || 'Calculating...'}</li>
+                        <li><strong>Customer CAC:</strong> ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.customerCAC || 'Calculating...'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.revenueStreams && Array.isArray(projectData.pitchOutput.pitchDeckSlides.businessModelSlide.revenueStreams) ? `
+                    <h4>Revenue Streams:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.businessModelSlide.revenueStreams.map((stream: string) => 
+                            `<li>${stream}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="content-grid">
+                ${projectData.pitchOutput.pitchDeckSlides.tractionSlide ? `
+                <div class="content-card">
+                    <h3>Traction & Validation</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.tractionSlide.headline || 'Market Validation'}</h4>
+                    <ul>
+                        <li><strong>Current Metrics:</strong> ${projectData.pitchOutput.pitchDeckSlides.tractionSlide.currentMetrics || 'Metrics being tracked'}</li>
+                        <li><strong>Customer Validation:</strong> ${projectData.pitchOutput.pitchDeckSlides.tractionSlide.customerValidation || 'Validation in progress'}</li>
+                        <li><strong>Key Partnerships:</strong> ${projectData.pitchOutput.pitchDeckSlides.tractionSlide.partnerships || 'Partnership development ongoing'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.tractionSlide.milestones && Array.isArray(projectData.pitchOutput.pitchDeckSlides.tractionSlide.milestones) ? `
+                    <h4>Key Milestones:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.tractionSlide.milestones.map((milestone: string) => 
+                            `<li>${milestone}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.pitchOutput.pitchDeckSlides.competitionSlide ? `
+                <div class="content-card">
+                    <h3>Competitive Analysis</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.competitionSlide.headline || 'Competitive Landscape'}</h4>
+                    <ul>
+                        <li><strong>Competitive Advantage:</strong> ${projectData.pitchOutput.pitchDeckSlides.competitionSlide.competitiveAdvantage || 'Advantage analysis in progress'}</li>
+                        <li><strong>Market Position:</strong> ${projectData.pitchOutput.pitchDeckSlides.competitionSlide.marketPosition || 'Positioning strategy development'}</li>
+                        <li><strong>Barriers to Entry:</strong> ${projectData.pitchOutput.pitchDeckSlides.competitionSlide.barriersToEntry || 'Analyzing competitive barriers'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.competitionSlide.competitors && Array.isArray(projectData.pitchOutput.pitchDeckSlides.competitionSlide.competitors) ? `
+                    <h4>Key Competitors:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.competitionSlide.competitors.map((competitor: string) => 
+                            `<li>${competitor}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            <div class="content-grid">
+                ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide ? `
+                <div class="content-card">
+                    <h3>Financial Projections</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.headline || 'Revenue Projections'}</h4>
+                    <ul>
+                        <li><strong>Year 1 Revenue:</strong> ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.year1Revenue || 'Projecting...'}</li>
+                        <li><strong>Year 2 Revenue:</strong> ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.year2Revenue || 'Projecting...'}</li>
+                        <li><strong>Year 3 Revenue:</strong> ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.year3Revenue || 'Projecting...'}</li>
+                        <li><strong>Break-even:</strong> ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.breakEven || 'Calculating...'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.keyMetrics && Array.isArray(projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.keyMetrics) ? `
+                    <h4>Key Financial Metrics:</h4>
+                    <ul>
+                        ${projectData.pitchOutput.pitchDeckSlides.financialProjectionsSlide.keyMetrics.map((metric: string) => 
+                            `<li>${metric}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.pitchOutput.pitchDeckSlides.fundingSlide ? `
+                <div class="content-card">
+                    <h3>Funding Request</h3>
+                    <h4>${projectData.pitchOutput.pitchDeckSlides.fundingSlide.headline || 'Investment Opportunity'}</h4>
+                    <ul>
+                        <li><strong>Funding Amount:</strong> ${projectData.pitchOutput.pitchDeckSlides.fundingSlide.fundingAmount || 'Amount being determined'}</li>
+                        <li><strong>Funding Round:</strong> ${projectData.pitchOutput.pitchDeckSlides.fundingSlide.fundingRound || 'Round type being determined'}</li>
+                        <li><strong>Runway:</strong> ${projectData.pitchOutput.pitchDeckSlides.fundingSlide.runway || 'Runway calculation in progress'}</li>
+                    </ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.fundingSlide.useOfFunds ? `
+                    <h4>Use of Funds:</h4>
+                    <ul>
+                        ${Object.entries(projectData.pitchOutput.pitchDeckSlides.fundingSlide.useOfFunds).map(([category, amount]: [string, any]) => 
+                            `<li><strong>${category.charAt(0).toUpperCase() + category.slice(1)}:</strong> ${amount}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            ${projectData.pitchOutput.pitchDeckSlides.teamSlide ? `
+            <div class="content-card">
+                <h3>Team & Execution</h3>
+                <h4>${projectData.pitchOutput.pitchDeckSlides.teamSlide.headline || 'Leadership Team'}</h4>
+                <p>${projectData.pitchOutput.pitchDeckSlides.teamSlide.teamOverview || 'Team composition analysis in progress'}</p>
+                ${projectData.pitchOutput.pitchDeckSlides.teamSlide.keyTeamMembers && Array.isArray(projectData.pitchOutput.pitchDeckSlides.teamSlide.keyTeamMembers) ? `
+                <h4>Key Team Members:</h4>
+                <ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.teamSlide.keyTeamMembers.map((member: string) => 
+                        `<li>${member}</li>`
+                    ).join('')}
+                </ul>
+                ` : ''}
+                ${projectData.pitchOutput.pitchDeckSlides.teamSlide.advisors && Array.isArray(projectData.pitchOutput.pitchDeckSlides.teamSlide.advisors) ? `
+                <h4>Advisors:</h4>
+                <ul>
+                    ${projectData.pitchOutput.pitchDeckSlides.teamSlide.advisors.map((advisor: string) => 
+                        `<li>${advisor}</li>`
+                    ).join('')}
+                </ul>
+                ` : ''}
+            </div>
+            ` : ''}
+            ` : ''}
+        </div>
+        ` : ''}
+
         ${options.includeCharts ? `
         <div class="chart-container">
             <h3 class="chart-title">Financial Projections (3-Year)</h3>
@@ -713,6 +913,7 @@ export class ReportGenerator {
         ${projectData.gtmOutput ? `
         <div class="section">
             <h2 class="section-title">Go-to-Market Strategy</h2>
+            
             <div class="content-grid">
                 <div class="content-card">
                     <h3>Strategic Overview</h3>
@@ -720,17 +921,221 @@ export class ReportGenerator {
                         <li><strong>GTM Thesis:</strong> ${projectData.gtmOutput.strategicOverview?.gtmThesis || 'Strategy development in progress'}</li>
                         <li><strong>Market Entry:</strong> ${projectData.gtmOutput.strategicOverview?.marketEntryStrategy || 'Market entry planning ongoing'}</li>
                         <li><strong>Primary Objective:</strong> ${projectData.gtmOutput.strategicOverview?.primaryObjective || 'Objectives being defined'}</li>
+                        <li><strong>Success Metrics:</strong> ${projectData.gtmOutput.strategicOverview?.successMetrics || 'Metrics being defined'}</li>
+                        <li><strong>Competitive Positioning:</strong> ${projectData.gtmOutput.strategicOverview?.competitivePositioning || 'Positioning strategy development'}</li>
                     </ul>
                 </div>
+                
                 <div class="content-card">
-                    <h3>6-Month Targets</h3>
+                    <h3>Budget & Investment</h3>
                     <ul>
-                        <li><strong>Month 1 Revenue:</strong> ${projectData.gtmOutput.salesTargets?.month1 || 'TBD'}</li>
-                        <li><strong>Month 3 Revenue:</strong> ${projectData.gtmOutput.salesTargets?.month3 || 'TBD'}</li>
-                        <li><strong>Month 6 Revenue:</strong> ${projectData.gtmOutput.salesTargets?.month6 || 'TBD'}</li>
+                        <li><strong>Total GTM Budget:</strong> ${projectData.gtmOutput.budgetAndInvestment?.totalGtmBudget || 'Budget planning in progress'}</li>
+                        <li><strong>Month 1 Allocation:</strong> ${projectData.gtmOutput.budgetAndInvestment?.monthlyAllocation?.month1 || 'TBD'}</li>
+                        <li><strong>Months 2-3 Allocation:</strong> ${projectData.gtmOutput.budgetAndInvestment?.monthlyAllocation?.["months2-3"] || 'TBD'}</li>
+                        <li><strong>Months 4-6 Allocation:</strong> ${projectData.gtmOutput.budgetAndInvestment?.monthlyAllocation?.["months4-6"] || 'TBD'}</li>
                     </ul>
+                    ${projectData.gtmOutput.budgetAndInvestment?.roiProjections ? `
+                    <h4>ROI Projections:</h4>
+                    <ul>
+                        <li><strong>Month 6 Revenue:</strong> ${projectData.gtmOutput.budgetAndInvestment.roiProjections.month6Revenue || 'TBD'}</li>
+                        <li><strong>Month 6 Customers:</strong> ${projectData.gtmOutput.budgetAndInvestment.roiProjections.month6Customers || 'TBD'}</li>
+                        <li><strong>Blended CAC:</strong> ${projectData.gtmOutput.budgetAndInvestment.roiProjections.blendedCAC || 'TBD'}</li>
+                        <li><strong>LTV:CAC Ratio:</strong> ${projectData.gtmOutput.budgetAndInvestment.roiProjections.ltvCacRatio || 'TBD'}</li>
+                        <li><strong>Payback Period:</strong> ${projectData.gtmOutput.budgetAndInvestment.roiProjections.paybackPeriod || 'TBD'}</li>
+                    </ul>
+                    ` : ''}
                 </div>
             </div>
+            
+            ${projectData.gtmOutput.customerAcquisitionFramework ? `
+            <div class="content-card">
+                <h3>Customer Acquisition Framework</h3>
+                ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile ? `
+                <h4>Ideal Customer Profile:</h4>
+                <ul>
+                    <li><strong>Primary Segment:</strong> ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.primarySegment || 'Segment analysis in progress'}</li>
+                    <li><strong>Customer Jobs:</strong> ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.customerJobs || 'Jobs-to-be-done analysis ongoing'}</li>
+                    <li><strong>Budget:</strong> ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.budget || 'Budget analysis in progress'}</li>
+                    <li><strong>Buying Process:</strong> ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.buyingProcess || 'Process mapping ongoing'}</li>
+                    <li><strong>Decision Criteria:</strong> ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.decisionCriteria || 'Criteria analysis in progress'}</li>
+                </ul>
+                ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.painPoints ? `
+                <h4>Key Pain Points:</h4>
+                <ul>
+                    ${projectData.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.painPoints.map((pain: string) => 
+                        `<li>${pain}</li>`
+                    ).join('')}
+                </ul>
+                ` : ''}
+                ` : ''}
+            </div>
+            ` : ''}
+            
+            ${projectData.gtmOutput.customerAcquisitionFramework?.acquisitionChannels ? `
+            <div class="content-grid">
+                <h3>Customer Acquisition Channels</h3>
+                ${projectData.gtmOutput.customerAcquisitionFramework.acquisitionChannels.map((channel: any, index: number) => `
+                <div class="content-card">
+                    <h4>${channel.channelName || `Channel ${index + 1}`}</h4>
+                    <ul>
+                        <li><strong>Channel Type:</strong> ${channel.channelType || 'TBD'}</li>
+                        <li><strong>Monthly Investment:</strong> ${channel.monthlyInvestment || 'TBD'}</li>
+                        <li><strong>Customer CAC:</strong> ${channel.cac || 'TBD'}</li>
+                        <li><strong>Implementation:</strong> ${channel.implementation || 'Strategy development in progress'}</li>
+                        <li><strong>Conversion Path:</strong> ${channel.conversionPath || 'Path mapping in progress'}</li>
+                        <li><strong>Optimization Plan:</strong> ${channel.optimizationPlan || 'Optimization strategy development'}</li>
+                    </ul>
+                    ${channel.expectedResults ? `
+                    <h5>Expected Results:</h5>
+                    <ul>
+                        <li><strong>Month 1:</strong> ${channel.expectedResults.month1 || 'TBD'}</li>
+                        <li><strong>Month 3:</strong> ${channel.expectedResults.month3 || 'TBD'}</li>
+                        <li><strong>Month 6:</strong> ${channel.expectedResults.month6 || 'TBD'}</li>
+                    </ul>
+                    ` : ''}
+                </div>
+                `).join('')}
+            </div>
+            ` : ''}
+            
+            ${projectData.gtmOutput.monthlyExecutionPlan ? `
+            <div class="content-grid">
+                <h3>Monthly Execution Plan</h3>
+                
+                ${projectData.gtmOutput.monthlyExecutionPlan.month1 ? `
+                <div class="content-card">
+                    <h4>Month 1: ${projectData.gtmOutput.monthlyExecutionPlan.month1.primaryFocus || 'Initial Launch'}</h4>
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month1.keyActivities ? `
+                    <h5>Key Activities:</h5>
+                    <ul>
+                        ${projectData.gtmOutput.monthlyExecutionPlan.month1.keyActivities.map((activity: string) => 
+                            `<li>${activity}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month1.targetMetrics ? `
+                    <h5>Target Metrics:</h5>
+                    <ul>
+                        <li><strong>New Customers:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.newCustomers || 'TBD'}</li>
+                        <li><strong>MRR:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.mrr || 'TBD'}</li>
+                        <li><strong>Pipeline:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.pipeline || 'TBD'}</li>
+                        <li><strong>Channel Mix:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.channelMix || 'TBD'}</li>
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.gtmOutput.monthlyExecutionPlan.month3 ? `
+                <div class="content-card">
+                    <h4>Month 3: ${projectData.gtmOutput.monthlyExecutionPlan.month3.primaryFocus || 'Growth & Optimization'}</h4>
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month3.keyActivities ? `
+                    <h5>Key Activities:</h5>
+                    <ul>
+                        ${projectData.gtmOutput.monthlyExecutionPlan.month3.keyActivities.map((activity: string) => 
+                            `<li>${activity}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month3.targetMetrics ? `
+                    <h5>Target Metrics:</h5>
+                    <ul>
+                        <li><strong>New Customers:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.newCustomers || 'TBD'}</li>
+                        <li><strong>MRR:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.mrr || 'TBD'}</li>
+                        <li><strong>Pipeline:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.pipeline || 'TBD'}</li>
+                        <li><strong>Customer Success:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.customerSuccess || 'TBD'}</li>
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.gtmOutput.monthlyExecutionPlan.month6 ? `
+                <div class="content-card">
+                    <h4>Month 6: ${projectData.gtmOutput.monthlyExecutionPlan.month6.primaryFocus || 'Scale & Sustainable Growth'}</h4>
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month6.keyActivities ? `
+                    <h5>Key Activities:</h5>
+                    <ul>
+                        ${projectData.gtmOutput.monthlyExecutionPlan.month6.keyActivities.map((activity: string) => 
+                            `<li>${activity}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                    ${projectData.gtmOutput.monthlyExecutionPlan.month6.targetMetrics ? `
+                    <h5>Target Metrics:</h5>
+                    <ul>
+                        <li><strong>New Customers:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.newCustomers || 'TBD'}</li>
+                        <li><strong>MRR:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.mrr || 'TBD'}</li>
+                        <li><strong>Pipeline:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.pipeline || 'TBD'}</li>
+                        <li><strong>Efficiency:</strong> ${projectData.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.efficiency || 'TBD'}</li>
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
+            
+            ${projectData.gtmOutput.salesPlaybook ? `
+            <div class="content-card">
+                <h3>Sales Playbook & Targets</h3>
+                ${projectData.gtmOutput.salesPlaybook.salesProcess ? `
+                <h4>Sales Process:</h4>
+                <ul>
+                    <li><strong>Prospect Qualification:</strong> ${projectData.gtmOutput.salesPlaybook.salesProcess.prospectQualification || 'Qualification framework development'}</li>
+                    <li><strong>Demo Strategy:</strong> ${projectData.gtmOutput.salesPlaybook.salesProcess.demoStrategy || 'Demo strategy development'}</li>
+                    <li><strong>Proposal Format:</strong> ${projectData.gtmOutput.salesPlaybook.salesProcess.proposalFormat || 'Proposal template development'}</li>
+                    <li><strong>Closing Techniques:</strong> ${projectData.gtmOutput.salesPlaybook.salesProcess.closingTechniques || 'Closing methodology development'}</li>
+                </ul>
+                ${projectData.gtmOutput.salesPlaybook.salesProcess.discoveryQuestions ? `
+                <h5>Discovery Questions:</h5>
+                <ul>
+                    ${projectData.gtmOutput.salesPlaybook.salesProcess.discoveryQuestions.map((question: string) => 
+                        `<li>${question}</li>`
+                    ).join('')}
+                </ul>
+                ` : ''}
+                ` : ''}
+                
+                ${projectData.gtmOutput.salesPlaybook.salesTargets ? `
+                <h4>Sales Targets:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 10px;">
+                    ${projectData.gtmOutput.salesPlaybook.salesTargets.month1 ? `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5>Month 1 Targets:</h5>
+                        <ul>
+                            <li><strong>Pipeline:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month1.pipeline || 'TBD'}</li>
+                            <li><strong>Closed Won:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month1.closedWon || 'TBD'}</li>
+                            <li><strong>Avg Deal Size:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month1.averageDealSize || 'TBD'}</li>
+                            <li><strong>Sales Cycle:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month1.salesCycle || 'TBD'}</li>
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
+                    ${projectData.gtmOutput.salesPlaybook.salesTargets.month3 ? `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5>Month 3 Targets:</h5>
+                        <ul>
+                            <li><strong>Pipeline:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month3.pipeline || 'TBD'}</li>
+                            <li><strong>Closed Won:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month3.closedWon || 'TBD'}</li>
+                            <li><strong>Avg Deal Size:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month3.averageDealSize || 'TBD'}</li>
+                            <li><strong>Sales Cycle:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month3.salesCycle || 'TBD'}</li>
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
+                    ${projectData.gtmOutput.salesPlaybook.salesTargets.month6 ? `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                        <h5>Month 6 Targets:</h5>
+                        <ul>
+                            <li><strong>Pipeline:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month6.pipeline || 'TBD'}</li>
+                            <li><strong>Closed Won:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month6.closedWon || 'TBD'}</li>
+                            <li><strong>Avg Deal Size:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month6.averageDealSize || 'TBD'}</li>
+                            <li><strong>Sales Cycle:</strong> ${projectData.gtmOutput.salesPlaybook.salesTargets.month6.salesCycle || 'TBD'}</li>
+                        </ul>
+                    </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
         </div>
         ` : ''}
     </div>
