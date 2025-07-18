@@ -7,15 +7,16 @@
   "/api/user/credits/route": "/api/user/credits",
   "/api/forge/idea-spark/route": "/api/forge/idea-spark",
   "/api/forge/financials/route": "/api/forge/financials",
-  "/api/forge/blueprint/route": "/api/forge/blueprint",
   "/api/forge/gtm/route": "/api/forge/gtm",
-  "/api/forge/research/route": "/api/forge/research",
+  "/api/forge/blueprint/route": "/api/forge/blueprint",
   "/api/forge/research-gemini/route": "/api/forge/research-gemini",
+  "/api/forge/research/route": "/api/forge/research",
+  "/api/reports/generate/route": "/api/reports/generate",
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/page": "/",
   "/dashboard/page": "/dashboard",
   "/marketplace/page": "/marketplace",
   "/projects/page": "/projects",
-  "/projects/[id]/page": "/projects/[id]",
-  "/settings/page": "/settings"
+  "/settings/page": "/settings",
+  "/projects/[id]/page": "/projects/[id]"
 }
