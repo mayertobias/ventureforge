@@ -248,6 +248,13 @@ const GTM_PROMPT = `You are the 'Go-to-Market Strategist' module of VentureForge
 - Provide clear decision frameworks and optimization strategies
 - Address common GTM challenges and failure modes proactively
 
+**CRITICAL CONSTRAINT - NO PLACEHOLDERS ALLOWED:**
+- You MUST calculate and provide specific, numerical revenue targets for Month 1, 3, and 6 based on the provided financial projections
+- Do NOT use "TBD", "X", "Y", "Z", or other placeholders in any section
+- Replace ALL template variables (e.g., "$X,XXX", "X customers") with concrete numbers
+- All metrics must be mathematically consistent with the financial projections provided
+- If specific data is not available, make reasonable assumptions based on industry standards and clearly state the assumption
+
 Generate a comprehensive, execution-ready GTM strategy now. Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
@@ -303,7 +310,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create a summarized business context to reduce token usage
+    // Create comprehensive business context with financial projections for GTM strategy
     const ideaOutput = project.ideaOutput as any;
     const researchOutput = project.researchOutput as any;
     const blueprintOutput = project.blueprintOutput as any;
@@ -312,18 +319,44 @@ export async function POST(request: NextRequest) {
     
     const businessContext = {
       businessIdea: ideaOutput?.selectedIdea?.title || "Business concept",
-      targetMarket: researchOutput?.targetCustomerAnalysis?.primarySegment || "Target market TBD",
-      valueProposition: blueprintOutput?.valueProposition?.core || "Value prop TBD",
-      revenueModel: blueprintOutput?.revenueStreams?.primary || "Revenue model TBD",
-      fundingNeeds: financialOutput?.fundingAnalysis?.seedFunding || "Funding TBD",
-      targetCustomers: pitchOutput?.marketOpportunity?.targetCustomer || "Customers TBD"
+      targetMarket: researchOutput?.targetCustomerAnalysis?.primarySegment || "Target market analysis",
+      valueProposition: blueprintOutput?.executiveSummary?.businessConcept || blueprintOutput?.valueProposition?.core || "Value proposition analysis",
+      revenueModel: blueprintOutput?.coreBusinessModel?.primaryModel || "Revenue model analysis",
+      fundingNeeds: financialOutput?.fundingAnalysis?.seedFunding || "$1,500,000",
+      targetCustomers: pitchOutput?.marketOpportunity?.targetCustomer || researchOutput?.targetCustomerAnalysis?.primarySegment || "Target customer analysis",
+      
+      // CRITICAL: Include comprehensive financial projections for concrete targets
+      financialProjections: {
+        year1Revenue: financialOutput?.threeYearProjections?.year1?.totalRevenue || "$500,000",
+        year2Revenue: financialOutput?.threeYearProjections?.year2?.totalRevenue || "$1,200,000",
+        year3Revenue: financialOutput?.threeYearProjections?.year3?.totalRevenue || "$2,800,000",
+        monthlyBurnRate: financialOutput?.fundingAnalysis?.monthlyBurnRate?.year1Average || "$75,000",
+        customerCAC: financialOutput?.keyMetrics?.cac || "$500",
+        customerLTV: financialOutput?.keyMetrics?.ltv || "$2,400",
+        averageARPU: financialOutput?.revenueModel?.revenueStreams?.[0]?.pricingStrategy || "$200/month"
+      },
+      
+      // Include key assumptions for realistic targets
+      keyAssumptions: {
+        customerGrowthRate: "25% monthly growth target",
+        marketPenetration: "0.1% of TAM by Year 3",
+        avgDealSize: financialOutput?.keyMetrics?.paybackPeriod || "12 months",
+        conversionRate: "2.5% website to demo, 15% demo to close"
+      }
     };
 
     // Use the new AI service with retry mechanism
     console.log(`[GTM] Starting GTM strategy generation for project ${projectId}`);
     
     const prompt = GTM_PROMPT.replace("{full_business_plan}", JSON.stringify(businessContext));
-    const userPrompt = `Create a 6-month go-to-market strategy for: ${businessContext.businessIdea}. Target: ${businessContext.targetCustomers}. Value: ${businessContext.valueProposition}.`;
+    const userPrompt = `Create a 6-month go-to-market strategy for: ${businessContext.businessIdea}. 
+    
+    CRITICAL: Based on the financial projections (Year 1 Revenue: ${businessContext.financialProjections.year1Revenue}, CAC: ${businessContext.financialProjections.customerCAC}, LTV: ${businessContext.financialProjections.customerLTV}), calculate specific monthly revenue targets that build toward the Year 1 goal.
+    
+    Target Customer: ${businessContext.targetCustomers}
+    Value Proposition: ${businessContext.valueProposition}
+    
+    You must provide concrete numbers for all metrics - NO placeholders or TBD values allowed.`;
 
     const aiResult = await AIService.generateWithRetry({
       prompt,
