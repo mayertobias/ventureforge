@@ -41,6 +41,7 @@ export default function ProjectPage() {
   const [userInput, setUserInput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedIdea, setSelectedIdea] = useState<any>(null);
+  const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
 
   const fetchProject = useCallback(async () => {
     try {
@@ -193,9 +194,6 @@ export default function ProjectPage() {
   const getCurrentStepIndex = () => stepOrder.indexOf(currentStep);
   const canGoPrevious = () => {
     const currentIndex = getCurrentStepIndex();
-    if (currentIndex <= 0) return false;
-    const completed = getCompletedSteps();
-    // Can go to previous step if it's completed or if we're currently on a step after it
     return currentIndex > 0;
   };
   const canGoNext = () => {
@@ -203,14 +201,15 @@ export default function ProjectPage() {
     if (currentIndex >= stepOrder.length - 1) return false;
     const completed = getCompletedSteps();
     const nextStep = stepOrder[currentIndex + 1];
-    // Can go to next step if current step is completed or if we're on complete
-    return completed.includes(currentStep) || currentStep === "complete";
+    // Can go to next step if current step is completed
+    return completed.includes(currentStep) || nextStep === "complete";
   };
   
   const goToPreviousStep = () => {
     const currentIndex = getCurrentStepIndex();
     if (currentIndex > 0) {
       setCurrentStep(stepOrder[currentIndex - 1]);
+      setHasAutoNavigated(true); // Prevent auto-navigation interference
     }
   };
   
@@ -219,10 +218,11 @@ export default function ProjectPage() {
     if (currentIndex < stepOrder.length - 1) {
       const nextStep = stepOrder[currentIndex + 1];
       setCurrentStep(nextStep);
+      setHasAutoNavigated(true); // Prevent auto-navigation interference
     }
   };
 
-  // Auto-advance based on completed steps
+  // Auto-advance based on completed steps - only run once when project loads
   const getNextStep = useCallback(() => {
     const completed = getCompletedSteps();
     if (!completed.includes("idea")) return "idea";
@@ -239,18 +239,20 @@ export default function ProjectPage() {
     if (!completed.includes("financials")) return "financials";
     if (!completed.includes("pitch")) return "pitch";
     if (!completed.includes("gtm")) return "gtm";
-    return "gtm"; // All completed
+    if (completed.includes("gtm")) return "complete";
+    return "gtm";
   }, [project, getCompletedSteps, selectedIdea]);
 
-  // Auto-navigate to next incomplete step when project loads, but only if URL doesn't specify a step
+  // Auto-navigate to next incomplete step when project loads - only once
   useEffect(() => {
-    if (project && !isGenerating && !stepFromUrl) {
+    if (project && !isGenerating && !stepFromUrl && !hasAutoNavigated) {
       const nextStep = getNextStep();
       if (nextStep !== currentStep) {
         setCurrentStep(nextStep);
       }
+      setHasAutoNavigated(true);
     }
-  }, [project, isGenerating, currentStep, getNextStep, stepFromUrl]);
+  }, [project, isGenerating, stepFromUrl, hasAutoNavigated, getNextStep, currentStep]);
 
   if (loading) {
     return (
@@ -305,8 +307,9 @@ export default function ProjectPage() {
         onStepClick={(step) => {
           // Allow navigation to any completed step or current step
           const completed = getCompletedSteps();
-          if (completed.includes(step) || step === currentStep) {
+          if (completed.includes(step) || step === currentStep || step === "complete") {
             setCurrentStep(step);
+            setHasAutoNavigated(true); // Prevent auto-navigation interference
           }
         }}
       />
@@ -1673,10 +1676,8 @@ export default function ProjectPage() {
                         <p className="text-sm text-green-700">All sections have been generated. View your complete business plan and export it.</p>
                         <Button 
                           onClick={() => {
-                            console.log("Complete report button clicked");
-                            console.log("Current step before:", currentStep);
                             setCurrentStep("complete");
-                            console.log("Set current step to: complete");
+                            setHasAutoNavigated(true); // Prevent auto-navigation from interfering
                           }}
                           className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                         >
