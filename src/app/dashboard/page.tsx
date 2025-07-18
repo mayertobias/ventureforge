@@ -260,7 +260,7 @@ export default function Dashboard() {
                   <p className="text-xs text-gray-500">From idea to business plan</p>
                 </div>
                 <div className="new-project-button">
-                  <NewProjectDialog />
+                  <NewProjectDialog hasExistingProjects={userStats?.projects && userStats.projects.length > 0} />
                 </div>
               </div>
             </div>

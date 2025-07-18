@@ -15,7 +15,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function NewProjectDialog() {
+interface NewProjectDialogProps {
+  hasExistingProjects?: boolean;
+}
+
+export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [projectName, setProjectName] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -54,10 +58,26 @@ export function NewProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="w-full justify-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200" size="lg">
-          <Sparkles className="mr-2 h-5 w-5" />
-          Start Your First Project
-          <ArrowRight className="ml-2 h-4 w-4" />
+        <Button 
+          className={`${
+            hasExistingProjects 
+              ? "justify-center" 
+              : "w-full justify-center"
+          } bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200`} 
+          size={hasExistingProjects ? "default" : "lg"}
+        >
+          {hasExistingProjects ? (
+            <>
+              <Plus className="mr-2 h-4 w-4" />
+              New Project
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-5 w-5" />
+              Start Your First Project
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[500px]">

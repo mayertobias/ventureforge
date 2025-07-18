@@ -96,7 +96,7 @@ export default function ProjectsPage() {
             Manage your business planning projects and track progress
           </p>
         </div>
-        <NewProjectDialog />
+        <NewProjectDialog hasExistingProjects={projects.length > 0} />
       </div>
 
       {/* Projects Grid */}
@@ -203,7 +203,7 @@ export default function ProjectsPage() {
                 Create your first project to start building your business plan with AI assistance.
               </p>
             </div>
-            <NewProjectDialog />
+            <NewProjectDialog hasExistingProjects={false} />
           </div>
         </div>
       )}
