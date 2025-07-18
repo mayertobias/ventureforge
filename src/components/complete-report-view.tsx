@@ -283,6 +283,7 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
 
         <TabsContent value="research">
           <div className="space-y-4">
+            {/* Market Landscape */}
             <Card>
               <CardHeader>
                 <CardTitle>Market Landscape</CardTitle>
@@ -308,30 +309,291 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
                     <div className="text-sm text-muted-foreground">Market Growth Rate</div>
                   </div>
                 </div>
+                
+                {/* Key Trends */}
+                {project.researchOutput?.marketLandscape?.keyTrends && (
+                  <div className="mt-4">
+                    <h4 className="font-medium mb-2">Key Market Trends</h4>
+                    <p className="text-sm text-muted-foreground">{project.researchOutput.marketLandscape.keyTrends}</p>
+                  </div>
+                )}
+                
+                {/* Market Maturity and Seasonality */}
+                <div className="grid gap-4 md:grid-cols-2 mt-4">
+                  {project.researchOutput?.marketLandscape?.marketMaturity && (
+                    <div>
+                      <h4 className="font-medium mb-2">Market Maturity</h4>
+                      <p className="text-sm text-muted-foreground">{project.researchOutput.marketLandscape.marketMaturity}</p>
+                    </div>
+                  )}
+                  {project.researchOutput?.marketLandscape?.seasonality && (
+                    <div>
+                      <h4 className="font-medium mb-2">Seasonality</h4>
+                      <p className="text-sm text-muted-foreground">{project.researchOutput.marketLandscape.seasonality}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Target Customer Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Target Customer Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Primary Customer Segment</h4>
+                    <p className="text-sm">{project.researchOutput?.targetCustomerAnalysis?.primarySegment || 'Customer segment not available'}</p>
+                  </div>
+                  
+                  {project.researchOutput?.targetCustomerAnalysis?.customerPainPoints && (
+                    <div>
+                      <h4 className="font-medium mb-2">Key Pain Points</h4>
+                      <div className="space-y-2">
+                        {project.researchOutput.targetCustomerAnalysis.customerPainPoints.map((painPoint: string, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-red-50 rounded-lg border-l-4 border-red-200">
+                            {painPoint}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {project.researchOutput?.targetCustomerAnalysis?.buyingBehavior && (
+                      <div>
+                        <h4 className="font-medium mb-2">Buying Behavior</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.targetCustomerAnalysis.buyingBehavior}</p>
+                      </div>
+                    )}
+                    {project.researchOutput?.targetCustomerAnalysis?.segmentSize && (
+                      <div>
+                        <h4 className="font-medium mb-2">Segment Size</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.targetCustomerAnalysis.segmentSize}</p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {project.researchOutput?.targetCustomerAnalysis?.customerAcquisitionCost && (
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-lg font-bold text-blue-800">
+                          {project.researchOutput.targetCustomerAnalysis.customerAcquisitionCost}
+                        </div>
+                        <div className="text-xs text-blue-600">Industry CAC Benchmark</div>
+                      </div>
+                    )}
+                    {project.researchOutput?.targetCustomerAnalysis?.lifetimeValue && (
+                      <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <div className="text-lg font-bold text-green-800">
+                          {project.researchOutput.targetCustomerAnalysis.lifetimeValue}
+                        </div>
+                        <div className="text-xs text-green-600">Expected LTV</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
             
+            {/* Competitive Landscape */}
             <Card>
               <CardHeader>
-                <CardTitle>Competitive Analysis</CardTitle>
+                <CardTitle>Competitive Landscape</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm"><strong>Key Opportunity:</strong> {project.researchOutput?.competitiveLandscape?.competitiveGap || 'Analysis not available'}</p>
-                {project.researchOutput?.competitiveLandscape?.directCompetitors && (
-                  <div className="mt-3">
-                    <p className="text-sm font-medium">Direct Competitors:</p>
-                    <div className="space-y-2 mt-2">
-                      {project.researchOutput.competitiveLandscape.directCompetitors.map((competitor: any, index: number) => (
-                        <div key={index} className="text-xs p-2 bg-muted rounded">
-                          <p className="font-medium">{competitor.name}</p>
-                          <p className="text-muted-foreground">{competitor.strength}</p>
-                        </div>
-                      ))}
-                    </div>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Market Opportunity</h4>
+                    <p className="text-sm">{project.researchOutput?.competitiveLandscape?.competitiveGap || 'Analysis not available'}</p>
                   </div>
-                )}
+                  
+                  {project.researchOutput?.competitiveLandscape?.mainCompetitors && (
+                    <div>
+                      <h4 className="font-medium mb-2">Main Competitors</h4>
+                      <div className="grid gap-2 md:grid-cols-2">
+                        {project.researchOutput.competitiveLandscape.mainCompetitors.map((competitor: string, index: number) => (
+                          <div key={index} className="text-sm p-2 bg-muted rounded">
+                            {competitor}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {project.researchOutput?.competitiveLandscape?.directCompetitors && (
+                    <div>
+                      <h4 className="font-medium mb-2">Direct Competitors</h4>
+                      <div className="space-y-2">
+                        {project.researchOutput.competitiveLandscape.directCompetitors.map((competitor: any, index: number) => (
+                          <div key={index} className="text-xs p-2 bg-muted rounded">
+                            <p className="font-medium">{competitor.name}</p>
+                            <p className="text-muted-foreground">{competitor.strength}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {project.researchOutput?.competitiveLandscape?.competitiveAdvantages && (
+                    <div>
+                      <h4 className="font-medium mb-2">Competitive Advantages</h4>
+                      <div className="space-y-2">
+                        {project.researchOutput.competitiveLandscape.competitiveAdvantages.map((advantage: string, index: number) => (
+                          <div key={index} className="text-sm p-3 bg-green-50 rounded-lg border-l-4 border-green-200">
+                            {advantage}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {project.researchOutput?.competitiveLandscape?.threatLevel && (
+                      <div>
+                        <h4 className="font-medium mb-2">Threat Level</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.competitiveLandscape.threatLevel}</p>
+                      </div>
+                    )}
+                    {project.researchOutput?.competitiveLandscape?.marketPosition && (
+                      <div>
+                        <h4 className="font-medium mb-2">Recommended Positioning</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.competitiveLandscape.marketPosition}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </CardContent>
             </Card>
+
+            {/* Technology Analysis */}
+            {project.researchOutput?.technologyAnalysis && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Technology Analysis</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.researchOutput.technologyAnalysis.requiredTechnologies && (
+                      <div>
+                        <h4 className="font-medium mb-2">Required Technologies</h4>
+                        <div className="grid gap-2 md:grid-cols-2">
+                          {project.researchOutput.technologyAnalysis.requiredTechnologies.map((tech: string, index: number) => (
+                            <div key={index} className="text-sm p-2 bg-blue-50 rounded">
+                              {tech}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {project.researchOutput.technologyAnalysis.implementationComplexity && (
+                        <div>
+                          <h4 className="font-medium mb-2">Implementation Complexity</h4>
+                          <p className="text-sm text-muted-foreground">{project.researchOutput.technologyAnalysis.implementationComplexity}</p>
+                        </div>
+                      )}
+                      {project.researchOutput.technologyAnalysis.developmentTimeline && (
+                        <div>
+                          <h4 className="font-medium mb-2">Development Timeline</h4>
+                          <p className="text-sm text-muted-foreground">{project.researchOutput.technologyAnalysis.developmentTimeline}</p>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {project.researchOutput.technologyAnalysis.technicalRisks && (
+                      <div>
+                        <h4 className="font-medium mb-2">Technical Risks</h4>
+                        <p className="text-sm text-orange-600">{project.researchOutput.technologyAnalysis.technicalRisks}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Financial Benchmarks */}
+            {project.researchOutput?.financialBenchmarks && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Industry Financial Benchmarks</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.researchOutput.financialBenchmarks.industryMetrics && (
+                      <div>
+                        <h4 className="font-medium mb-2">Industry Metrics</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.financialBenchmarks.industryMetrics}</p>
+                      </div>
+                    )}
+                    
+                    {project.researchOutput.financialBenchmarks.revenueModels && (
+                      <div>
+                        <h4 className="font-medium mb-2">Revenue Models</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.financialBenchmarks.revenueModels}</p>
+                      </div>
+                    )}
+                    
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {project.researchOutput.financialBenchmarks.pricingStrategies && (
+                        <div>
+                          <h4 className="font-medium mb-2">Pricing Strategies</h4>
+                          <p className="text-sm text-muted-foreground">{project.researchOutput.financialBenchmarks.pricingStrategies}</p>
+                        </div>
+                      )}
+                      {project.researchOutput.financialBenchmarks.unitEconomics && (
+                        <div>
+                          <h4 className="font-medium mb-2">Unit Economics Benchmarks</h4>
+                          <p className="text-sm text-muted-foreground">{project.researchOutput.financialBenchmarks.unitEconomics}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Regulatory Considerations */}
+            {project.researchOutput?.regulatoryConsiderations && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Regulatory Considerations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {project.researchOutput.regulatoryConsiderations.relevantRegulations && (
+                      <div>
+                        <h4 className="font-medium mb-2">Relevant Regulations</h4>
+                        <div className="space-y-2">
+                          {project.researchOutput.regulatoryConsiderations.relevantRegulations.map((regulation: string, index: number) => (
+                            <div key={index} className="text-sm p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-200">
+                              {regulation}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {project.researchOutput.regulatoryConsiderations.complianceRequirements && (
+                      <div>
+                        <h4 className="font-medium mb-2">Compliance Requirements</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.regulatoryConsiderations.complianceRequirements}</p>
+                      </div>
+                    )}
+                    
+                    {project.researchOutput.regulatoryConsiderations.regulatoryTrends && (
+                      <div>
+                        <h4 className="font-medium mb-2">Regulatory Trends</h4>
+                        <p className="text-sm text-muted-foreground">{project.researchOutput.regulatoryConsiderations.regulatoryTrends}</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
