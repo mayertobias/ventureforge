@@ -7,19 +7,19 @@
     "/api/forge/financials": {
       "maxDuration": 300
     },
+    "/api/forge/blueprint": {
+      "maxDuration": 300
+    },
     "/api/forge/gtm": {
       "maxDuration": 300
     },
-    "/api/forge/blueprint": {
+    "/api/forge/research-gemini": {
       "maxDuration": 300
     },
     "/api/forge/research": {
       "maxDuration": 300
     },
     "/api/forge/pitch": {
-      "maxDuration": 300
-    },
-    "/api/forge/research-gemini": {
       "maxDuration": 300
     },
     "/api/reports/generate": {

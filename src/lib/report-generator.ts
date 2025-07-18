@@ -359,8 +359,11 @@ export class ReportGenerator {
                     <h3>Market Landscape</h3>
                     <ul>
                         <li><strong>Total Addressable Market:</strong> ${projectData.researchOutput.marketLandscape?.totalAddressableMarket || 'Analyzing...'}</li>
+                        <li><strong>Serviceable Addressable Market:</strong> ${projectData.researchOutput.marketLandscape?.serviceableAddressableMarket || 'Analyzing...'}</li>
                         <li><strong>Market Growth Rate:</strong> ${projectData.researchOutput.marketLandscape?.marketGrowthRate || 'Analyzing...'}</li>
                         <li><strong>Key Trends:</strong> ${projectData.researchOutput.marketLandscape?.keyTrends || 'Market analysis in progress'}</li>
+                        <li><strong>Market Maturity:</strong> ${projectData.researchOutput.marketLandscape?.marketMaturity || 'Analyzing...'}</li>
+                        ${projectData.researchOutput.marketLandscape?.seasonality ? `<li><strong>Seasonality:</strong> ${projectData.researchOutput.marketLandscape.seasonality}</li>` : ''}
                     </ul>
                 </div>
                 <div class="content-card">
@@ -369,15 +372,118 @@ export class ReportGenerator {
                         <li><strong>Primary Segment:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.primarySegment || 'Customer analysis in progress'}</li>
                         <li><strong>Segment Size:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.segmentSize || 'Analyzing...'}</li>
                         <li><strong>Customer LTV:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.lifetimeValue || 'Calculating...'}</li>
+                        <li><strong>Customer CAC:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.customerAcquisitionCost || 'Calculating...'}</li>
+                        <li><strong>Buying Behavior:</strong> ${projectData.researchOutput.targetCustomerAnalysis?.buyingBehavior || 'Analyzing...'}</li>
                     </ul>
+                    ${projectData.researchOutput.targetCustomerAnalysis?.customerPainPoints ? `
+                    <h4>Key Pain Points:</h4>
+                    <ul>
+                        ${projectData.researchOutput.targetCustomerAnalysis.customerPainPoints.map((pain: string) => 
+                            `<li>• ${pain}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
                 </div>
             </div>
+            
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Competitive Landscape</h3>
+                    <ul>
+                        <li><strong>Market Opportunity:</strong> ${projectData.researchOutput.competitiveLandscape?.competitiveGap || 'Analysis not available'}</li>
+                        <li><strong>Threat Level:</strong> ${projectData.researchOutput.competitiveLandscape?.threatLevel || 'Analyzing...'}</li>
+                        <li><strong>Recommended Positioning:</strong> ${projectData.researchOutput.competitiveLandscape?.marketPosition || 'Analyzing...'}</li>
+                    </ul>
+                    ${projectData.researchOutput.competitiveLandscape?.mainCompetitors ? `
+                    <h4>Main Competitors:</h4>
+                    <ul>
+                        ${projectData.researchOutput.competitiveLandscape.mainCompetitors.map((competitor: string) => 
+                            `<li>• ${competitor}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                    ${projectData.researchOutput.competitiveLandscape?.competitiveAdvantages ? `
+                    <h4>Competitive Advantages:</h4>
+                    <ul>
+                        ${projectData.researchOutput.competitiveLandscape.competitiveAdvantages.map((advantage: string) => 
+                            `<li>• ${advantage}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                
+                ${projectData.researchOutput.technologyAnalysis ? `
+                <div class="content-card">
+                    <h3>Technology Analysis</h3>
+                    <ul>
+                        <li><strong>Implementation Complexity:</strong> ${projectData.researchOutput.technologyAnalysis.implementationComplexity || 'Analyzing...'}</li>
+                        <li><strong>Development Timeline:</strong> ${projectData.researchOutput.technologyAnalysis.developmentTimeline || 'Analyzing...'}</li>
+                        <li><strong>Technical Risks:</strong> ${projectData.researchOutput.technologyAnalysis.technicalRisks || 'Analyzing...'}</li>
+                    </ul>
+                    ${projectData.researchOutput.technologyAnalysis.requiredTechnologies ? `
+                    <h4>Required Technologies:</h4>
+                    <ul>
+                        ${projectData.researchOutput.technologyAnalysis.requiredTechnologies.map((tech: string) => 
+                            `<li>• ${tech}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            
+            ${projectData.researchOutput.financialBenchmarks ? `
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Industry Financial Benchmarks</h3>
+                    <ul>
+                        <li><strong>Industry Metrics:</strong> ${projectData.researchOutput.financialBenchmarks.industryMetrics || 'Analyzing...'}</li>
+                        <li><strong>Revenue Models:</strong> ${projectData.researchOutput.financialBenchmarks.revenueModels || 'Analyzing...'}</li>
+                        <li><strong>Pricing Strategies:</strong> ${projectData.researchOutput.financialBenchmarks.pricingStrategies || 'Analyzing...'}</li>
+                        <li><strong>Unit Economics:</strong> ${projectData.researchOutput.financialBenchmarks.unitEconomics || 'Analyzing...'}</li>
+                    </ul>
+                </div>
+                
+                ${projectData.researchOutput.regulatoryConsiderations ? `
+                <div class="content-card">
+                    <h3>Regulatory Considerations</h3>
+                    <ul>
+                        <li><strong>Compliance Requirements:</strong> ${projectData.researchOutput.regulatoryConsiderations.complianceRequirements || 'Analyzing...'}</li>
+                        <li><strong>Regulatory Trends:</strong> ${projectData.researchOutput.regulatoryConsiderations.regulatoryTrends || 'Analyzing...'}</li>
+                    </ul>
+                    ${projectData.researchOutput.regulatoryConsiderations.relevantRegulations ? `
+                    <h4>Relevant Regulations:</h4>
+                    <ul>
+                        ${projectData.researchOutput.regulatoryConsiderations.relevantRegulations.map((regulation: string) => 
+                            `<li>• ${regulation}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+            </div>
+            ` : ''}
         </div>
         ` : ''}
 
         ${projectData.blueprintOutput ? `
         <div class="section">
             <h2 class="section-title">Business Strategy & Model</h2>
+            
+            ${projectData.blueprintOutput.executiveSummary ? `
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Executive Summary</h3>
+                    <ul>
+                        <li><strong>Business Concept:</strong> ${projectData.blueprintOutput.executiveSummary.businessConcept || 'Business concept development in progress'}</li>
+                        <li><strong>Market Opportunity:</strong> ${projectData.blueprintOutput.executiveSummary.marketOpportunity || 'Market analysis ongoing'}</li>
+                        <li><strong>Unique Advantage:</strong> ${projectData.blueprintOutput.executiveSummary.uniqueAdvantage || 'Competitive advantage analysis in progress'}</li>
+                        <li><strong>Revenue Projection:</strong> ${projectData.blueprintOutput.executiveSummary.revenueProjection || 'Financial projections in development'}</li>
+                    </ul>
+                </div>
+            </div>
+            ` : ''}
+            
             <div class="content-grid">
                 <div class="content-card">
                     <h3>Core Business Model</h3>
@@ -385,7 +491,74 @@ export class ReportGenerator {
                         <li><strong>Primary Model:</strong> ${projectData.blueprintOutput.coreBusinessModel?.primaryModel || 'Strategy development in progress'}</li>
                         <li><strong>Revenue Logic:</strong> ${projectData.blueprintOutput.coreBusinessModel?.revenueLogic || 'Business model analysis ongoing'}</li>
                     </ul>
+                    ${projectData.blueprintOutput.coreBusinessModel?.businessModelCanvas ? `
+                    <h4>Business Model Canvas:</h4>
+                    <ul>
+                        ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners ? `
+                        <li><strong>Key Partners:</strong> ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners.join(', ')}</li>
+                        ` : ''}
+                        ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities ? `
+                        <li><strong>Key Activities:</strong> ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities.join(', ')}</li>
+                        ` : ''}
+                        ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources ? `
+                        <li><strong>Key Resources:</strong> ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources.join(', ')}</li>
+                        ` : ''}
+                        ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure ? `
+                        <li><strong>Cost Structure:</strong> ${projectData.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure.join(', ')}</li>
+                        ` : ''}
+                    </ul>
+                    ` : ''}
                 </div>
+                
+                <div class="content-card">
+                    <h3>Revenue Architecture</h3>
+                    ${projectData.blueprintOutput.revenueArchitecture ? `
+                    <ul>
+                        <li><strong>Pricing Philosophy:</strong> ${projectData.blueprintOutput.revenueArchitecture.pricingPhilosophy || 'Pricing strategy development in progress'}</li>
+                        <li><strong>Monetization Timeline:</strong> ${projectData.blueprintOutput.revenueArchitecture.monetizationTimeline || 'Timeline development in progress'}</li>
+                    </ul>
+                    ${projectData.blueprintOutput.revenueArchitecture.primaryStreams ? `
+                    <h4>Primary Revenue Streams:</h4>
+                    <ul>
+                        ${projectData.blueprintOutput.revenueArchitecture.primaryStreams.map((stream: any) => 
+                            `<li><strong>${stream.streamName}:</strong> ${stream.model} - ${stream.pricingStrategy} (${stream.year3Projection})</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                    ${projectData.blueprintOutput.revenueArchitecture.unitEconomics ? `
+                    <h4>Unit Economics:</h4>
+                    <ul>
+                        <li><strong>ARPU:</strong> ${projectData.blueprintOutput.revenueArchitecture.unitEconomics.averageRevenuePerUser || 'Calculating...'}</li>
+                        <li><strong>Customer LTV:</strong> ${projectData.blueprintOutput.revenueArchitecture.unitEconomics.customerLifetimeValue || 'Calculating...'}</li>
+                        <li><strong>Gross Margin:</strong> ${projectData.blueprintOutput.revenueArchitecture.unitEconomics.grossMarginPerCustomer || 'Calculating...'}</li>
+                    </ul>
+                    ` : ''}
+                    ` : ''}
+                </div>
+            </div>
+            
+            ${projectData.blueprintOutput.customerStrategy ? `
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Customer Strategy</h3>
+                    ${projectData.blueprintOutput.customerStrategy.primarySegments ? `
+                    <h4>Primary Customer Segments:</h4>
+                    ${projectData.blueprintOutput.customerStrategy.primarySegments.map((segment: any) => `
+                        <div style="margin-bottom: 15px;">
+                            <strong>${segment.segmentName}:</strong> ${segment.size}<br>
+                            <strong>Characteristics:</strong> ${segment.characteristics}<br>
+                            <strong>Value Proposition:</strong> ${segment.valueProposition}<br>
+                            <strong>Willingness to Pay:</strong> ${segment.willingnessToPay}<br>
+                            <strong>Acquisition Strategy:</strong> ${segment.acquisitionStrategy}
+                            ${segment.painPoints ? `<br><strong>Pain Points:</strong> ${segment.painPoints.join(', ')}` : ''}
+                        </div>
+                    `).join('')}
+                    ` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div class="content-grid">
                 <div class="content-card">
                     <h3>Competitive Advantages</h3>
                     <ul>
@@ -395,6 +568,136 @@ export class ReportGenerator {
                     </ul>
                 </div>
             </div>
+        </div>
+        ` : ''}
+
+        ${projectData.financialOutput ? `
+        <div class="section">
+            <h2 class="section-title">Financial Projections & Analysis</h2>
+            
+            ${projectData.financialOutput.keyAssumptions ? `
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Key Financial Assumptions</h3>
+                    ${projectData.financialOutput.keyAssumptions.map((assumption: any) => `
+                        <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff;">
+                            <strong>${assumption.assumption}:</strong> ${assumption.value}<br>
+                            <small style="color: #666;">${assumption.justification}</small>
+                            ${assumption.sensitivity ? `<br><small style="color: #0066cc;"><strong>Sensitivity:</strong> ${assumption.sensitivity}</small>` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+            
+            ${projectData.financialOutput.threeYearProjections ? `
+            <div class="content-card">
+                <h3>3-Year Financial Projections</h3>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Metric</th>
+                            <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Year 1</th>
+                            <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Year 2</th>
+                            <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Year 3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">Total Revenue</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year1?.totalRevenue || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year2?.totalRevenue || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year3?.totalRevenue || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 12px;">Cost of Goods Sold (COGS)</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year1?.cogs || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year2?.cogs || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year3?.cogs || 'N/A'}</td>
+                        </tr>
+                        <tr style="background: #e8f5e8;">
+                            <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">Gross Margin</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year1?.grossMargin || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year2?.grossMargin || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year3?.grossMargin || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 12px;">Operating Expenses</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year1?.operatingExpenses || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year2?.operatingExpenses || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year3?.operatingExpenses || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 12px;">EBITDA</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year1?.ebitda || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year2?.ebitda || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year3?.ebitda || 'N/A'}</td>
+                        </tr>
+                        <tr style="background: #e8f4fd;">
+                            <td style="border: 1px solid #ddd; padding: 12px; font-weight: bold;">Net Profit/Loss</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year1?.netProfitLoss || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year2?.netProfitLoss || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right; font-weight: bold;">${projectData.financialOutput.threeYearProjections.year3?.netProfitLoss || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <td style="border: 1px solid #ddd; padding: 12px;">Cash Flow</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year1?.cashFlow || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year2?.cashFlow || 'N/A'}</td>
+                            <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">${projectData.financialOutput.threeYearProjections.year3?.cashFlow || 'N/A'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            ` : ''}
+            
+            <div class="content-grid">
+                ${projectData.financialOutput.fundingAnalysis ? `
+                <div class="content-card">
+                    <h3>Funding Analysis & Burn Rate</h3>
+                    <ul>
+                        <li><strong>Funding Amount:</strong> ${projectData.financialOutput.fundingAnalysis.seedFunding || 'N/A'}</li>
+                        <li><strong>Year 1 Burn Rate:</strong> ${projectData.financialOutput.fundingAnalysis.monthlyBurnRate?.year1Average || 'N/A'}</li>
+                        <li><strong>Year 2 Burn Rate:</strong> ${projectData.financialOutput.fundingAnalysis.monthlyBurnRate?.year2Average || 'N/A'}</li>
+                        <li><strong>Peak Burn:</strong> ${projectData.financialOutput.fundingAnalysis.monthlyBurnRate?.peakBurn || 'N/A'}</li>
+                        <li><strong>Runway:</strong> ${projectData.financialOutput.fundingAnalysis.runwayAnalysis?.currentFunding || 'N/A'}</li>
+                    </ul>
+                    ${projectData.financialOutput.fundingAnalysis.useOfFunds ? `
+                    <h4>Use of Funds:</h4>
+                    <ul>
+                        ${Object.entries(projectData.financialOutput.fundingAnalysis.useOfFunds).map(([category, allocation]: [string, any]) => 
+                            `<li><strong>${category.charAt(0).toUpperCase() + category.slice(1)}:</strong> ${allocation}</li>`
+                        ).join('')}
+                    </ul>
+                    ` : ''}
+                </div>
+                ` : ''}
+                
+                ${projectData.financialOutput.keyMetrics ? `
+                <div class="content-card">
+                    <h3>Unit Economics & Key Metrics</h3>
+                    <ul>
+                        <li><strong>Customer LTV:</strong> ${projectData.financialOutput.keyMetrics.ltv || 'N/A'}</li>
+                        <li><strong>Customer CAC:</strong> ${projectData.financialOutput.keyMetrics.cac || 'N/A'}</li>
+                        <li><strong>LTV:CAC Ratio:</strong> ${projectData.financialOutput.keyMetrics.ltvCacRatio || 'N/A'}</li>
+                        <li><strong>Payback Period:</strong> ${projectData.financialOutput.keyMetrics.paybackPeriod || 'N/A'}</li>
+                        <li><strong>ARR Growth:</strong> ${projectData.financialOutput.keyMetrics.arr || 'N/A'}</li>
+                        <li><strong>Revenue Growth:</strong> ${projectData.financialOutput.keyMetrics.revenueGrowth || 'N/A'}</li>
+                    </ul>
+                </div>
+                ` : ''}
+            </div>
+            
+            ${projectData.financialOutput.pathToProfitability ? `
+            <div class="content-card">
+                <h3>Path to Profitability</h3>
+                <ul>
+                    <li><strong>Break-even Month:</strong> ${projectData.financialOutput.pathToProfitability.breakEvenMonth || 'N/A'}</li>
+                    <li><strong>Break-even Revenue:</strong> ${projectData.financialOutput.pathToProfitability.breakEvenRevenue || 'N/A'}</li>
+                    <li><strong>Key Drivers:</strong> ${projectData.financialOutput.pathToProfitability.keyDrivers || 'N/A'}</li>
+                    <li><strong>Strategy:</strong> ${projectData.financialOutput.pathToProfitability.profitabilityStrategy || 'N/A'}</li>
+                </ul>
+            </div>
+            ` : ''}
         </div>
         ` : ''}
 

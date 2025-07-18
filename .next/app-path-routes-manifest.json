@@ -14,9 +14,9 @@
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/api/reports/generate/route": "/api/reports/generate",
   "/page": "/",
-  "/marketplace/page": "/marketplace",
   "/dashboard/page": "/dashboard",
-  "/settings/page": "/settings",
+  "/marketplace/page": "/marketplace",
+  "/projects/[id]/page": "/projects/[id]",
   "/projects/page": "/projects",
-  "/projects/[id]/page": "/projects/[id]"
+  "/settings/page": "/settings"
 }
