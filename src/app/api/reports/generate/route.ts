@@ -77,19 +77,49 @@ export async function POST(request: NextRequest) {
     console.log(`[REPORT] Generating ${options.format} report for project ${projectId}`);
 
     if (options.format === 'pdf') {
+      console.log(`[REPORT API] Starting PDF generation for project: ${project.name}`);
+      
       const projectData = {
         ...project,
         createdAt: project.createdAt.toISOString()
       };
-      const pdfBuffer = await ReportGenerator.generatePDF(projectData, options);
       
-      return new NextResponse(pdfBuffer, {
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="${project.name}-business-plan.pdf"`,
-          'Cache-Control': 'no-cache'
+      try {
+        const pdfBuffer = await ReportGenerator.generatePDF(projectData, options);
+        
+        console.log(`[REPORT API] PDF generated successfully, size: ${pdfBuffer.length} bytes`);
+        
+        // Additional validation
+        if (!pdfBuffer || pdfBuffer.length === 0) {
+          throw new Error('PDF buffer is empty');
         }
-      });
+        
+        const filename = `${project.name.replace(/[^a-zA-Z0-9]/g, '-')}-business-plan.pdf`;
+        console.log(`[REPORT API] Returning PDF with filename: ${filename}`);
+        
+        return new NextResponse(pdfBuffer, {
+          headers: {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Content-Length': pdfBuffer.length.toString(),
+            'Cache-Control': 'no-cache'
+          }
+        });
+      } catch (pdfError) {
+        console.error('[REPORT API] PDF generation failed:', pdfError);
+        
+        // Log project data for debugging
+        console.log('[REPORT API] Project data summary:', {
+          hasIdea: !!projectData.ideaOutput,
+          hasResearch: !!projectData.researchOutput,
+          hasBlueprint: !!projectData.blueprintOutput,
+          hasFinancials: !!projectData.financialOutput,
+          hasPitch: !!projectData.pitchOutput,
+          hasGTM: !!projectData.gtmOutput
+        });
+        
+        throw pdfError;
+      }
     } else {
       const projectData = {
         ...project,
