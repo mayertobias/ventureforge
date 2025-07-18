@@ -22,11 +22,16 @@ model User {
   accounts      Account[]
   sessions      Session[]
   projects      Project[]
+  supportGrants SupportGrant[]
 
   // Monetization
   stripeCustomerId String?   @unique
   subscriptionPlan Plan      @default(FREE)
-  credits          Int       @default(25) // Starter credits
+  credits          Int       @default(100) // Updated starter credits
+
+  // Zero-Knowledge Encryption
+  kmsKeyId      String?   // Reference to user's encryption key in KMS
+  encryptionEnabled Boolean @default(true) // Flag to enable/disable encryption
 }
 
 model Project {
@@ -44,6 +49,30 @@ model Project {
   financialOutput Json?
   pitchOutput     Json?
   gtmOutput       Json?
+
+  // Support access control
+  supportGrants SupportGrant[]
+}
+
+model SupportGrant {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  ticketId  String   // Support ticket ID for tracking
+  status    SupportGrantStatus @default(ACTIVE)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, projectId, ticketId])
+}
+
+enum SupportGrantStatus {
+  ACTIVE
+  EXPIRED
+  REVOKED
 }
 
 // Models for NextAuth.js

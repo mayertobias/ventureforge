@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
+import { KMSService } from "@/lib/kms";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -310,12 +311,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Decrypt all previous outputs before using them
+    const decryptedIdeaOutput = project.ideaOutput ? await KMSService.decryptUserData(user.id, project.ideaOutput) : null;
+    const decryptedResearchOutput = project.researchOutput ? await KMSService.decryptUserData(user.id, project.researchOutput) : null;
+    const decryptedBlueprintOutput = project.blueprintOutput ? await KMSService.decryptUserData(user.id, project.blueprintOutput) : null;
+    const decryptedFinancialOutput = project.financialOutput ? await KMSService.decryptUserData(user.id, project.financialOutput) : null;
+    const decryptedPitchOutput = await KMSService.decryptUserData(user.id, project.pitchOutput);
+
     // Create comprehensive business context with financial projections for GTM strategy
-    const ideaOutput = project.ideaOutput as any;
-    const researchOutput = project.researchOutput as any;
-    const blueprintOutput = project.blueprintOutput as any;
-    const financialOutput = project.financialOutput as any;
-    const pitchOutput = project.pitchOutput as any;
+    const ideaOutput = decryptedIdeaOutput as any;
+    const researchOutput = decryptedResearchOutput as any;
+    const blueprintOutput = decryptedBlueprintOutput as any;
+    const financialOutput = decryptedFinancialOutput as any;
+    const pitchOutput = decryptedPitchOutput as any;
     
     const businessContext = {
       businessIdea: ideaOutput?.selectedIdea?.title || "Business concept",
@@ -388,12 +396,15 @@ export async function POST(request: NextRequest) {
       parsedResponse._retryCount = aiResult.retryCount;
     }
 
-    // Update project with the GTM output and deduct credits
+    // Encrypt the GTM output before storing
+    const encryptedGtmOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+
+    // Update project with the encrypted GTM output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          gtmOutput: parsedResponse,
+          gtmOutput: encryptedGtmOutput,
           updatedAt: new Date(),
         },
       }),

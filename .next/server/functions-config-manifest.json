@@ -7,9 +7,6 @@
     "/api/forge/financials": {
       "maxDuration": 300
     },
-    "/api/forge/blueprint": {
-      "maxDuration": 300
-    },
     "/api/forge/gtm": {
       "maxDuration": 300
     },
@@ -24,6 +21,9 @@
     },
     "/api/reports/generate": {
       "maxDuration": 120
+    },
+    "/api/forge/blueprint": {
+      "maxDuration": 300
     }
   }
 }

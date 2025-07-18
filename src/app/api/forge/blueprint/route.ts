@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
+import { KMSService } from "@/lib/kms";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -252,10 +253,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Decrypt the research output before using it
+    const decryptedResearchOutput = await KMSService.decryptUserData(user.id, project.researchOutput);
+
     // Use the new AI service with retry mechanism and phased generation for complex blueprints
     console.log(`[BLUEPRINT] Starting blueprint generation for project ${projectId}`);
     
-    const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(project.researchOutput));
+    const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(decryptedResearchOutput));
     const userPrompt = `Please create a comprehensive business blueprint based on the research data.`;
 
     // For complex blueprints, use phased generation
@@ -322,12 +326,15 @@ export async function POST(request: NextRequest) {
       parsedResponse._phaseResults = phasedResult.phases.map(p => ({ successful: p.successful, retryCount: p.retryCount }));
     }
 
-    // Update project with the blueprint output and deduct credits
+    // Encrypt the blueprint output before storing
+    const encryptedBlueprintOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+
+    // Update project with the encrypted blueprint output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          blueprintOutput: parsedResponse,
+          blueprintOutput: encryptedBlueprintOutput,
           updatedAt: new Date(),
         },
       }),

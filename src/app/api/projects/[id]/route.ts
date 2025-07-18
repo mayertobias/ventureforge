@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { KMSService } from "@/lib/kms";
 
 export async function GET(
   request: NextRequest,
@@ -37,7 +38,35 @@ export async function GET(
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ project });
+    // Decrypt all project data fields before returning
+    const decryptedProject = { ...project };
+    
+    // List of fields to decrypt
+    const fieldsToDecrypt = [
+      'ideaOutput',
+      'researchOutput',
+      'blueprintOutput',
+      'financialOutput',
+      'pitchOutput',
+      'gtmOutput'
+    ];
+    
+    for (const field of fieldsToDecrypt) {
+      if (project[field as keyof typeof project]) {
+        try {
+          const decryptedData = await KMSService.decryptUserData(
+            user.id, 
+            project[field as keyof typeof project]
+          );
+          (decryptedProject as any)[field] = decryptedData;
+        } catch (error) {
+          console.error(`Failed to decrypt ${field}:`, error);
+          // Keep the field as-is if decryption fails (for backward compatibility)
+        }
+      }
+    }
+
+    return NextResponse.json({ project: decryptedProject });
   } catch (error) {
     console.error("Error fetching project:", error);
     return NextResponse.json(

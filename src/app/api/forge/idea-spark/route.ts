@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
+import { KMSService } from "@/lib/kms";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -127,12 +128,15 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Update project with the idea output and deduct credits
+    // Encrypt the idea output before storing
+    const encryptedIdeaOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+
+    // Update project with the encrypted idea output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          ideaOutput: parsedResponse,
+          ideaOutput: encryptedIdeaOutput,
           updatedAt: new Date(),
         },
       }),

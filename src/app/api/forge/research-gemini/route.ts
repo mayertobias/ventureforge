@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
+import { KMSService } from "@/lib/kms";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -168,12 +169,15 @@ Return the response as a properly formatted JSON object.`;
       parsedResponse._retryCount = aiResult.retryCount;
     }
 
-    // Update project with the research output and deduct credits
+    // Encrypt the research output before storing
+    const encryptedResearchOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+
+    // Update project with the encrypted research output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          researchOutput: parsedResponse,
+          researchOutput: encryptedResearchOutput,
           updatedAt: new Date(),
         },
       }),

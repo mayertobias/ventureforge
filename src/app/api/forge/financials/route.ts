@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
+import { KMSService } from "@/lib/kms";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -237,11 +238,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Decrypt all previous outputs before using them
+    const decryptedIdeaOutput = project.ideaOutput ? await KMSService.decryptUserData(user.id, project.ideaOutput) : null;
+    const decryptedResearchOutput = project.researchOutput ? await KMSService.decryptUserData(user.id, project.researchOutput) : null;
+    const decryptedBlueprintOutput = await KMSService.decryptUserData(user.id, project.blueprintOutput);
+
     // Combine all previous outputs for context
     const businessPlan = {
-      idea: project.ideaOutput,
-      research: project.researchOutput,
-      blueprint: project.blueprintOutput
+      idea: decryptedIdeaOutput,
+      research: decryptedResearchOutput,
+      blueprint: decryptedBlueprintOutput
     };
 
     // Use the new AI service with retry mechanism
@@ -280,12 +286,15 @@ export async function POST(request: NextRequest) {
       parsedResponse._retryCount = aiResult.retryCount;
     }
 
-    // Update project with the financial output and deduct credits
+    // Encrypt the financial output before storing
+    const encryptedFinancialOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+
+    // Update project with the encrypted financial output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          financialOutput: parsedResponse,
+          financialOutput: encryptedFinancialOutput,
           updatedAt: new Date(),
         },
       }),
