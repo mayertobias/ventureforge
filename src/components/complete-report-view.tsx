@@ -336,62 +336,211 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
         </TabsContent>
 
         <TabsContent value="blueprint">
-          <Card>
-            <CardHeader>
-              <CardTitle>Business Model & Strategy</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Core Business Model</h4>
-                  <p className="text-sm"><strong>Model:</strong> {businessModel?.model || 'Not specified'}</p>
-                  <p className="text-sm mt-2">{businessModel?.rationale || 'No rationale provided'}</p>
+          <div className="space-y-4">
+            {/* Executive Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Executive Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <h4 className="font-medium mb-2">Business Concept</h4>
+                    <p className="text-sm">{project.blueprintOutput?.executiveSummary?.businessConcept || 'No concept available'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Market Opportunity</h4>
+                    <p className="text-sm">{project.blueprintOutput?.executiveSummary?.marketOpportunity || 'No market opportunity available'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Unique Advantage</h4>
+                    <p className="text-sm">{project.blueprintOutput?.executiveSummary?.uniqueAdvantage || 'No unique advantage available'}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-2">Revenue Projection</h4>
+                    <p className="text-sm font-medium text-green-600">{project.blueprintOutput?.executiveSummary?.revenueProjection || 'No projection available'}</p>
+                  </div>
                 </div>
-                
-                <Separator />
-                
-                <div>
-                  <h4 className="font-medium mb-2">Revenue Streams</h4>
-                  {project.blueprintOutput?.revenueStreams?.length > 0 ? (
-                    <div className="space-y-2">
-                      {project.blueprintOutput.revenueStreams.map((stream: any, index: number) => (
-                        <div key={index} className="p-3 bg-muted rounded text-sm">
-                          <p className="font-medium">{stream.stream} ({stream.type})</p>
-                          <p className="text-muted-foreground mt-1">{stream.justification}</p>
-                          <p className="text-xs mt-1"><strong>Price:</strong> {stream.illustrativePrice}</p>
+              </CardContent>
+            </Card>
+
+            {/* Core Business Model */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Core Business Model</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Primary Model</h4>
+                    <p className="text-sm"><strong>Model:</strong> {project.blueprintOutput?.coreBusinessModel?.primaryModel || businessModel?.model || 'Not specified'}</p>
+                    <p className="text-sm mt-2">{project.blueprintOutput?.coreBusinessModel?.rationale || businessModel?.rationale || 'No rationale provided'}</p>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h4 className="font-medium mb-2">Revenue Logic</h4>
+                    <p className="text-sm">{project.blueprintOutput?.coreBusinessModel?.revenueLogic || 'No revenue logic specified'}</p>
+                  </div>
+
+                  {/* Business Model Canvas */}
+                  {project.blueprintOutput?.coreBusinessModel?.businessModelCanvas && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <h4 className="font-medium mb-2">Key Partners</h4>
+                        <div className="space-y-1">
+                          {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners?.map((partner: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-muted rounded">
+                              {partner}
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Key Activities</h4>
+                        <div className="space-y-1">
+                          {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities?.map((activity: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-muted rounded">
+                              {activity}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Key Resources</h4>
+                        <div className="space-y-1">
+                          {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources?.map((resource: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-muted rounded">
+                              {resource}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-medium mb-2">Cost Structure</h4>
+                        <div className="space-y-1">
+                          {project.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure?.map((cost: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-muted rounded">
+                              {cost}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-sm">No revenue streams defined</p>
                   )}
                 </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Value Propositions</h4>
-                  {project.blueprintOutput?.valuePropositions?.length > 0 ? (
-                    <div className="space-y-2">
-                      {project.blueprintOutput.valuePropositions.map((vp: any, index: number) => (
-                        <div key={index} className="p-3 bg-muted rounded text-sm">
-                          <p className="font-medium">For {vp.segment}:</p>
-                          <p className="text-muted-foreground mt-1">{vp.value}</p>
-                          {vp.keyBenefits && (
-                            <ul className="list-disc list-inside text-xs mt-2">
-                              {vp.keyBenefits.map((benefit: string, idx: number) => (
-                                <li key={idx}>{benefit}</li>
-                              ))}
-                            </ul>
-                          )}
+              </CardContent>
+            </Card>
+
+            {/* Revenue Architecture */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Architecture</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium mb-2">Primary Revenue Streams</h4>
+                    {project.blueprintOutput?.revenueArchitecture?.primaryStreams?.length > 0 ? (
+                      <div className="space-y-3">
+                        {project.blueprintOutput.revenueArchitecture.primaryStreams.map((stream: any, index: number) => (
+                          <div key={index} className="p-4 border rounded-lg">
+                            <div className="flex justify-between items-start mb-2">
+                              <h5 className="font-medium">{stream.streamName}</h5>
+                              <span className="text-sm text-green-600 font-medium">{stream.year3Projection}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2"><strong>Model:</strong> {stream.model}</p>
+                            <p className="text-sm text-muted-foreground mb-2"><strong>Target:</strong> {stream.targetSegment}</p>
+                            <p className="text-sm text-muted-foreground mb-2"><strong>Pricing:</strong> {stream.pricingStrategy}</p>
+                            <p className="text-sm">{stream.justification}</p>
+                            <p className="text-xs text-blue-600 mt-2"><strong>Scalability:</strong> {stream.scalabilityFactor}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : project.blueprintOutput?.revenueStreams?.length > 0 ? (
+                      <div className="space-y-2">
+                        {project.blueprintOutput.revenueStreams.map((stream: any, index: number) => (
+                          <div key={index} className="p-3 bg-muted rounded text-sm">
+                            <p className="font-medium">{stream.stream} ({stream.type})</p>
+                            <p className="text-muted-foreground mt-1">{stream.justification}</p>
+                            <p className="text-xs mt-1"><strong>Price:</strong> {stream.illustrativePrice}</p>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm">No revenue streams defined</p>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div>
+                    <h4 className="font-medium mb-2">Pricing Philosophy</h4>
+                    <p className="text-sm">{project.blueprintOutput?.revenueArchitecture?.pricingPhilosophy || 'No pricing philosophy specified'}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium mb-2">Monetization Timeline</h4>
+                    <p className="text-sm">{project.blueprintOutput?.revenueArchitecture?.monetizationTimeline || 'No timeline specified'}</p>
+                  </div>
+
+                  {/* Unit Economics */}
+                  {project.blueprintOutput?.revenueArchitecture?.unitEconomics && (
+                    <div>
+                      <h4 className="font-medium mb-2">Unit Economics</h4>
+                      <div className="grid gap-3 md:grid-cols-3">
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-medium">
+                            {project.blueprintOutput.revenueArchitecture.unitEconomics.averageRevenuePerUser || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">ARPU</div>
                         </div>
-                      ))}
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-medium">
+                            {project.blueprintOutput.revenueArchitecture.unitEconomics.customerLifetimeValue || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Customer LTV</div>
+                        </div>
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-sm font-medium">
+                            {project.blueprintOutput.revenueArchitecture.unitEconomics.grossMarginPerCustomer || 'N/A'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">Gross Margin</div>
+                        </div>
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-sm">{valueProp || 'No value proposition defined'}</p>
                   )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Fallback for legacy value propositions */}
+            {project.blueprintOutput?.valuePropositions?.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Value Propositions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {project.blueprintOutput.valuePropositions.map((vp: any, index: number) => (
+                      <div key={index} className="p-3 bg-muted rounded text-sm">
+                        <p className="font-medium">For {vp.segment}:</p>
+                        <p className="text-muted-foreground mt-1">{vp.value}</p>
+                        {vp.keyBenefits && (
+                          <ul className="list-disc list-inside text-xs mt-2">
+                            {vp.keyBenefits.map((benefit: string, idx: number) => (
+                              <li key={idx}>{benefit}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="financials">
