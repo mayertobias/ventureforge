@@ -14,12 +14,12 @@
   "/api/forge/pitch/route": "app/api/forge/pitch/route.js",
   "/api/reports/generate/route": "app/api/reports/generate/route.js",
   "/page": "app/page.js",
-  "/privacy/page": "app/privacy/page.js",
   "/terms/page": "app/terms/page.js",
+  "/privacy/page": "app/privacy/page.js",
   "/trust/page": "app/trust/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/marketplace/page": "app/marketplace/page.js",
-  "/projects/[id]/page": "app/projects/[id]/page.js",
   "/projects/page": "app/projects/page.js",
-  "/settings/page": "app/settings/page.js"
+  "/settings/page": "app/settings/page.js",
+  "/projects/[id]/page": "app/projects/[id]/page.js"
 }

@@ -383,13 +383,6 @@ export default function ProjectPage() {
             {project.ideaOutput && (
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Generated Ideas:</h3>
-                {/* Debug output */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="p-2 bg-gray-100 text-xs">
-                    <strong>Debug - ideaOutput structure:</strong>
-                    <pre>{JSON.stringify(project.ideaOutput, null, 2)}</pre>
-                  </div>
-                )}
                 {project.ideaOutput.ideas?.map((idea: any, index: number) => (
                   <Card key={index} className={`p-4 cursor-pointer transition-colors ${selectedIdea === idea ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`} onClick={() => setSelectedIdea(idea)}>
                     <div className="flex items-center justify-between mb-2">

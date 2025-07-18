@@ -14,12 +14,12 @@
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/api/reports/generate/route": "/api/reports/generate",
   "/page": "/",
-  "/privacy/page": "/privacy",
   "/terms/page": "/terms",
+  "/privacy/page": "/privacy",
   "/trust/page": "/trust",
   "/dashboard/page": "/dashboard",
   "/marketplace/page": "/marketplace",
-  "/projects/[id]/page": "/projects/[id]",
   "/projects/page": "/projects",
-  "/settings/page": "/settings"
+  "/settings/page": "/settings",
+  "/projects/[id]/page": "/projects/[id]"
 }
