@@ -7,6 +7,12 @@ import ReportGenerator, { ReportOptions } from "@/lib/report-generator";
 export const maxDuration = 120; // 2 minutes for report generation
 
 export async function POST(request: NextRequest) {
+  let requestedFormat = 'html';
+  let project: any = null;
+  let template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' = 'comprehensive';
+  let includeCharts = true;
+  let branding: any = {};
+  
   try {
     const session = await getServerSession(authOptions);
     
@@ -14,7 +20,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId, format, template, includeCharts, branding } = await request.json();
+    const requestData = await request.json();
+    const { projectId, format, template: reqTemplate, includeCharts: reqIncludeCharts, branding: reqBranding } = requestData;
+    
+    requestedFormat = format || 'html';
+    template = (reqTemplate as 'executive' | 'investor' | 'comprehensive' | 'pitch-deck') || 'comprehensive';
+    includeCharts = reqIncludeCharts !== false;
+    branding = reqBranding || {};
 
     if (!projectId) {
       return NextResponse.json(
@@ -33,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify project ownership and get project data
-    const project = await prisma.project.findFirst({
+    project = await prisma.project.findFirst({
       where: {
         id: projectId,
         userId: user.id,
@@ -95,8 +107,41 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error("Error generating report:", error);
+    
+    // If PDF generation fails, try to provide HTML fallback
+    if (requestedFormat === 'pdf') {
+      try {
+        const projectData = {
+          ...project,
+          createdAt: project.createdAt.toISOString()
+        };
+        const html = ReportGenerator.generateHTML(projectData, { 
+          format: 'html',
+          template: template || 'comprehensive',
+          includeCharts: includeCharts !== false,
+          branding: branding || {
+            primaryColor: '#3B82F6',
+            companyName: project.name
+          }
+        });
+        
+        return new NextResponse(html, {
+          headers: {
+            'Content-Type': 'text/html',
+            'Cache-Control': 'no-cache'
+          }
+        });
+      } catch (fallbackError) {
+        console.error("HTML fallback also failed:", fallbackError);
+      }
+    }
+    
     return NextResponse.json(
-      { error: "Failed to generate report", details: error instanceof Error ? error.message : "Unknown error" },
+      { 
+        error: "Failed to generate report", 
+        details: error instanceof Error ? error.message : "Unknown error",
+        note: "PDF generation not available in this environment. Please try HTML format."
+      },
       { status: 500 }
     );
   }
