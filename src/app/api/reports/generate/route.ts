@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import ReportGenerator, { ReportOptions } from "@/lib/report-generator";
+import { SessionStorageService } from "@/lib/session-storage";
 
 export const maxDuration = 120; // 2 minutes for report generation
 
@@ -44,17 +45,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Verify project ownership and get project data
-    project = await prisma.project.findFirst({
-      where: {
-        id: projectId,
-        userId: user.id,
-      },
-    });
+    // Get session-based project data for report generation
+    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
 
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
     }
+
+    // Convert session data to expected project format for report generator
+    project = {
+      id: sessionProject.id,
+      name: sessionProject.name,
+      createdAt: sessionProject.createdAt,
+      userId: sessionProject.userId,
+      ideaOutput: sessionProject.data.ideaOutput,
+      researchOutput: sessionProject.data.researchOutput,
+      blueprintOutput: sessionProject.data.blueprintOutput,
+      financialOutput: sessionProject.data.financialOutput,
+      pitchOutput: sessionProject.data.pitchOutput,
+      gtmOutput: sessionProject.data.gtmOutput,
+    };
 
     // Check if project has enough content for report generation
     if (!project.ideaOutput) {

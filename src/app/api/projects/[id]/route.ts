@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { KMSService } from "@/lib/kms";
+import { SessionStorageService } from "@/lib/session-storage";
 
 export async function GET(
   request: NextRequest,
@@ -26,58 +26,32 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Find the project and verify ownership
-    const project = await prisma.project.findFirst({
-      where: {
-        id: projectId,
-        userId: user.id,
-      },
-    });
+    // Get session-based project data
+    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
 
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
     }
 
-    // Decrypt all project data fields before returning
-    const decryptedProject = { ...project };
-    
-    // List of fields to decrypt
-    const fieldsToDecrypt = [
-      'ideaOutput',
-      'researchOutput',
-      'blueprintOutput',
-      'financialOutput',
-      'pitchOutput',
-      'gtmOutput'
-    ];
-    
-    for (const field of fieldsToDecrypt) {
-      if (project[field as keyof typeof project]) {
-        try {
-          // Check if data is encrypted before attempting to decrypt
-          const fieldData = project[field as keyof typeof project];
-          
-          // Only attempt decryption if data appears to be encrypted
-          if (fieldData && typeof fieldData === 'object' && 
-              !Array.isArray(fieldData) && !(fieldData instanceof Date) &&
-              ((fieldData as any).encrypted || (fieldData as any).iv || (fieldData as any).authTag)) {
-            const decryptedData = await KMSService.decryptUserData(
-              user.id, 
-              fieldData
-            );
-            (decryptedProject as any)[field] = decryptedData;
-          } else {
-            // Data is not encrypted, use as-is
-            (decryptedProject as any)[field] = fieldData;
-          }
-        } catch (error) {
-          console.error(`Failed to decrypt ${field}:`, error);
-          // Keep the field as-is if decryption fails (for backward compatibility)
-        }
-      }
-    }
+    // Convert session data to expected project format
+    const project = {
+      id: sessionProject.id,
+      name: sessionProject.name,
+      createdAt: sessionProject.createdAt.toISOString(),
+      updatedAt: sessionProject.lastAccessed.toISOString(),
+      userId: sessionProject.userId,
+      ideaOutput: sessionProject.data.ideaOutput,
+      researchOutput: sessionProject.data.researchOutput,
+      blueprintOutput: sessionProject.data.blueprintOutput,
+      financialOutput: sessionProject.data.financialOutput,
+      pitchOutput: sessionProject.data.pitchOutput,
+      gtmOutput: sessionProject.data.gtmOutput,
+    };
 
-    return NextResponse.json({ project: decryptedProject });
+    // Extend session when user accesses the project
+    SessionStorageService.extendSession(projectId, user.id, 2);
+
+    return NextResponse.json({ project });
   } catch (error) {
     console.error("Error fetching project:", error);
     return NextResponse.json(

@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
-import { KMSService } from "@/lib/kms";
+import { SessionStorageService } from "@/lib/session-storage";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -73,16 +73,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify project ownership
-    const project = await prisma.project.findFirst({
-      where: {
-        id: projectId,
-        userId: user.id,
-      },
-    });
+    // Verify session project exists and user owns it
+    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
 
-    if (!project) {
-      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
     }
 
     // Call OpenAI API
@@ -128,26 +123,25 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Temporarily store unencrypted data until Vault is properly configured
-    // TODO: Re-enable encryption once HashiCorp Vault is set up
-    // const encryptedIdeaOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+    // Store idea output in session memory (no database persistence for privacy)
+    const updateSuccess = SessionStorageService.updateProjectData(
+      projectId,
+      user.id,
+      'ideaOutput',
+      parsedResponse
+    );
 
-    // Update project with the idea output and deduct credits
-    await prisma.$transaction([
-      prisma.project.update({
-        where: { id: projectId },
-        data: {
-          ideaOutput: parsedResponse,
-          updatedAt: new Date(),
-        },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: user.credits - IDEA_SPARK_COST,
-        },
-      }),
-    ]);
+    if (!updateSuccess) {
+      return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+
+    // Deduct credits from user account
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        credits: user.credits - IDEA_SPARK_COST,
+      },
+    });
 
     return NextResponse.json({
       success: true,

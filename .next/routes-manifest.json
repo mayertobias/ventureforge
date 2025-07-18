@@ -36,6 +36,14 @@
       "namedRegex": "^/api/projects/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/api/projects/[id]/export-and-delete",
+      "regex": "^/api/projects/([^/]+?)/export\\-and\\-delete(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/api/projects/(?<nxtPid>[^/]+?)/export\\-and\\-delete(?:/)?$"
+    },
+    {
       "page": "/projects/[id]",
       "regex": "^/projects/([^/]+?)(?:/)?$",
       "routeKeys": {

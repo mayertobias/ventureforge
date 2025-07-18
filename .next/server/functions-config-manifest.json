@@ -1,7 +1,7 @@
 {
   "version": 1,
   "functions": {
-    "/api/forge/idea-spark": {
+    "/api/forge/research-gemini": {
       "maxDuration": 300
     },
     "/api/forge/financials": {
@@ -13,10 +13,10 @@
     "/api/forge/gtm": {
       "maxDuration": 300
     },
-    "/api/forge/research-gemini": {
+    "/api/forge/research": {
       "maxDuration": 300
     },
-    "/api/forge/research": {
+    "/api/forge/idea-spark": {
       "maxDuration": 300
     },
     "/api/forge/pitch": {
