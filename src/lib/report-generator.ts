@@ -1,6 +1,4 @@
 import puppeteer from 'puppeteer';
-import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, pdf } from '@react-pdf/renderer';
-import { createElement } from 'react';
 
 export interface ProjectData {
   id: string;
@@ -25,147 +23,9 @@ export interface ReportOptions {
   };
 }
 
-// React PDF Document Component
-const PDFDocument = ({ projectData, options }: { projectData: ProjectData, options: ReportOptions }) => {
-  const styles = StyleSheet.create({
-    page: {
-      flexDirection: 'column',
-      backgroundColor: '#ffffff',
-      padding: 30,
-      fontFamily: 'Helvetica'
-    },
-    header: {
-      backgroundColor: options.branding?.primaryColor || '#3B82F6',
-      color: '#ffffff',
-      padding: 20,
-      marginBottom: 20,
-      textAlign: 'center'
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 10
-    },
-    subtitle: {
-      fontSize: 14,
-      opacity: 0.9
-    },
-    section: {
-      marginBottom: 20,
-      padding: 15,
-      border: '1px solid #e5e7eb',
-      borderRadius: 8
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginBottom: 10,
-      color: '#111827'
-    },
-    text: {
-      fontSize: 12,
-      lineHeight: 1.5,
-      color: '#374151',
-      marginBottom: 8
-    },
-    metricRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginBottom: 5
-    },
-    metricLabel: {
-      fontSize: 11,
-      color: '#6b7280'
-    },
-    metricValue: {
-      fontSize: 11,
-      fontWeight: 'bold',
-      color: options.branding?.primaryColor || '#3B82F6'
-    }
-  });
-
-  const financialMetrics = ReportGenerator.extractFinancialMetrics(projectData);
-  const executiveSummary = ReportGenerator.generateExecutiveSummary(projectData);
-  const companyName = options.branding?.companyName || projectData.name;
-
-  return createElement(Document, {},
-    createElement(Page, { size: 'A4', style: styles.page },
-      // Header
-      createElement(View, { style: styles.header },
-        createElement(Text, { style: styles.title }, companyName),
-        createElement(Text, { style: styles.subtitle }, 'Comprehensive Business Plan & Investment Proposal')
-      ),
-
-      // Executive Summary
-      createElement(View, { style: styles.section },
-        createElement(Text, { style: styles.sectionTitle }, 'Executive Summary'),
-        createElement(Text, { style: styles.text }, executiveSummary)
-      ),
-
-      // Financial Metrics
-      ...(financialMetrics ? [
-        createElement(View, { style: styles.section },
-          createElement(Text, { style: styles.sectionTitle }, 'Key Financial Metrics'),
-          createElement(View, { style: styles.metricRow },
-            createElement(Text, { style: styles.metricLabel }, 'Seed Funding Target'),
-            createElement(Text, { style: styles.metricValue }, financialMetrics.seedFunding)
-          ),
-          createElement(View, { style: styles.metricRow },
-            createElement(Text, { style: styles.metricLabel }, 'Year 3 Revenue'),
-            createElement(Text, { style: styles.metricValue }, financialMetrics.year3Revenue)
-          ),
-          createElement(View, { style: styles.metricRow },
-            createElement(Text, { style: styles.metricLabel }, 'Break-Even Timeline'),
-            createElement(Text, { style: styles.metricValue }, financialMetrics.breakEvenMonth)
-          ),
-          createElement(View, { style: styles.metricRow },
-            createElement(Text, { style: styles.metricLabel }, 'Gross Margin'),
-            createElement(Text, { style: styles.metricValue }, financialMetrics.grossMargin)
-          )
-        )
-      ] : []),
-
-      // Market Research
-      ...(projectData.researchOutput ? [
-        createElement(View, { style: styles.section },
-          createElement(Text, { style: styles.sectionTitle }, 'Market Research & Analysis'),
-          createElement(Text, { style: styles.text }, 
-            `Total Addressable Market: ${projectData.researchOutput.marketLandscape?.totalAddressableMarket || 'Analyzing...'}`
-          ),
-          createElement(Text, { style: styles.text }, 
-            `Primary Customer Segment: ${projectData.researchOutput.targetCustomerAnalysis?.primarySegment || 'Customer analysis in progress'}`
-          ),
-          createElement(Text, { style: styles.text }, 
-            `Market Growth Rate: ${projectData.researchOutput.marketLandscape?.marketGrowthRate || 'Analyzing...'}`
-          )
-        )
-      ] : []),
-
-      // Business Strategy
-      ...(projectData.blueprintOutput ? [
-        createElement(View, { style: styles.section },
-          createElement(Text, { style: styles.sectionTitle }, 'Business Strategy & Model'),
-          createElement(Text, { style: styles.text }, 
-            `Primary Business Model: ${projectData.blueprintOutput.coreBusinessModel?.primaryModel || 'Strategy development in progress'}`
-          ),
-          createElement(Text, { style: styles.text }, 
-            `Revenue Logic: ${projectData.blueprintOutput.coreBusinessModel?.revenueLogic || 'Business model analysis ongoing'}`
-          )
-        )
-      ] : []),
-
-      // Footer
-      createElement(View, { style: { ...styles.section, marginTop: 'auto', textAlign: 'center' } },
-        createElement(Text, { style: { ...styles.text, textAlign: 'center', fontSize: 10 } }, 
-          `Generated by VentureForge AI • ${new Date().toLocaleDateString()}`
-        )
-      )
-    )
-  );
-};
 
 export class ReportGenerator {
-  private static formatCurrency(amount: string | number): string {
+  public static formatCurrency(amount: string | number): string {
     if (typeof amount === 'string') {
       // Extract number from string like "$1,500,000" or "1.5M"
       const numStr = amount.replace(/[$,]/g, '');
@@ -188,7 +48,7 @@ export class ReportGenerator {
     return amount.toString();
   }
 
-  private static extractFinancialMetrics(projectData: ProjectData) {
+  public static extractFinancialMetrics(projectData: ProjectData) {
     const financial = projectData.financialOutput;
     if (!financial) return null;
 
@@ -202,7 +62,7 @@ export class ReportGenerator {
     };
   }
 
-  private static generateExecutiveSummary(projectData: ProjectData): string {
+  public static generateExecutiveSummary(projectData: ProjectData): string {
     const idea = projectData.ideaOutput?.selectedIdea;
     const research = projectData.researchOutput;
     const blueprint = projectData.blueprintOutput;
@@ -388,6 +248,9 @@ export class ReportGenerator {
             padding: 40px;
             margin: 40px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: 400px;
+            max-height: 400px;
+            overflow: hidden;
         }
         
         .chart-title {
@@ -396,6 +259,17 @@ export class ReportGenerator {
             margin-bottom: 30px;
             text-align: center;
             color: #111827;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .chart-wrapper canvas {
+            max-height: 300px !important;
+            width: 100% !important;
         }
         
         .footer {
@@ -422,6 +296,14 @@ export class ReportGenerator {
             .metrics-grid { grid-template-columns: 1fr; }
             .content-grid { grid-template-columns: 1fr; }
             .executive-summary { padding: 30px; }
+            .chart-container { 
+                padding: 20px; 
+                height: 300px;
+                max-height: 300px;
+            }
+            .chart-wrapper { 
+                height: 200px; 
+            }
         }
     </style>
 </head>
@@ -518,7 +400,9 @@ export class ReportGenerator {
         ${options.includeCharts ? `
         <div class="chart-container">
             <h3 class="chart-title">Financial Projections (3-Year)</h3>
-            <canvas id="revenueChart" width="400" height="200"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="revenueChart"></canvas>
+            </div>
         </div>
         ` : ''}
 
@@ -573,7 +457,8 @@ export class ReportGenerator {
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
                 plugins: {
                     legend: {
                         display: false
@@ -588,6 +473,9 @@ export class ReportGenerator {
                             }
                         }
                     }
+                },
+                layout: {
+                    padding: 10
                 }
             }
         });
@@ -599,121 +487,97 @@ export class ReportGenerator {
     return template;
   }
 
-  static async generatePDFWithReactPDF(projectData: ProjectData, options: ReportOptions): Promise<Buffer> {
+
+  static async generatePDF(projectData: ProjectData, options: ReportOptions): Promise<Buffer> {
+    // Use enhanced Puppeteer for PDF generation
+    console.log('[PDF] Generating PDF with enhanced Puppeteer...');
+    
+    const pdfOptions = {
+      ...options,
+      includeCharts: false // Disable charts for PDF to avoid loading issues
+    };
+    const html = this.generateHTML(projectData, pdfOptions);
+    
+    let browser: any = null;
+    
     try {
-      console.log('[PDF] Generating PDF with React PDF...');
       
-      const doc = PDFDocument({ projectData, options });
-      const pdfBuffer = await pdf(doc).toBuffer();
+      console.log('[PDF] Launching Puppeteer browser...');
       
-      console.log(`[PDF] React PDF generated successfully, size: ${pdfBuffer.length} bytes`);
+      // Enhanced Puppeteer configuration for serverless environments
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-accelerated-2d-canvas',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor'
+        ],
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+        timeout: 30000 // 30 second timeout
+      });
+      
+      console.log('[PDF] Creating new page...');
+      const page = await browser.newPage();
+      
+      // Set viewport and user agent
+      await page.setViewport({ width: 1200, height: 800 });
+      await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+      
+      console.log('[PDF] Setting page content...');
+      await page.setContent(html, { 
+        waitUntil: 'domcontentloaded',
+        timeout: 30000
+      });
+      
+      // Small delay to ensure rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('[PDF] Generating PDF...');
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        preferCSSPageSize: false,
+        margin: {
+          top: '20mm',
+          right: '15mm',
+          bottom: '20mm',
+          left: '15mm'
+        },
+        timeout: 30000
+      });
+      
+      console.log(`[PDF] Generated PDF successfully, size: ${pdfBuffer.length} bytes`);
       
       // Validate PDF buffer
       if (!pdfBuffer || pdfBuffer.length < 1000) {
         throw new Error('Generated PDF is too small or empty');
       }
       
-      return pdfBuffer;
+      // Check if buffer starts with PDF signature
+      const pdfSignature = pdfBuffer.slice(0, 4).toString();
+      if (pdfSignature !== '%PDF') {
+        throw new Error('Generated buffer is not a valid PDF');
+      }
+      
+      return Buffer.from(pdfBuffer);
+      
     } catch (error) {
-      console.error('[PDF] React PDF generation failed:', error);
-      throw error;
-    }
-  }
-
-  static async generatePDF(projectData: ProjectData, options: ReportOptions): Promise<Buffer> {
-    // First try React PDF (more reliable in serverless)
-    try {
-      console.log('[PDF] Attempting React PDF generation...');
-      return await this.generatePDFWithReactPDF(projectData, options);
-    } catch (reactPdfError) {
-      console.warn('[PDF] React PDF failed, falling back to Puppeteer:', reactPdfError);
-      
-      // Fallback to Puppeteer
-      const pdfOptions = {
-        ...options,
-        includeCharts: false // Disable charts for PDF to avoid loading issues
-      };
-      const html = this.generateHTML(projectData, pdfOptions);
-      
-      let browser;
-      try {
-        console.log('[PDF] Launching Puppeteer browser...');
-        
-        // Enhanced Puppeteer configuration for serverless environments
-        browser = await puppeteer.launch({
-          headless: true,
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--no-first-run',
-            '--no-zygote',
-            '--single-process',
-            '--disable-gpu',
-            '--disable-web-security',
-            '--disable-features=VizDisplayCompositor'
-          ],
-          executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-          timeout: 30000 // 30 second timeout
-        });
-        
-        console.log('[PDF] Creating new page...');
-        const page = await browser.newPage();
-        
-        // Set viewport and user agent
-        await page.setViewport({ width: 1200, height: 800 });
-        await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
-        
-        console.log('[PDF] Setting page content...');
-        await page.setContent(html, { 
-          waitUntil: 'domcontentloaded',
-          timeout: 30000
-        });
-        
-        // Small delay to ensure rendering
-        await page.waitForTimeout(1000);
-        
-        console.log('[PDF] Generating PDF...');
-        const pdfBuffer = await page.pdf({
-          format: 'A4',
-          printBackground: true,
-          preferCSSPageSize: false,
-          margin: {
-            top: '20mm',
-            right: '15mm',
-            bottom: '20mm',
-            left: '15mm'
-          },
-          timeout: 30000
-        });
-        
-        console.log(`[PDF] Generated PDF successfully, size: ${pdfBuffer.length} bytes`);
-        
-        // Validate PDF buffer
-        if (!pdfBuffer || pdfBuffer.length < 1000) {
-          throw new Error('Generated PDF is too small or empty');
-        }
-        
-        // Check if buffer starts with PDF signature
-        const pdfSignature = pdfBuffer.slice(0, 4).toString();
-        if (pdfSignature !== '%PDF') {
-          throw new Error('Generated buffer is not a valid PDF');
-        }
-        
-        return pdfBuffer;
-        
-      } catch (error) {
-        console.error('[PDF] Puppeteer PDF generation failed:', error);
-        throw new Error(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      } finally {
-        if (browser) {
-          console.log('[PDF] Closing browser...');
-          try {
-            await browser.close();
-          } catch (closeError) {
-            console.warn('[PDF] Error closing browser:', closeError);
-          }
+      console.error('[PDF] Puppeteer PDF generation failed:', error);
+      throw new Error(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      if (browser) {
+        console.log('[PDF] Closing browser...');
+        try {
+          await browser.close();
+        } catch (closeError) {
+          console.warn('[PDF] Error closing browser:', closeError);
         }
       }
     }
