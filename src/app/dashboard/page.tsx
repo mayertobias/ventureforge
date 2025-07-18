@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, Coins, Sparkles, TrendingUp, Zap, Trophy, Lightbulb, Target, Calendar } from "lucide-react";
+import { BarChart3, Coins, Sparkles, TrendingUp, Zap, Trophy, Lightbulb, Target, Calendar, Lock } from "lucide-react";
 import { NewProjectDialog } from "@/components/new-project-dialog";
 import { CreditDisplay } from "@/components/credit-display";
 import { OnboardingTour } from "@/components/onboarding-tour";
@@ -328,7 +328,15 @@ export default function Dashboard() {
                         <Link key={project.id} href={`/projects/${project.id}`}>
                           <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
                             <div className="flex items-center justify-between mb-1">
-                              <h5 className="text-sm font-medium text-gray-900 truncate">{project.name}</h5>
+                              <div className="flex items-center space-x-2">
+                                <h5 className="text-sm font-medium text-gray-900 truncate">{project.name}</h5>
+                                <div className="group relative">
+                                  <Lock className="h-3 w-3 text-green-600" />
+                                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                    This project is encrypted with a key only you can access
+                                  </div>
+                                </div>
+                              </div>
                               <span className="text-xs text-gray-500">
                                 {progress.completed}/{progress.total}
                               </span>

@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, Calendar, BarChart3, ArrowRight, Trash2, Download, Eye, CheckCircle } from "lucide-react";
+import { PlusCircle, Calendar, BarChart3, ArrowRight, Trash2, Download, Eye, CheckCircle, Lock } from "lucide-react";
 import { NewProjectDialog } from "@/components/new-project-dialog";
 import Link from "next/link";
 
@@ -113,7 +113,15 @@ export default function ProjectsPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <CardTitle className="text-lg">{project.name}</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {project.name}
+                        <div className="group relative">
+                          <Lock className="h-4 w-4 text-green-600" />
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                            This project is encrypted with a key only you can access
+                          </div>
+                        </div>
+                      </CardTitle>
                       <CardDescription className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
                         {new Date(project.createdAt).toLocaleDateString()}
