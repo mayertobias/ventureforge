@@ -20,9 +20,11 @@ import {
   Target,
   Rocket,
   Copy,
-  ExternalLink
+  ExternalLink,
+  Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { ReportGenerator } from "@/components/report-generator";
 
 interface Project {
   id: string;
@@ -42,7 +44,6 @@ interface CompleteReportViewProps {
 
 export function CompleteReportView({ project }: CompleteReportViewProps) {
   const [activeTab, setActiveTab] = useState("overview");
-  const [isExporting, setIsExporting] = useState(false);
 
   if (!project) {
     return (
@@ -61,139 +62,19 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
     );
   }
 
-  const handleExportPDF = async () => {
-    setIsExporting(true);
+  const handleCopyLink = async () => {
     try {
-      // Create a formatted report string
-      const reportContent = generateReportContent(project);
-      
-      // Create a blob with the content
-      const blob = new Blob([reportContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      
-      // Create download link
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${project.name}-business-plan-${new Date().toISOString().split('T')[0]}.txt`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      toast.success("Report exported successfully!", {
-        icon: '📄',
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success('Report link copied to clipboard!', {
+        icon: '🔗',
         duration: 3000
       });
     } catch (error) {
-      console.error('Export error:', error);
-      toast.error("Failed to export report. Please try again.");
-    } finally {
-      setIsExporting(false);
+      console.error('Copy error:', error);
+      toast.error('Failed to copy link');
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard!", {
-      icon: '📋',
-      duration: 2000
-    });
-  };
-
-  const generateReportContent = (project: Project) => {
-    const date = new Date().toLocaleDateString();
-    
-    return `
-VentureForge AI - Complete Business Plan Report
-Generated on: ${date}
-Project: ${project.name}
-
-==============================================
-EXECUTIVE SUMMARY
-==============================================
-
-${project.pitchOutput?.executiveSummary || 'Executive summary not available'}
-
-==============================================
-1. BUSINESS IDEA & CONCEPT
-==============================================
-
-Selected Business Idea: ${project.ideaOutput?.selectedIdea?.title || 'N/A'}
-Concept: ${project.ideaOutput?.selectedIdea?.concept || 'N/A'}
-Target Niche: ${project.ideaOutput?.selectedIdea?.targetNiche || 'N/A'}
-Revenue Model: ${project.ideaOutput?.selectedIdea?.revenueModel || 'N/A'}
-Uniqueness Score: ${project.ideaOutput?.selectedIdea?.uniquenessScore || 'N/A'}/10
-Why Unique: ${project.ideaOutput?.selectedIdea?.uniquenessReason || 'N/A'}
-
-==============================================
-2. MARKET RESEARCH & ANALYSIS
-==============================================
-
-Market Landscape:
-- Total Addressable Market (TAM): ${project.researchOutput?.marketLandscape?.totalAddressableMarket || 'N/A'}
-- Serviceable Addressable Market (SAM): ${project.researchOutput?.marketLandscape?.serviceableAddressableMarket || 'N/A'}
-- Market Growth Rate: ${project.researchOutput?.marketLandscape?.marketGrowthRate || 'N/A'}
-
-Competitive Analysis:
-- Key Opportunity: ${project.researchOutput?.competitiveLandscape?.competitiveGap || 'N/A'}
-- Market Position: ${project.researchOutput?.competitiveLandscape?.marketPosition || 'N/A'}
-
-==============================================
-3. BUSINESS MODEL & STRATEGY
-==============================================
-
-Core Business Model: ${project.blueprintOutput?.coreBusinessModel?.model || 'N/A'}
-Rationale: ${project.blueprintOutput?.coreBusinessModel?.rationale || 'N/A'}
-
-Revenue Streams: ${project.blueprintOutput?.revenueStreams?.primary || 'N/A'}
-Value Proposition: ${project.blueprintOutput?.valueProposition?.core || 'N/A'}
-
-==============================================
-4. FINANCIAL PROJECTIONS
-==============================================
-
-Funding Analysis:
-- Seed Funding Required: ${project.financialOutput?.fundingAnalysis?.seedFunding || 'N/A'}
-- Runway (Months): ${project.financialOutput?.fundingAnalysis?.runwayMonths || 'N/A'}
-- Monthly Burn Rate: ${project.financialOutput?.fundingAnalysis?.avgMonthlyNetBurnYear1 || 'N/A'}
-
-Revenue Projections:
-- Year 1: ${project.financialOutput?.threeYearProjections?.year1?.totalRevenue || 'N/A'}
-- Year 2: ${project.financialOutput?.threeYearProjections?.year2?.totalRevenue || 'N/A'}
-- Year 3: ${project.financialOutput?.threeYearProjections?.year3?.totalRevenue || 'N/A'}
-
-==============================================
-5. INVESTOR PITCH HIGHLIGHTS
-==============================================
-
-Key Pitch Points:
-- Problem: ${project.pitchOutput?.pitchDeckContent?.problem?.content || 'N/A'}
-- Solution: ${project.pitchOutput?.pitchDeckContent?.solution?.content || 'N/A'}
-- Market Opportunity: ${project.pitchOutput?.pitchDeckContent?.marketOpportunity?.marketTrends || 'N/A'}
-- Funding Ask: ${project.pitchOutput?.pitchDeckContent?.theAsk?.fundingAmount || 'N/A'}
-- Use of Funds: ${project.pitchOutput?.pitchDeckContent?.theAsk?.useOfFunds || 'N/A'}
-
-==============================================
-6. GO-TO-MARKET STRATEGY
-==============================================
-
-Launch Timeline:
-- Pre-Launch: ${project.gtmOutput?.preLaunch?.timeline || 'N/A'}
-- Launch: ${project.gtmOutput?.launch?.timeline || 'N/A'}
-- Post-Launch: ${project.gtmOutput?.postLaunch?.timeline || 'N/A'}
-
-Customer Acquisition:
-- Primary Channels: ${project.gtmOutput?.customerAcquisition?.primaryChannels || 'N/A'}
-- Customer Acquisition Cost: ${project.gtmOutput?.customerAcquisition?.cac || 'N/A'}
-
-==============================================
-END OF REPORT
-==============================================
-
-This report was generated by VentureForge AI.
-For questions or updates, visit https://venture-forge.com
-`;
-  };
 
   const completedSteps = [
     { id: 'idea', name: 'Business Idea', icon: Lightbulb, completed: !!project.ideaOutput },
@@ -237,13 +118,10 @@ For questions or updates, visit https://venture-forge.com
             ))}
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleExportPDF} disabled={isExporting} className="flex-1">
-              <Download className="mr-2 h-4 w-4" />
-              {isExporting ? 'Exporting...' : 'Export Report'}
-            </Button>
-            <Button variant="outline" onClick={() => copyToClipboard(generateReportContent(project))}>
+            <ReportGenerator projectId={project.id} projectName={project.name} />
+            <Button variant="outline" onClick={handleCopyLink}>
               <Copy className="mr-2 h-4 w-4" />
-              Copy All
+              Copy Link
             </Button>
             <Button variant="outline" onClick={() => window.open(`/projects/${project.id}/share`, '_blank')}>
               <Share2 className="mr-2 h-4 w-4" />
