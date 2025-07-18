@@ -9,8 +9,8 @@
   "/api/forge/financials/route": "/api/forge/financials",
   "/api/forge/blueprint/route": "/api/forge/blueprint",
   "/api/forge/gtm/route": "/api/forge/gtm",
-  "/api/forge/research-gemini/route": "/api/forge/research-gemini",
   "/api/forge/research/route": "/api/forge/research",
+  "/api/forge/research-gemini/route": "/api/forge/research-gemini",
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/api/reports/generate/route": "/api/reports/generate",
   "/page": "/",
@@ -19,7 +19,7 @@
   "/trust/page": "/trust",
   "/dashboard/page": "/dashboard",
   "/marketplace/page": "/marketplace",
-  "/settings/page": "/settings",
   "/projects/page": "/projects",
+  "/settings/page": "/settings",
   "/projects/[id]/page": "/projects/[id]"
 }

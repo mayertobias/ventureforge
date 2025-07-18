@@ -54,11 +54,21 @@ export async function GET(
     for (const field of fieldsToDecrypt) {
       if (project[field as keyof typeof project]) {
         try {
-          const decryptedData = await KMSService.decryptUserData(
-            user.id, 
-            project[field as keyof typeof project]
-          );
-          (decryptedProject as any)[field] = decryptedData;
+          // Check if data is encrypted before attempting to decrypt
+          const fieldData = project[field as keyof typeof project];
+          
+          // Only attempt decryption if data appears to be encrypted
+          if (fieldData && typeof fieldData === 'object' && 
+              (fieldData.encrypted || fieldData.iv || fieldData.authTag)) {
+            const decryptedData = await KMSService.decryptUserData(
+              user.id, 
+              fieldData
+            );
+            (decryptedProject as any)[field] = decryptedData;
+          } else {
+            // Data is not encrypted, use as-is
+            (decryptedProject as any)[field] = fieldData;
+          }
         } catch (error) {
           console.error(`Failed to decrypt ${field}:`, error);
           // Keep the field as-is if decryption fails (for backward compatibility)

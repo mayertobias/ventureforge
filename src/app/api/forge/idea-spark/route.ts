@@ -128,15 +128,16 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Encrypt the idea output before storing
-    const encryptedIdeaOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+    // Temporarily store unencrypted data until Vault is properly configured
+    // TODO: Re-enable encryption once HashiCorp Vault is set up
+    // const encryptedIdeaOutput = await KMSService.encryptUserData(user.id, parsedResponse);
 
-    // Update project with the encrypted idea output and deduct credits
+    // Update project with the idea output and deduct credits
     await prisma.$transaction([
       prisma.project.update({
         where: { id: projectId },
         data: {
-          ideaOutput: encryptedIdeaOutput,
+          ideaOutput: parsedResponse,
           updatedAt: new Date(),
         },
       }),
