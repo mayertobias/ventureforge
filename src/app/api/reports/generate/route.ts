@@ -9,7 +9,7 @@ export const maxDuration = 120; // 2 minutes for report generation
 export async function POST(request: NextRequest) {
   let requestedFormat = 'html';
   let project: any = null;
-  let template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' = 'comprehensive';
+  let template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive' = 'comprehensive';
   let includeCharts = true;
   let branding: any = {};
   
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const { projectId, format, template: reqTemplate, includeCharts: reqIncludeCharts, branding: reqBranding } = requestData;
     
     requestedFormat = format || 'html';
-    template = (reqTemplate as 'executive' | 'investor' | 'comprehensive' | 'pitch-deck') || 'comprehensive';
+    template = (reqTemplate as 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive') || 'comprehensive';
     includeCharts = reqIncludeCharts !== false;
     branding = reqBranding || {};
 

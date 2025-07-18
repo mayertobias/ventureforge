@@ -30,7 +30,7 @@ interface ReportGeneratorProps {
 
 interface ReportOptions {
   format: 'pdf' | 'html';
-  template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck';
+  template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive';
   includeCharts: boolean;
   branding: {
     primaryColor: string;
@@ -41,11 +41,19 @@ interface ReportOptions {
 const templates = [
   {
     id: 'comprehensive',
-    name: 'Comprehensive Business Plan',
+    name: 'Complete Business Plan',
     description: 'Complete business plan with all sections, perfect for detailed analysis',
     icon: FileText,
     badge: 'Most Popular',
     features: ['Executive Summary', 'Market Research', 'Financial Projections', 'GTM Strategy']
+  },
+  {
+    id: 'full-comprehensive',
+    name: 'Comprehensive Report',
+    description: 'Everything included - all responses from all 6 VentureForge AI steps',
+    icon: Sparkles,
+    badge: 'Complete Analysis',
+    features: ['All AI Responses', 'Idea Development', 'Research Analysis', 'Blueprint Strategy', 'Financial Models', 'Pitch Deck', 'GTM Plan']
   },
   {
     id: 'investor',
@@ -200,6 +208,7 @@ export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps
                             <CardTitle className="text-base">{template.name}</CardTitle>
                             <span className={`text-xs px-2 py-1 rounded-full ${
                               template.badge === 'Most Popular' ? 'bg-green-100 text-green-700' :
+                              template.badge === 'Complete Analysis' ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700' :
                               template.badge === 'Investor Ready' ? 'bg-purple-100 text-purple-700' :
                               template.badge === 'Quick Overview' ? 'bg-blue-100 text-blue-700' :
                               'bg-orange-100 text-orange-700'
