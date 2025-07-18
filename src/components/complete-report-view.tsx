@@ -755,6 +755,7 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
 
         <TabsContent value="pitch">
           <div className="space-y-4">
+            {/* Executive Summary */}
             <Card>
               <CardHeader>
                 <CardTitle>Executive Summary</CardTitle>
@@ -766,46 +767,337 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
               </CardContent>
             </Card>
             
-            <Card>
-              <CardHeader>
-                <CardTitle>Key Pitch Points</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium mb-2">The Problem</h4>
-                    <p className="text-sm">{pitchData?.problem?.content || 'Problem statement not available'}</p>
-                    {pitchData?.problem?.marketSize && (
-                      <p className="text-xs text-muted-foreground mt-1">Market Size: {pitchData.problem.marketSize}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">The Solution</h4>
-                    <p className="text-sm">{pitchData?.solution?.content || 'Solution description not available'}</p>
-                    {pitchData?.solution?.keyFeatures && (
-                      <div className="mt-2">
-                        <p className="text-xs font-medium">Key Features:</p>
-                        <ul className="list-disc list-inside text-xs text-muted-foreground">
-                          {pitchData.solution.keyFeatures.map((feature: string, index: number) => (
-                            <li key={index}>{feature}</li>
+            {/* Investor Pitch Deck Slides */}
+            <div className="grid gap-4">
+              {/* Problem Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Slide 1</span>
+                    The Problem
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-red-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.problemSlide?.headline || 'Problem Statement'}
+                      </h4>
+                      <p className="text-sm mb-2">{project.pitchOutput?.pitchDeckSlides?.problemSlide?.problemStatement || pitchData?.problem?.content || 'Problem statement not available'}</p>
+                      {project.pitchOutput?.pitchDeckSlides?.problemSlide?.marketPainPoints && (
+                        <div className="grid gap-2 md:grid-cols-3">
+                          {project.pitchOutput.pitchDeckSlides.problemSlide.marketPainPoints.map((pain: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-red-50 rounded text-red-700">
+                              {pain}
+                            </div>
                           ))}
-                        </ul>
+                        </div>
+                      )}
+                      {project.pitchOutput?.pitchDeckSlides?.problemSlide?.urgency && (
+                        <p className="text-xs text-red-600 mt-2"><strong>Urgency:</strong> {project.pitchOutput.pitchDeckSlides.problemSlide.urgency}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Solution Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Slide 2</span>
+                    The Solution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-green-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.solutionSlide?.headline || 'Our Solution'}
+                      </h4>
+                      <p className="text-sm mb-2">{project.pitchOutput?.pitchDeckSlides?.solutionSlide?.solutionDescription || pitchData?.solution?.content || 'Solution description not available'}</p>
+                      {project.pitchOutput?.pitchDeckSlides?.solutionSlide?.keyDifferentiators && (
+                        <div className="space-y-1">
+                          <p className="text-xs font-medium">Key Differentiators:</p>
+                          {project.pitchOutput.pitchDeckSlides.solutionSlide.keyDifferentiators.map((diff: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-green-50 rounded text-green-700">
+                              {diff}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {project.pitchOutput?.pitchDeckSlides?.solutionSlide?.proofOfConcept && (
+                        <p className="text-xs text-green-600 mt-2"><strong>Proof of Concept:</strong> {project.pitchOutput.pitchDeckSlides.solutionSlide.proofOfConcept}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Market Opportunity Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Slide 3</span>
+                    Market Opportunity
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-blue-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.marketOpportunitySlide?.headline || 'Market Opportunity'}
+                      </h4>
+                      {project.pitchOutput?.pitchDeckSlides?.marketOpportunitySlide?.marketSizing && (
+                        <div className="grid gap-3 md:grid-cols-3">
+                          <div className="text-center p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm font-bold text-blue-800">
+                              {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.tam || 'N/A'}
+                            </div>
+                            <div className="text-xs text-blue-600">TAM</div>
+                          </div>
+                          <div className="text-center p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm font-bold text-blue-800">
+                              {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.sam || 'N/A'}
+                            </div>
+                            <div className="text-xs text-blue-600">SAM</div>
+                          </div>
+                          <div className="text-center p-3 bg-blue-50 rounded-lg">
+                            <div className="text-sm font-bold text-blue-800">
+                              {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.som || 'N/A'}
+                            </div>
+                            <div className="text-xs text-blue-600">SOM</div>
+                          </div>
+                        </div>
+                      )}
+                      {project.pitchOutput?.pitchDeckSlides?.marketOpportunitySlide?.marketTrends && (
+                        <div className="space-y-1 mt-3">
+                          <p className="text-xs font-medium">Market Trends:</p>
+                          {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketTrends.map((trend: string, index: number) => (
+                            <div key={index} className="text-xs p-2 bg-blue-50 rounded">
+                              {trend}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Business Model Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Slide 4</span>
+                    Business Model
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-purple-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.businessModelSlide?.headline || 'Business Model'}
+                      </h4>
+                      <p className="text-sm mb-2">{project.pitchOutput?.pitchDeckSlides?.businessModelSlide?.revenueModel || 'Revenue model not available'}</p>
+                      {project.pitchOutput?.pitchDeckSlides?.businessModelSlide?.unitEconomics && (
+                        <div className="grid gap-3 md:grid-cols-3">
+                          <div className="text-center p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-bold text-purple-800">
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.customerAcquisitionCost || 'N/A'}
+                            </div>
+                            <div className="text-xs text-purple-600">CAC</div>
+                          </div>
+                          <div className="text-center p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-bold text-purple-800">
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.lifetimeValue || 'N/A'}
+                            </div>
+                            <div className="text-xs text-purple-600">LTV</div>
+                          </div>
+                          <div className="text-center p-3 bg-purple-50 rounded-lg">
+                            <div className="text-sm font-bold text-purple-800">
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.grossMargin || 'N/A'}
+                            </div>
+                            <div className="text-xs text-purple-600">Gross Margin</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Traction Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded">Slide 5</span>
+                    Traction & Validation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-orange-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.tractionSlide?.headline || 'Traction & Validation'}
+                      </h4>
+                      {project.pitchOutput?.pitchDeckSlides?.tractionSlide?.keyMetrics && (
+                        <div className="grid gap-3 md:grid-cols-3">
+                          <div className="text-center p-3 bg-orange-50 rounded-lg">
+                            <div className="text-sm font-bold text-orange-800">
+                              {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.customers || 'N/A'}
+                            </div>
+                            <div className="text-xs text-orange-600">Customers</div>
+                          </div>
+                          <div className="text-center p-3 bg-orange-50 rounded-lg">
+                            <div className="text-sm font-bold text-orange-800">
+                              {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.revenue || 'N/A'}
+                            </div>
+                            <div className="text-xs text-orange-600">Revenue</div>
+                          </div>
+                          <div className="text-center p-3 bg-orange-50 rounded-lg">
+                            <div className="text-sm font-bold text-orange-800">
+                              {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.retention || 'N/A'}
+                            </div>
+                            <div className="text-xs text-orange-600">Retention</div>
+                          </div>
+                        </div>
+                      )}
+                      {project.pitchOutput?.pitchDeckSlides?.tractionSlide?.milestoneProgression && (
+                        <p className="text-xs text-orange-600 mt-2"><strong>Milestones:</strong> {project.pitchOutput.pitchDeckSlides.tractionSlide.milestoneProgression}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Financial Projections Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Slide 6</span>
+                    Financial Projections
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-green-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.financialProjectionsSlide?.headline || 'Financial Projections'}
+                      </h4>
+                      {project.pitchOutput?.pitchDeckSlides?.financialProjectionsSlide?.revenueGrowth && (
+                        <div className="grid gap-3 md:grid-cols-4">
+                          <div className="text-center p-3 bg-green-50 rounded-lg">
+                            <div className="text-sm font-bold text-green-800">
+                              {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth.year1 || 'N/A'}
+                            </div>
+                            <div className="text-xs text-green-600">Year 1</div>
+                          </div>
+                          <div className="text-center p-3 bg-green-50 rounded-lg">
+                            <div className="text-sm font-bold text-green-800">
+                              {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth.year2 || 'N/A'}
+                            </div>
+                            <div className="text-xs text-green-600">Year 2</div>
+                          </div>
+                          <div className="text-center p-3 bg-green-50 rounded-lg">
+                            <div className="text-sm font-bold text-green-800">
+                              {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth.year3 || 'N/A'}
+                            </div>
+                            <div className="text-xs text-green-600">Year 3</div>
+                          </div>
+                          <div className="text-center p-3 bg-green-50 rounded-lg">
+                            <div className="text-sm font-bold text-green-800">
+                              {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth.year5 || 'N/A'}
+                            </div>
+                            <div className="text-xs text-green-600">Year 5</div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Funding Ask Slide */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Slide 7</span>
+                    The Ask
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium text-yellow-700 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.fundingAskSlide?.headline || 'Investment Ask'}
+                      </h4>
+                      <p className="text-lg font-bold text-yellow-800 mb-2">
+                        {project.pitchOutput?.pitchDeckSlides?.fundingAskSlide?.fundingAmount || pitchData?.theAsk?.fundingAmount || 'Funding amount not specified'}
+                      </p>
+                      {project.pitchOutput?.pitchDeckSlides?.fundingAskSlide?.useOfFunds && (
+                        <div className="space-y-2">
+                          <p className="text-xs font-medium">Use of Funds:</p>
+                          {Object.entries(project.pitchOutput.pitchDeckSlides.fundingAskSlide.useOfFunds).map(([category, allocation]: [string, any]) => (
+                            <div key={category} className="flex justify-between items-center p-2 bg-yellow-50 rounded">
+                              <span className="text-xs capitalize">{category.replace(/([A-Z])/g, ' $1').trim()}</span>
+                              <span className="text-xs font-medium">{allocation}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {project.pitchOutput?.pitchDeckSlides?.fundingAskSlide?.keyMilestones && (
+                        <p className="text-xs text-yellow-600 mt-2"><strong>Key Milestones:</strong> {project.pitchOutput.pitchDeckSlides.fundingAskSlide.keyMilestones}</p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Fallback for legacy pitch data */}
+              {!project.pitchOutput?.pitchDeckSlides && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Key Pitch Points</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium mb-2">The Problem</h4>
+                        <p className="text-sm">{pitchData?.problem?.content || 'Problem statement not available'}</p>
+                        {pitchData?.problem?.marketSize && (
+                          <p className="text-xs text-muted-foreground mt-1">Market Size: {pitchData.problem.marketSize}</p>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">The Ask</h4>
-                    <p className="text-sm"><strong>Funding Amount:</strong> {pitchData?.theAsk?.fundingAmount || 'Not specified'}</p>
-                    <p className="text-sm"><strong>Use of Funds:</strong> {pitchData?.theAsk?.useOfFunds || 'Not specified'}</p>
-                    {pitchData?.theAsk?.timeline && (
-                      <p className="text-sm"><strong>Timeline:</strong> {pitchData.theAsk.timeline}</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2">The Solution</h4>
+                        <p className="text-sm">{pitchData?.solution?.content || 'Solution description not available'}</p>
+                        {pitchData?.solution?.keyFeatures && (
+                          <div className="mt-2">
+                            <p className="text-xs font-medium">Key Features:</p>
+                            <ul className="list-disc list-inside text-xs text-muted-foreground">
+                              {pitchData.solution.keyFeatures.map((feature: string, index: number) => (
+                                <li key={index}>{feature}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium mb-2">The Ask</h4>
+                        <p className="text-sm"><strong>Funding Amount:</strong> {pitchData?.theAsk?.fundingAmount || 'Not specified'}</p>
+                        <p className="text-sm"><strong>Use of Funds:</strong> {pitchData?.theAsk?.useOfFunds || 'Not specified'}</p>
+                        {pitchData?.theAsk?.timeline && (
+                          <p className="text-sm"><strong>Timeline:</strong> {pitchData.theAsk.timeline}</p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </TabsContent>
       </Tabs>
