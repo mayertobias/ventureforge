@@ -396,61 +396,211 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
 
         <TabsContent value="financials">
           <div className="space-y-4">
+            {/* Key Financial Assumptions */}
             <Card>
               <CardHeader>
-                <CardTitle>Funding Analysis</CardTitle>
+                <CardTitle>Key Financial Assumptions</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.fundingAnalysis?.seedFunding || 'Not calculated'}
+                <div className="space-y-4">
+                  {financialData?.keyAssumptions?.map((assumption: any, index: number) => (
+                    <div key={index} className="p-4 bg-muted rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium">{assumption.assumption}</h4>
+                        <span className="text-lg font-bold text-primary">{assumption.value}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">{assumption.justification}</p>
+                      {assumption.sensitivity && (
+                        <p className="text-xs text-blue-600"><strong>Sensitivity:</strong> {assumption.sensitivity}</p>
+                      )}
+                      {assumption.impact && (
+                        <p className="text-xs text-orange-600"><strong>Impact:</strong> {assumption.impact}</p>
+                      )}
                     </div>
-                    <div className="text-sm text-muted-foreground">Seed Funding</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.fundingAnalysis?.runwayMonths || 'N/A'}
+                  )) || (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <p className="text-sm text-muted-foreground">Financial assumptions not available</p>
                     </div>
-                    <div className="text-sm text-muted-foreground">Runway (Months)</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.pathToProfitability?.breakEvenMonth || 'Not calculated'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Break-even Timeline</div>
-                  </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
-            
+
+            {/* 3-Year P&L Table */}
             <Card>
               <CardHeader>
-                <CardTitle>Revenue Projections</CardTitle>
+                <CardTitle>3-Year Profit & Loss Projections</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.threeYearProjections?.year1?.totalRevenue || 'Not projected'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Year 1 Revenue</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.threeYearProjections?.year2?.totalRevenue || 'Not projected'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Year 2 Revenue</div>
-                  </div>
-                  <div className="text-center p-4 bg-muted rounded-lg">
-                    <div className="text-2xl font-bold text-primary mb-1">
-                      {financialData?.threeYearProjections?.year3?.totalRevenue || 'Not projected'}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Year 3 Revenue</div>
-                  </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-200">
+                    <thead>
+                      <tr className="bg-muted">
+                        <th className="border border-gray-200 px-4 py-2 text-left font-medium">Metric</th>
+                        <th className="border border-gray-200 px-4 py-2 text-right font-medium">Year 1</th>
+                        <th className="border border-gray-200 px-4 py-2 text-right font-medium">Year 2</th>
+                        <th className="border border-gray-200 px-4 py-2 text-right font-medium">Year 3</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="border border-gray-200 px-4 py-2 font-medium">Total Revenue</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year1?.totalRevenue || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year2?.totalRevenue || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year3?.totalRevenue || 'Not available'}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-200 px-4 py-2">Cost of Goods Sold (COGS)</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year1?.cogs || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year2?.cogs || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year3?.cogs || 'Not available'}</td>
+                      </tr>
+                      <tr className="bg-green-50">
+                        <td className="border border-gray-200 px-4 py-2 font-medium">Gross Margin</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year1?.grossMargin || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year2?.grossMargin || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year3?.grossMargin || 'Not available'}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-200 px-4 py-2">Operating Expenses</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year1?.operatingExpenses || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year2?.operatingExpenses || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year3?.operatingExpenses || 'Not available'}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-200 px-4 py-2">EBITDA</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year1?.ebitda || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year2?.ebitda || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year3?.ebitda || 'Not available'}</td>
+                      </tr>
+                      <tr className="bg-blue-50">
+                        <td className="border border-gray-200 px-4 py-2 font-medium">Net Profit/Loss</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year1?.netProfitLoss || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year2?.netProfitLoss || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right font-medium">{financialData?.threeYearProjections?.year3?.netProfitLoss || 'Not available'}</td>
+                      </tr>
+                      <tr>
+                        <td className="border border-gray-200 px-4 py-2">Cash Flow</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year1?.cashFlow || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year2?.cashFlow || 'Not available'}</td>
+                        <td className="border border-gray-200 px-4 py-2 text-right">{financialData?.threeYearProjections?.year3?.cashFlow || 'Not available'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Burn Rate Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Burn Rate Analysis & Runway</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-3">
+                    <h4 className="font-medium">Monthly Burn Rate</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Year 1 Average:</span>
+                        <span className="font-medium">{financialData?.fundingAnalysis?.monthlyBurnRate?.year1Average || 'Not calculated'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Year 2 Average:</span>
+                        <span className="font-medium">{financialData?.fundingAnalysis?.monthlyBurnRate?.year2Average || 'Not calculated'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Peak Burn:</span>
+                        <span className="font-medium text-red-600">{financialData?.fundingAnalysis?.monthlyBurnRate?.peakBurn || 'Not calculated'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-medium">Runway Analysis</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-sm">Funding Amount:</span>
+                        <span className="font-medium">{financialData?.fundingAnalysis?.seedFunding || 'Not specified'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Runway to Break-even:</span>
+                        <span className="font-medium">{financialData?.fundingAnalysis?.runwayAnalysis?.currentFunding || 'Not calculated'}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm">Break-even Month:</span>
+                        <span className="font-medium text-green-600">{financialData?.pathToProfitability?.breakEvenMonth || 'Not calculated'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {financialData?.fundingAnalysis?.runwayAnalysis?.keyMilestones && (
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium mb-2">Key Milestones</h4>
+                    <p className="text-sm">{financialData.fundingAnalysis.runwayAnalysis.keyMilestones}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Unit Economics & Key Metrics */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Unit Economics & Key Metrics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  <div className="text-center p-4 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-primary mb-1">
+                      {financialData?.keyMetrics?.ltv || 'Not calculated'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Customer LTV</div>
+                  </div>
+                  <div className="text-center p-4 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-primary mb-1">
+                      {financialData?.keyMetrics?.cac || 'Not calculated'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Customer CAC</div>
+                  </div>
+                  <div className="text-center p-4 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-primary mb-1">
+                      {financialData?.keyMetrics?.ltvCacRatio || 'Not calculated'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">LTV:CAC Ratio</div>
+                  </div>
+                  <div className="text-center p-4 bg-muted rounded-lg">
+                    <div className="text-2xl font-bold text-primary mb-1">
+                      {financialData?.keyMetrics?.paybackPeriod || 'Not calculated'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Payback Period</div>
+                  </div>
+                </div>
+                {financialData?.keyMetrics?.arr && (
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                    <h4 className="font-medium mb-2">ARR Growth Trajectory</h4>
+                    <p className="text-sm">{financialData.keyMetrics.arr}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Use of Funds */}
+            {financialData?.fundingAnalysis?.useOfFunds && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Use of Funds Breakdown</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {Object.entries(financialData.fundingAnalysis.useOfFunds).map(([category, allocation]: [string, any]) => (
+                      <div key={category} className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                        <span className="capitalize font-medium">{category}</span>
+                        <span className="text-sm">{allocation}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </TabsContent>
 
