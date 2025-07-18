@@ -81,7 +81,7 @@ export default function ProjectPage() {
     }
   }, [session, fetchProject]);
 
-  const getCompletedSteps = () => {
+  const getCompletedSteps = useCallback(() => {
     if (!project) return [];
     const completed = [];
     if (project.ideaOutput) completed.push("idea");
@@ -91,7 +91,7 @@ export default function ProjectPage() {
     if (project.pitchOutput) completed.push("pitch");
     if (project.gtmOutput) completed.push("gtm");
     return completed;
-  };
+  }, [project]);
 
   const handleAIGeneration = async (endpoint: string, payload: any, successMessage: string, nextStep?: string) => {
     setIsGenerating(true);

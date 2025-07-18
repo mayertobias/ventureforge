@@ -1,7 +1,7 @@
 {
   "/_not-found/page": "/_not-found",
-  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
   "/api/admin/update-credits/route": "/api/admin/update-credits",
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
   "/api/projects/[id]/route": "/api/projects/[id]",
   "/api/projects/route": "/api/projects",
   "/api/user/credits/route": "/api/user/credits",
@@ -14,9 +14,9 @@
   "/api/forge/pitch/route": "/api/forge/pitch",
   "/api/reports/generate/route": "/api/reports/generate",
   "/page": "/",
-  "/projects/page": "/projects",
   "/dashboard/page": "/dashboard",
   "/marketplace/page": "/marketplace",
-  "/settings/page": "/settings",
-  "/projects/[id]/page": "/projects/[id]"
+  "/projects/page": "/projects",
+  "/projects/[id]/page": "/projects/[id]",
+  "/settings/page": "/settings"
 }

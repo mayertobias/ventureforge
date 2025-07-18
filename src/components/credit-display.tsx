@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Badge } from "@/components/ui/badge";
 import { Coins, Zap } from "lucide-react";
@@ -12,13 +12,7 @@ export function CreditDisplay() {
   const [loading, setLoading] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
-  useEffect(() => {
-    if (session) {
-      fetchCredits();
-    }
-  }, [session]);
-
-  const fetchCredits = async () => {
+  const fetchCredits = useCallback(async () => {
     try {
       const response = await fetch("/api/user/credits");
       if (response.ok) {
@@ -41,10 +35,16 @@ export function CreditDisplay() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [credits]);
+
+  useEffect(() => {
+    if (session) {
+      fetchCredits();
+    }
+  }, [session, fetchCredits]);
 
   // Function to trigger credit animation (can be called externally)
-  const animateCreditsUsed = (amount: number) => {
+  const animateCreditsUsed = useCallback((amount: number) => {
     if (credits === null) return;
     
     setIsAnimating(true);
@@ -62,14 +62,14 @@ export function CreditDisplay() {
         }, 1000);
       }
     }, 100);
-  };
+  }, [credits]);
 
   // Expose the animation function globally
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as any).animateCreditsUsed = animateCreditsUsed;
     }
-  }, [credits]);
+  }, [animateCreditsUsed]);
 
   if (!session || loading) {
     return (
