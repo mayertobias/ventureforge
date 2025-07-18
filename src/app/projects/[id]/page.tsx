@@ -12,7 +12,7 @@ import { ProjectStepper } from "@/components/project-stepper";
 import { CreditDisplay } from "@/components/credit-display";
 import { VentureForgeLoader } from "@/components/ui/venture-forge-loader";
 import { CompleteReportView } from "@/components/complete-report-view";
-import { Loader2, Coins, ArrowLeft } from "lucide-react";
+import { Loader2, Coins, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -50,15 +50,22 @@ export default function ProjectPage() {
         setProject(data.project);
         
         // Determine current step based on URL parameter or what's completed
-        if (stepFromUrl === 'complete' && data.project.gtmOutput) {
-          setCurrentStep("complete");
-        } else if (data.project.gtmOutput) setCurrentStep("gtm");
-        else if (data.project.pitchOutput) setCurrentStep("gtm");
-        else if (data.project.financialOutput) setCurrentStep("pitch");
-        else if (data.project.blueprintOutput) setCurrentStep("financials");
-        else if (data.project.researchOutput) setCurrentStep("blueprint");
-        else if (data.project.ideaOutput) setCurrentStep("research");
-        else setCurrentStep("idea");
+        if (stepFromUrl) {
+          // Validate that the step from URL is accessible
+          const validSteps = ["idea", "research", "blueprint", "financials", "pitch", "gtm", "complete"];
+          if (validSteps.includes(stepFromUrl)) {
+            setCurrentStep(stepFromUrl);
+          }
+        } else {
+          // Auto-set based on completion status only if no URL step specified
+          if (data.project.gtmOutput) setCurrentStep("gtm");
+          else if (data.project.pitchOutput) setCurrentStep("pitch");
+          else if (data.project.financialOutput) setCurrentStep("financials");
+          else if (data.project.blueprintOutput) setCurrentStep("blueprint");
+          else if (data.project.researchOutput) setCurrentStep("research");
+          else if (data.project.ideaOutput) setCurrentStep("research");
+          else setCurrentStep("idea");
+        }
       }
     } catch (error) {
       console.error("Error fetching project:", error);
@@ -181,6 +188,40 @@ export default function ProjectPage() {
     await handleAIGeneration("gtm", {}, "Go-to-market strategy completed!");
   };
 
+  // Navigation helpers
+  const stepOrder = ["idea", "research", "blueprint", "financials", "pitch", "gtm", "complete"];
+  const getCurrentStepIndex = () => stepOrder.indexOf(currentStep);
+  const canGoPrevious = () => {
+    const currentIndex = getCurrentStepIndex();
+    if (currentIndex <= 0) return false;
+    const completed = getCompletedSteps();
+    // Can go to previous step if it's completed or if we're currently on a step after it
+    return currentIndex > 0;
+  };
+  const canGoNext = () => {
+    const currentIndex = getCurrentStepIndex();
+    if (currentIndex >= stepOrder.length - 1) return false;
+    const completed = getCompletedSteps();
+    const nextStep = stepOrder[currentIndex + 1];
+    // Can go to next step if current step is completed or if we're on complete
+    return completed.includes(currentStep) || currentStep === "complete";
+  };
+  
+  const goToPreviousStep = () => {
+    const currentIndex = getCurrentStepIndex();
+    if (currentIndex > 0) {
+      setCurrentStep(stepOrder[currentIndex - 1]);
+    }
+  };
+  
+  const goToNextStep = () => {
+    const currentIndex = getCurrentStepIndex();
+    if (currentIndex < stepOrder.length - 1) {
+      const nextStep = stepOrder[currentIndex + 1];
+      setCurrentStep(nextStep);
+    }
+  };
+
   // Auto-advance based on completed steps
   const getNextStep = useCallback(() => {
     const completed = getCompletedSteps();
@@ -201,15 +242,15 @@ export default function ProjectPage() {
     return "gtm"; // All completed
   }, [project, getCompletedSteps, selectedIdea]);
 
-  // Auto-navigate to next incomplete step when project loads
+  // Auto-navigate to next incomplete step when project loads, but only if URL doesn't specify a step
   useEffect(() => {
-    if (project && !isGenerating) {
+    if (project && !isGenerating && !stepFromUrl) {
       const nextStep = getNextStep();
       if (nextStep !== currentStep) {
         setCurrentStep(nextStep);
       }
     }
-  }, [project, isGenerating, currentStep, getNextStep]);
+  }, [project, isGenerating, currentStep, getNextStep, stepFromUrl]);
 
   if (loading) {
     return (
@@ -261,8 +302,38 @@ export default function ProjectPage() {
       <ProjectStepper
         currentStep={currentStep}
         completedSteps={getCompletedSteps()}
-        onStepClick={setCurrentStep}
+        onStepClick={(step) => {
+          // Allow navigation to any completed step or current step
+          const completed = getCompletedSteps();
+          if (completed.includes(step) || step === currentStep) {
+            setCurrentStep(step);
+          }
+        }}
       />
+
+      {/* Navigation buttons */}
+      {currentStep !== "complete" && (
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={goToPreviousStep}
+            disabled={!canGoPrevious()}
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            onClick={goToNextStep}
+            disabled={!canGoNext()}
+            className="flex items-center gap-2"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       {currentStep === "idea" && (
         <Card>
@@ -882,161 +953,166 @@ export default function ProjectPage() {
                         <div className="text-lg font-bold text-primary">
                           {project.financialOutput.fundingAnalysis?.runwayMonths || 'N/A'}
                         </div>
-                        <div className="text-xs text-muted-foreground">Runway (Months)</div>
+                        <div className="text-xs text-muted-foreground">Runway</div>
                       </div>
                       <div className="text-center p-3 bg-muted rounded-lg">
                         <div className="text-lg font-bold text-primary">
-                          {project.financialOutput.fundingAnalysis?.pathToProfitability || 'N/A'}
+                          {project.financialOutput.fundingAnalysis?.avgMonthlyNetBurnYear1 || 'N/A'}
                         </div>
-                        <div className="text-xs text-muted-foreground">Path to Profitability</div>
+                        <div className="text-xs text-muted-foreground">Monthly Burn Rate</div>
                       </div>
                     </div>
-                    {project.financialOutput.fundingAnalysis?.useOfFunds && (
+                    {project.financialOutput.fundingAnalysis?.runwayCalculation && (
                       <div className="mt-3">
-                        <p className="text-sm"><strong>Use of Funds:</strong></p>
-                        <p className="text-sm text-muted-foreground">{project.financialOutput.fundingAnalysis.useOfFunds}</p>
+                        <p className="text-sm"><strong>Runway Calculation:</strong></p>
+                        <p className="text-sm text-muted-foreground">{project.financialOutput.fundingAnalysis.runwayCalculation}</p>
                       </div>
                     )}
                   </Card>
 
-                  {/* Revenue Projections */}
-                  {project.financialOutput.revenueProjections && (
+                  {/* Three Year Projections */}
+                  {project.financialOutput.threeYearProjections && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📈 Revenue Projections
+                        📈 Three Year Financial Projections
                       </h4>
                       <div className="grid gap-3 md:grid-cols-3">
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-lg font-bold text-primary">
-                            {project.financialOutput.revenueProjections.year1 || 'N/A'}
+                            {project.financialOutput.threeYearProjections.year1?.totalRevenue || 'N/A'}
                           </div>
                           <div className="text-xs text-muted-foreground">Year 1 Revenue</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Profit: {project.financialOutput.threeYearProjections.year1?.netProfitLoss || 'N/A'}
+                          </div>
                         </div>
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-lg font-bold text-primary">
-                            {project.financialOutput.revenueProjections.year2 || 'N/A'}
+                            {project.financialOutput.threeYearProjections.year2?.totalRevenue || 'N/A'}
                           </div>
                           <div className="text-xs text-muted-foreground">Year 2 Revenue</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Profit: {project.financialOutput.threeYearProjections.year2?.netProfitLoss || 'N/A'}
+                          </div>
                         </div>
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-lg font-bold text-primary">
-                            {project.financialOutput.revenueProjections.year3 || 'N/A'}
+                            {project.financialOutput.threeYearProjections.year3?.totalRevenue || 'N/A'}
                           </div>
                           <div className="text-xs text-muted-foreground">Year 3 Revenue</div>
+                          <div className="text-xs text-muted-foreground mt-1">
+                            Profit: {project.financialOutput.threeYearProjections.year3?.netProfitLoss || 'N/A'}
+                          </div>
                         </div>
                       </div>
-                      {project.financialOutput.revenueProjections.assumptions && (
-                        <div className="mt-3">
-                          <p className="text-sm"><strong>Key Assumptions:</strong></p>
-                          <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                            {project.financialOutput.revenueProjections.assumptions.map((assumption: string, index: number) => (
-                              <li key={index}>{assumption}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
                     </Card>
                   )}
 
-                  {/* Cost Structure */}
-                  {project.financialOutput.costStructure && (
+                  {/* Path to Profitability */}
+                  {project.financialOutput.pathToProfitability && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📊 Cost Structure
+                        📈 Path to Profitability
                       </h4>
                       <div className="space-y-3">
-                        {project.financialOutput.costStructure.fixedCosts && (
+                        {project.financialOutput.pathToProfitability.breakEvenMonth && (
                           <div>
-                            <p className="text-sm"><strong>Fixed Costs (Monthly):</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.financialOutput.costStructure.fixedCosts}</p>
+                            <p className="text-sm"><strong>Break-even Timeline:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.pathToProfitability.breakEvenMonth}</p>
                           </div>
                         )}
-                        {project.financialOutput.costStructure.variableCosts && (
+                        {project.financialOutput.pathToProfitability.keyMilestones && project.financialOutput.pathToProfitability.keyMilestones.length > 0 && (
                           <div>
-                            <p className="text-sm"><strong>Variable Costs:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.financialOutput.costStructure.variableCosts}</p>
-                          </div>
-                        )}
-                        {project.financialOutput.costStructure.majorExpenses && (
-                          <div>
-                            <p className="text-sm"><strong>Major Expense Categories:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.financialOutput.costStructure.majorExpenses.map((expense: string, index: number) => (
-                                <Badge key={index} variant="outline" className="text-xs">{expense}</Badge>
+                            <p className="text-sm"><strong>Key Milestones:</strong></p>
+                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
+                              {project.financialOutput.pathToProfitability.keyMilestones.map((milestone: string, index: number) => (
+                                <li key={index}>{milestone}</li>
                               ))}
-                            </div>
+                            </ul>
+                          </div>
+                        )}
+                        {project.financialOutput.pathToProfitability.profitabilityStrategy && (
+                          <div>
+                            <p className="text-sm"><strong>Strategy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.financialOutput.pathToProfitability.profitabilityStrategy}</p>
                           </div>
                         )}
                       </div>
                     </Card>
                   )}
 
-                  {/* Unit Economics */}
-                  {project.financialOutput.unitEconomics && (
+                  {/* Key Metrics */}
+                  {project.financialOutput.keyMetrics && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        🎯 Unit Economics
+                        🎯 Key Financial Metrics
                       </h4>
                       <div className="grid gap-3 md:grid-cols-2">
-                        {project.financialOutput.unitEconomics.cac && (
+                        {project.financialOutput.keyMetrics.cac && (
                           <div className="text-center p-3 bg-muted rounded-lg">
                             <div className="text-lg font-bold text-primary">
-                              {project.financialOutput.unitEconomics.cac}
+                              {project.financialOutput.keyMetrics.cac}
                             </div>
                             <div className="text-xs text-muted-foreground">Customer Acquisition Cost</div>
                           </div>
                         )}
-                        {project.financialOutput.unitEconomics.ltv && (
+                        {project.financialOutput.keyMetrics.ltv && (
                           <div className="text-center p-3 bg-muted rounded-lg">
                             <div className="text-lg font-bold text-primary">
-                              {project.financialOutput.unitEconomics.ltv}
+                              {project.financialOutput.keyMetrics.ltv}
                             </div>
                             <div className="text-xs text-muted-foreground">Customer Lifetime Value</div>
                           </div>
                         )}
-                        {project.financialOutput.unitEconomics.ltvCacRatio && (
+                        {project.financialOutput.keyMetrics.ltvCacRatio && (
                           <div className="text-center p-3 bg-muted rounded-lg">
                             <div className="text-lg font-bold text-primary">
-                              {project.financialOutput.unitEconomics.ltvCacRatio}
+                              {project.financialOutput.keyMetrics.ltvCacRatio}
                             </div>
                             <div className="text-xs text-muted-foreground">LTV:CAC Ratio</div>
                           </div>
                         )}
-                        {project.financialOutput.unitEconomics.paybackPeriod && (
+                        {project.financialOutput.keyMetrics.paybackPeriod && (
                           <div className="text-center p-3 bg-muted rounded-lg">
                             <div className="text-lg font-bold text-primary">
-                              {project.financialOutput.unitEconomics.paybackPeriod}
+                              {project.financialOutput.keyMetrics.paybackPeriod}
                             </div>
                             <div className="text-xs text-muted-foreground">Payback Period</div>
+                          </div>
+                        )}
+                        {project.financialOutput.keyMetrics.arr && (
+                          <div className="text-center p-3 bg-muted rounded-lg">
+                            <div className="text-lg font-bold text-primary">
+                              {project.financialOutput.keyMetrics.arr}
+                            </div>
+                            <div className="text-xs text-muted-foreground">Annual Recurring Revenue</div>
                           </div>
                         )}
                       </div>
                     </Card>
                   )}
 
-                  {/* Break-even Analysis */}
-                  {project.financialOutput.breakEvenAnalysis && (
+                  {/* Revenue Breakdown */}
+                  {project.financialOutput.revenueBreakdown && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        ⚖️ Break-even Analysis
+                        💰 Revenue Breakdown
                       </h4>
-                      <div className="space-y-3">
-                        {project.financialOutput.breakEvenAnalysis.breakEvenPoint && (
+                      <div className="space-y-4">
+                        {project.financialOutput.revenueBreakdown.year1 && project.financialOutput.revenueBreakdown.year1.length > 0 && (
                           <div>
-                            <p className="text-sm"><strong>Break-even Point:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.breakEvenPoint}</p>
-                          </div>
-                        )}
-                        {project.financialOutput.breakEvenAnalysis.monthsToBreakEven && (
-                          <div>
-                            <p className="text-sm"><strong>Months to Break-even:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.monthsToBreakEven}</p>
-                          </div>
-                        )}
-                        {project.financialOutput.breakEvenAnalysis.sensitivity && (
-                          <div>
-                            <p className="text-sm"><strong>Sensitivity Analysis:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.financialOutput.breakEvenAnalysis.sensitivity}</p>
+                            <p className="text-sm font-medium mb-2">Year 1 Revenue Streams:</p>
+                            <div className="space-y-2">
+                              {project.financialOutput.revenueBreakdown.year1.map((stream: any, index: number) => (
+                                <div key={index} className="flex justify-between items-center p-2 bg-muted rounded">
+                                  <span className="text-sm">{stream.stream}</span>
+                                  <div className="text-right">
+                                    <div className="text-sm font-medium">{stream.amount}</div>
+                                    <div className="text-xs text-muted-foreground">{stream.percentage}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -1049,11 +1125,21 @@ export default function ProjectPage() {
                       <h4 className="font-medium mb-3 flex items-center gap-2">
                         📋 Key Financial Assumptions
                       </h4>
-                      <ul className="text-sm text-muted-foreground list-disc list-inside">
-                        {project.financialOutput.keyAssumptions.map((assumption: string, index: number) => (
-                          <li key={index}>{assumption}</li>
+                      <div className="space-y-3">
+                        {project.financialOutput.keyAssumptions.map((assumption: any, index: number) => (
+                          <div key={index} className="p-3 bg-muted rounded-lg">
+                            <div className="flex justify-between items-start mb-2">
+                              <p className="text-sm font-medium">{assumption.assumption || assumption}</p>
+                              {assumption.value && (
+                                <Badge variant="outline" className="text-xs">{assumption.value}</Badge>
+                              )}
+                            </div>
+                            {assumption.justification && (
+                              <p className="text-xs text-muted-foreground">{assumption.justification}</p>
+                            )}
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </Card>
                   )}
                 </div>
@@ -1609,15 +1695,10 @@ export default function ProjectPage() {
       {/* Complete Report View */}
       {currentStep === "complete" && project && (
         <>
-          {console.log("Rendering complete report view, project:", project)}
           <CompleteReportView project={project} />
         </>
       )}
 
-      {/* Debug info */}
-      {currentStep === "complete" && !project && (
-        <div>Debug: currentStep is complete but project is null</div>
-      )}
     </div>
   );
 }

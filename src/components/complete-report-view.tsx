@@ -41,7 +41,6 @@ interface CompleteReportViewProps {
 }
 
 export function CompleteReportView({ project }: CompleteReportViewProps) {
-  console.log("CompleteReportView component rendered with project:", project);
   const [activeTab, setActiveTab] = useState("overview");
   const [isExporting, setIsExporting] = useState(false);
 
@@ -156,12 +155,12 @@ Value Proposition: ${project.blueprintOutput?.valueProposition?.core || 'N/A'}
 Funding Analysis:
 - Seed Funding Required: ${project.financialOutput?.fundingAnalysis?.seedFunding || 'N/A'}
 - Runway (Months): ${project.financialOutput?.fundingAnalysis?.runwayMonths || 'N/A'}
-- Path to Profitability: ${project.financialOutput?.fundingAnalysis?.pathToProfitability || 'N/A'}
+- Monthly Burn Rate: ${project.financialOutput?.fundingAnalysis?.avgMonthlyNetBurnYear1 || 'N/A'}
 
 Revenue Projections:
-- Year 1: ${project.financialOutput?.revenueProjections?.year1 || 'N/A'}
-- Year 2: ${project.financialOutput?.revenueProjections?.year2 || 'N/A'}
-- Year 3: ${project.financialOutput?.revenueProjections?.year3 || 'N/A'}
+- Year 1: ${project.financialOutput?.threeYearProjections?.year1?.totalRevenue || 'N/A'}
+- Year 2: ${project.financialOutput?.threeYearProjections?.year2?.totalRevenue || 'N/A'}
+- Year 3: ${project.financialOutput?.threeYearProjections?.year3?.totalRevenue || 'N/A'}
 
 ==============================================
 5. INVESTOR PITCH HIGHLIGHTS
@@ -435,9 +434,9 @@ For questions or updates, visit https://venture-forge.com
                   </div>
                   <div className="text-center p-4 bg-muted rounded-lg">
                     <div className="text-2xl font-bold text-primary mb-1">
-                      {project.financialOutput?.fundingAnalysis?.pathToProfitability || 'N/A'}
+                      {project.financialOutput?.pathToProfitability?.breakEvenMonth || 'N/A'}
                     </div>
-                    <div className="text-sm text-muted-foreground">Path to Profitability</div>
+                    <div className="text-sm text-muted-foreground">Break-even Timeline</div>
                   </div>
                 </div>
               </CardContent>
@@ -451,19 +450,19 @@ For questions or updates, visit https://venture-forge.com
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="text-center p-4 bg-muted rounded-lg">
                     <div className="text-2xl font-bold text-primary mb-1">
-                      {project.financialOutput?.revenueProjections?.year1 || 'N/A'}
+                      {project.financialOutput?.threeYearProjections?.year1?.totalRevenue || 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">Year 1 Revenue</div>
                   </div>
                   <div className="text-center p-4 bg-muted rounded-lg">
                     <div className="text-2xl font-bold text-primary mb-1">
-                      {project.financialOutput?.revenueProjections?.year2 || 'N/A'}
+                      {project.financialOutput?.threeYearProjections?.year2?.totalRevenue || 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">Year 2 Revenue</div>
                   </div>
                   <div className="text-center p-4 bg-muted rounded-lg">
                     <div className="text-2xl font-bold text-primary mb-1">
-                      {project.financialOutput?.revenueProjections?.year3 || 'N/A'}
+                      {project.financialOutput?.threeYearProjections?.year3?.totalRevenue || 'N/A'}
                     </div>
                     <div className="text-sm text-muted-foreground">Year 3 Revenue</div>
                   </div>

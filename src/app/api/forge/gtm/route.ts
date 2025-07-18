@@ -101,13 +101,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a summarized business context to reduce token usage
+    const ideaOutput = project.ideaOutput as any;
+    const researchOutput = project.researchOutput as any;
+    const blueprintOutput = project.blueprintOutput as any;
+    const financialOutput = project.financialOutput as any;
+    const pitchOutput = project.pitchOutput as any;
+    
     const businessContext = {
-      businessIdea: project.ideaOutput?.selectedIdea?.title || "Business concept",
-      targetMarket: project.researchOutput?.targetCustomerAnalysis?.primarySegment || "Target market TBD",
-      valueProposition: project.blueprintOutput?.valueProposition?.core || "Value prop TBD",
-      revenueModel: project.blueprintOutput?.revenueStreams?.primary || "Revenue model TBD",
-      fundingNeeds: project.financialOutput?.fundingAnalysis?.seedFunding || "Funding TBD",
-      targetCustomers: project.pitchOutput?.marketOpportunity?.targetCustomer || "Customers TBD"
+      businessIdea: ideaOutput?.selectedIdea?.title || "Business concept",
+      targetMarket: researchOutput?.targetCustomerAnalysis?.primarySegment || "Target market TBD",
+      valueProposition: blueprintOutput?.valueProposition?.core || "Value prop TBD",
+      revenueModel: blueprintOutput?.revenueStreams?.primary || "Revenue model TBD",
+      fundingNeeds: financialOutput?.fundingAnalysis?.seedFunding || "Funding TBD",
+      targetCustomers: pitchOutput?.marketOpportunity?.targetCustomer || "Customers TBD"
     };
 
     // Call OpenAI API with reduced context
