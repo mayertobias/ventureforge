@@ -1,18 +1,92 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, Coins, Sparkles, TrendingUp, Zap, Trophy, Lightbulb, Target } from "lucide-react";
+import { BarChart3, Coins, Sparkles, TrendingUp, Zap, Trophy, Lightbulb, Target, Calendar } from "lucide-react";
 import { NewProjectDialog } from "@/components/new-project-dialog";
 import { CreditDisplay } from "@/components/credit-display";
 import { OnboardingTour } from "@/components/onboarding-tour";
+import Link from "next/link";
+
+interface Project {
+  id: string;
+  name: string;
+  createdAt: string;
+  ideaOutput?: any;
+  researchOutput?: any;
+  blueprintOutput?: any;
+  financialOutput?: any;
+  pitchOutput?: any;
+  gtmOutput?: any;
+}
+
+interface UserStats {
+  projects: Project[];
+  credits: number;
+  totalIdeas: number;
+  creditsUsed: number;
+}
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
 
   console.log("Dashboard - Session status:", status);
   console.log("Dashboard - Session data:", session);
+
+  // Fetch user stats
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      if (!session) return;
+      
+      try {
+        const [projectsRes, creditsRes] = await Promise.all([
+          fetch('/api/projects'),
+          fetch('/api/user/credits')
+        ]);
+        
+        const projectsData = await projectsRes.json();
+        const creditsData = await creditsRes.json();
+        
+        // Calculate stats
+        const projects = projectsData.projects || [];
+        const totalIdeas = projects.reduce((acc: number, project: Project) => {
+          return acc + (project.ideaOutput ? 1 : 0);
+        }, 0);
+        
+        const creditsUsed = 100 - creditsData.credits; // Assuming they start with 100
+        
+        setUserStats({
+          projects,
+          credits: creditsData.credits,
+          totalIdeas,
+          creditsUsed
+        });
+      } catch (error) {
+        console.error('Error fetching user stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserStats();
+  }, [session]);
+
+  const getProjectProgress = (project: Project) => {
+    const steps = ['ideaOutput', 'researchOutput', 'blueprintOutput', 'financialOutput', 'pitchOutput', 'gtmOutput'];
+    const completed = steps.filter(step => project[step as keyof Project]).length;
+    return { completed, total: steps.length };
+  };
+
+  const getRecentProjects = () => {
+    if (!userStats?.projects) return [];
+    return userStats.projects
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3);
+  };
 
   if (status === "loading") {
     return (
@@ -79,10 +153,10 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">0</div>
+            <div className="text-3xl font-bold text-gray-900">{userStats?.projects.length || 0}</div>
             <p className="text-xs text-gray-500 flex items-center mt-1">
               <TrendingUp className="h-3 w-3 mr-1" />
-              Ready to start your journey
+              {userStats?.projects.length ? `${userStats.projects.length} project${userStats.projects.length > 1 ? 's' : ''} created` : 'Ready to start your journey'}
             </p>
           </CardContent>
         </Card>
@@ -95,10 +169,10 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">25</div>
+            <div className="text-3xl font-bold text-gray-900">{userStats?.credits || 0}</div>
             <p className="text-xs text-gray-500 flex items-center mt-1">
               <Zap className="h-3 w-3 mr-1" />
-              Starter credits remaining
+              {userStats?.credits ? `${userStats.credits} credits remaining` : 'Loading credits...'}
             </p>
           </CardContent>
         </Card>
@@ -111,10 +185,10 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">0</div>
+            <div className="text-3xl font-bold text-gray-900">{userStats?.totalIdeas || 0}</div>
             <p className="text-xs text-gray-500 flex items-center mt-1">
               <Lightbulb className="h-3 w-3 mr-1" />
-              Start your first project
+              {userStats?.totalIdeas ? `${userStats.totalIdeas} idea${userStats.totalIdeas > 1 ? 's' : ''} generated` : 'Start your first project'}
             </p>
           </CardContent>
         </Card>
@@ -205,28 +279,88 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="h-8 w-8 text-gray-400" />
+            {!userStats?.projects.length ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  No activity yet. Create your first project to get started!
+                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>Projects</span>
+                    <span>0</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>Ideas Generated</span>
+                    <span>0</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    <span>Credits Used</span>
+                    <span>0</span>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mb-4">
-                No activity yet. Create your first project to get started!
-              </p>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                  <span>Projects</span>
-                  <span>0</span>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Projects</span>
+                    <span>{userStats.projects.length}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Ideas Generated</span>
+                    <span>{userStats.totalIdeas}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-500">
+                    <span>Credits Used</span>
+                    <span>{userStats.creditsUsed}</span>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                  <span>Ideas Generated</span>
-                  <span>0</span>
-                </div>
-                <div className="flex items-center justify-between text-xs text-gray-400">
-                  <span>Credits Used</span>
-                  <span>0</span>
+                
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">Recent Projects</h4>
+                  <div className="space-y-3">
+                    {getRecentProjects().map((project) => {
+                      const progress = getProjectProgress(project);
+                      return (
+                        <Link key={project.id} href={`/projects/${project.id}`}>
+                          <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                            <div className="flex items-center justify-between mb-1">
+                              <h5 className="text-sm font-medium text-gray-900 truncate">{project.name}</h5>
+                              <span className="text-xs text-gray-500">
+                                {progress.completed}/{progress.total}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs text-gray-500 flex items-center">
+                                <Calendar className="h-3 w-3 mr-1" />
+                                {new Date(project.createdAt).toLocaleDateString()}
+                              </span>
+                              <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                                <div 
+                                  className="bg-blue-600 h-1.5 rounded-full" 
+                                  style={{ width: `${(progress.completed / progress.total) * 100}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                  
+                  {userStats.projects.length > 3 && (
+                    <Link href="/projects">
+                      <Button variant="outline" size="sm" className="w-full mt-3">
+                        View All Projects
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
