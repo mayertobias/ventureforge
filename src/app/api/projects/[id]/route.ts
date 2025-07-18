@@ -59,7 +59,8 @@ export async function GET(
           
           // Only attempt decryption if data appears to be encrypted
           if (fieldData && typeof fieldData === 'object' && 
-              (fieldData.encrypted || fieldData.iv || fieldData.authTag)) {
+              !Array.isArray(fieldData) && !(fieldData instanceof Date) &&
+              ((fieldData as any).encrypted || (fieldData as any).iv || (fieldData as any).authTag)) {
             const decryptedData = await KMSService.decryptUserData(
               user.id, 
               fieldData
