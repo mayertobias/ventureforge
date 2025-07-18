@@ -8,78 +8,195 @@ export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
 const BLUEPRINT_COST = 15; // Credits required for business blueprint
 
-const BLUEPRINT_PROMPT = `You are the 'Blueprint Architect' module of VentureForge AI.
+const BLUEPRINT_PROMPT = `You are the 'Blueprint Architect' module of VentureForge AI, an elite business strategist and operational architect.
 
-**Task:** Formulate a comprehensive business model and strategic plan based on the provided research.
+**CRITICAL REQUIREMENT:** Design a comprehensive, execution-ready business model that real entrepreneurs can immediately implement. This blueprint will guide actual business decisions and investor presentations. Generic strategies or placeholder content is unacceptable.
 
-**INPUT:**
-- research_report: {research_report}
+**TASK:** Create a comprehensive business architecture and strategic framework based on: {research_report}
 
-**OUTPUT FORMAT:**
-Return a JSON object with this exact structure:
+**METHODOLOGY:**
+1. Business Model Analysis: Evaluate optimal revenue models based on market research
+2. Strategic Positioning: Define unique value propositions for each customer segment
+3. Operational Architecture: Design scalable systems and processes
+4. Competitive Strategy: Build defensible moats and sustainable advantages
+5. Execution Roadmap: Provide concrete steps for implementation
+
+**OUTPUT FORMAT - COMPREHENSIVE BUSINESS BLUEPRINT:**
 {
-  "coreBusinessModel": {
-    "model": "Platform-as-a-Service (PaaS) / Data-as-a-Service (DaaS) / SaaS / Marketplace / etc.",
-    "rationale": "Explanation why this model is optimal for the business"
+  "executiveSummary": {
+    "businessConcept": "2-sentence clear description of what this business does and why it matters",
+    "marketOpportunity": "$X.XB market opportunity with specific target of $X.XM SAM",
+    "uniqueAdvantage": "Primary competitive differentiation that creates sustainable moat",
+    "revenueProjection": "Year 3 revenue target: $X.XM with X% gross margins"
   },
-  "revenueStreams": [
-    {
-      "stream": "Revenue Stream Name",
-      "type": "Subscription / One-Time / Usage-Based / Commission",
-      "targetSegment": "Target customer segment",
-      "illustrativePrice": "$XX/month or $XXX one-time",
-      "justification": "Why this pricing makes sense"
+  "coreBusinessModel": {
+    "primaryModel": "Specific model (e.g., B2B SaaS, Marketplace, DaaS)",
+    "rationale": "Detailed justification based on market analysis, customer behavior, and competitive landscape",
+    "revenueLogic": "How the business captures value: unit economics and scalability factors",
+    "businessModelCanvas": {
+      "keyPartners": ["Strategic partner 1 with specific role", "Partner 2 with value exchange"],
+      "keyActivities": ["Core activity 1", "Core activity 2", "Core activity 3"],
+      "keyResources": ["Critical resource 1", "Critical resource 2", "Critical resource 3"],
+      "costStructure": ["Major cost category 1", "Major cost category 2", "Major cost category 3"]
     }
-  ],
-  "valuePropositions": [
-    {
-      "segment": "Customer Segment",
-      "value": "Specific value proposition for this segment",
-      "keyBenefits": ["benefit1", "benefit2", "benefit3"]
-    }
-  ],
-  "operationalPlan": {
-    "coreOperations": [
+  },
+  "revenueArchitecture": {
+    "primaryStreams": [
       {
-        "operation": "Operation Name",
-        "description": "What this operation involves",
-        "resources": "Required resources",
-        "scalingStrategy": "How to scale this operation"
+        "streamName": "Primary Revenue Stream",
+        "model": "Subscription/Usage/One-time/Hybrid",
+        "targetSegment": "Specific customer segment",
+        "pricingStrategy": "$XXX/month or $X,XXX one-time",
+        "justification": "Based on customer value analysis: saves $X/month, ROI of X% in Y months",
+        "scalabilityFactor": "Revenue multiplier as customer base grows",
+        "year3Projection": "$X.XM ARR from this stream"
       }
     ],
-    "technologyStack": {
-      "frontend": "Technology choices for frontend",
-      "backend": "Backend architecture recommendations",
-      "database": "Database technology and structure",
-      "ai_ml": "AI/ML components and models"
-    },
-    "qualityControl": {
-      "kpis": ["KPI 1", "KPI 2", "KPI 3"],
-      "qualityMetrics": "How to measure and maintain quality",
-      "scalingPlan": "Strategy for scaling operations"
+    "pricingPhilosophy": "Value-based/Cost-plus/Competitive/Penetration pricing with specific rationale",
+    "monetizationTimeline": "Month 1: MVP launch at $X, Month 6: Premium tier at $Y, Year 2: Enterprise at $Z",
+    "unitEconomics": {
+      "averageRevenuePerUser": "$XXX/month growing to $XXX/month by Year 3",
+      "customerLifetimeValue": "$X,XXX based on X% churn and Y months average tenure",
+      "grossMarginPerCustomer": "XX% after COGS including service delivery costs"
     }
   },
-  "goToMarketStrategy": {
-    "primaryChannels": ["channel1", "channel2", "channel3"],
-    "customerAcquisition": "Strategy for acquiring first customers",
-    "partnerships": "Potential strategic partnerships",
-    "marketingStrategy": "High-level marketing approach"
+  "customerStrategy": {
+    "primarySegments": [
+      {
+        "segmentName": "Target Segment 1",
+        "size": "X,XXX companies/individuals in addressable market",
+        "characteristics": "Specific demographics, firmographics, and behavioral traits",
+        "painPoints": ["Quantified pain point 1", "Measurable pain point 2"],
+        "valueProposition": "We help [segment] achieve [specific outcome] by [unique method], resulting in [quantified benefit]",
+        "willingnessToPay": "$XXX/month based on value delivered vs. cost of alternatives",
+        "acquisitionStrategy": "Specific channel mix: XX% inbound, XX% outbound, XX% partnerships"
+      }
+    ],
+    "customerJourney": {
+      "awareness": "How prospects discover the solution",
+      "consideration": "Decision criteria and evaluation process",
+      "purchase": "Conversion process and onboarding",
+      "retention": "Success metrics and expansion opportunities"
+    }
   },
-  "competitiveAdvantage": {
-    "dataMoat": "How data creates competitive advantage",
-    "networkEffects": "Any network effects in the business",
-    "switchingCosts": "Factors that create customer stickiness",
-    "uniqueAssets": "Proprietary assets or capabilities"
+  "operationalBlueprint": {
+    "coreOperations": [
+      {
+        "operationName": "Product Development",
+        "description": "Specific processes for building and iterating the product",
+        "keyPersonnel": "X engineers, Y designers, Z product managers",
+        "toolsAndSystems": "Development stack, project management, quality assurance",
+        "scalingStrategy": "How to grow development capacity: offshore vs. onshore, team structure",
+        "qualityMetrics": "Bug rate <X%, feature delivery velocity of Y features/sprint"
+      },
+      {
+        "operationName": "Customer Success",
+        "description": "Onboarding, support, and retention processes",
+        "keyPersonnel": "X CSMs handling Y customers each",
+        "toolsAndSystems": "CRM, helpdesk, onboarding automation",
+        "scalingStrategy": "Self-service features, tiered support model, automation",
+        "qualityMetrics": "NPS >X, churn rate <Y%, time to value <Z days"
+      }
+    ],
+    "technologyArchitecture": {
+      "frontend": "React/Vue/Angular with justification for choice based on team expertise",
+      "backend": "Node.js/Python/Java with microservices/monolith decision rationale",
+      "database": "PostgreSQL/MongoDB choice based on data structure and scale needs",
+      "infrastructure": "AWS/GCP/Azure with specific services and cost projections",
+      "aiMlStack": "Specific AI models, training pipelines, and deployment strategy",
+      "securityCompliance": "SOC2, GDPR, HIPAA requirements and implementation plan"
+    },
+    "qualityAssurance": {
+      "productQuality": "Automated testing coverage >XX%, performance benchmarks",
+      "serviceQuality": "SLA targets: XX% uptime, <Xs response time",
+      "dataQuality": "Accuracy >XX%, completeness >XX%, validation processes",
+      "continuousImprovement": "Weekly retrospectives, monthly quality reviews, quarterly audits"
+    }
+  },
+  "goToMarketExecution": {
+    "launchStrategy": {
+      "mvpDefinition": "Specific features for initial launch",
+      "targetDate": "Month X post-funding",
+      "initialMarket": "Geographic/demographic focus for launch",
+      "successMetrics": "X customers, $X MRR, X% market penetration in initial segment"
+    },
+    "acquisitionChannels": [
+      {
+        "channel": "Content Marketing + SEO",
+        "strategy": "Target keywords: [keyword1], [keyword2] with estimated XX searches/month",
+        "investment": "$X,XXX/month for content creation and optimization",
+        "expectedResults": "XX leads/month at $XX CAC by Month 6",
+        "scalability": "Can scale to XXX leads/month with additional investment"
+      },
+      {
+        "channel": "Direct Sales",
+        "strategy": "Outbound prospecting to [specific company types] with [specific titles]",
+        "investment": "$XXX,XXX for X SDRs and Y AEs",
+        "expectedResults": "XX qualified meetings/month, XX% close rate",
+        "scalability": "Each additional rep can generate $X,XXX ARR annually"
+      }
+    ],
+    "partnershipStrategy": {
+      "strategicPartnerships": ["Partner type 1 for distribution", "Partner type 2 for integration"],
+      "channelPartnerships": "Reseller/referral program with X% commission structure",
+      "technologyPartnerships": "Integrations with [platform1], [platform2] for ecosystem play"
+    }
+  },
+  "competitiveStrategy": {
+    "sustainableAdvantages": [
+      {
+        "advantage": "Data Network Effects",
+        "description": "More users generate better data, creating superior AI models",
+        "defensibility": "Compounds over time, difficult for new entrants to replicate",
+        "strengthening": "Continuous data collection and model improvement creates widening moat"
+      },
+      {
+        "advantage": "Switching Costs",
+        "description": "Customer workflows and integrations create lock-in",
+        "defensibility": "High cost and effort to migrate to competitors",
+        "strengthening": "Deeper integrations and workflow automation increase stickiness"
+      }
+    ],
+    "competitiveResponse": {
+      "directCompetitors": "How to defend against [Competitor A] and [Competitor B]",
+      "indirectThreats": "Strategy against build vs. buy decisions by enterprises",
+      "newEntrants": "Barriers to entry and first-mover advantage protection"
+    },
+    "innovationStrategy": {
+      "rdInvestment": "XX% of revenue reinvested in product development",
+      "innovationAreas": "AI advancement, user experience, platform capabilities",
+      "patentStrategy": "IP protection for core algorithms and processes"
+    }
+  },
+  "riskManagement": {
+    "businessRisks": [
+      {
+        "risk": "Market adoption slower than projected",
+        "probability": "Medium",
+        "impact": "High",
+        "mitigation": "Multiple customer segments, pivot capability, extended runway"
+      }
+    ],
+    "operationalRisks": [
+      {
+        "risk": "Key talent departure",
+        "probability": "Medium", 
+        "impact": "High",
+        "mitigation": "Equity incentives, knowledge documentation, succession planning"
+      }
+    ],
+    "contingencyPlans": "Revenue scenarios: base case, upside case, downside case with specific triggers"
   }
 }
 
-**Core Principles:**
-- Strategic & Analytical: Focus on business model viability
-- Data-Driven: Ground recommendations in research insights
-- Scalable: Design for growth and expansion
-- Defensible: Create sustainable competitive advantages
+**QUALITY STANDARDS:**
+- All strategies must be specific, actionable, and implementation-ready
+- Include concrete metrics, timelines, and resource requirements
+- Reference market research findings and competitive intelligence
+- Demonstrate clear path from current state to market leadership
+- Show understanding of industry dynamics and business model economics
 
-Generate comprehensive business blueprint now.`;
+Generate a comprehensive, execution-ready business blueprint now. Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
   try {

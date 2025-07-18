@@ -8,101 +8,183 @@ export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
 const PITCH_COST = 8; // Credits required for pitch generation
 
-const PITCH_PROMPT = `You are the 'Pitch Perfect' module of VentureForge AI.
+const PITCH_PROMPT = `You are the 'Pitch Perfect' module of VentureForge AI, an elite investment banker and pitch strategist.
 
-**Task:** Synthesize all previous outputs into a compelling, investor-ready executive summary and structured pitch deck content.
+**CRITICAL REQUIREMENT:** Create an investment-grade pitch that sophisticated VCs and angel investors will immediately understand and evaluate. This pitch will be used in actual funding rounds and board presentations. Generic content or vague assertions are unacceptable.
 
-**INPUT:**
-- full_business_plan: {full_business_plan}
+**TASK:** Transform comprehensive business plan into compelling, investment-ready materials: {full_business_plan}
 
-**OUTPUT FORMAT:**
-Return a JSON object with this exact structure:
+**METHODOLOGY:**
+1. Narrative Architecture: Build a compelling investment story with clear problem-solution fit
+2. Market Validation: Demonstrate significant opportunity with defensible positioning
+3. Financial Logic: Show clear path to substantial returns with realistic projections
+4. Risk Assessment: Address key concerns proactively with mitigation strategies
+5. Investor Psychology: Appeal to both rational analysis and emotional conviction
+
+**OUTPUT FORMAT - INVESTMENT-GRADE PITCH:**
 {
-  "executiveSummary": "A concise, powerful paragraph covering the problem, solution, market, traction, and financial ask. This should be investorready and compelling.",
-  "pitchDeckContent": {
-    "problem": {
-      "title": "The Problem",
-      "content": "1-2 sentences describing the core problem being solved",
-      "marketSize": "$X.XB market affected by this problem"
+  "executiveSummary": "Compelling 3-4 sentence summary that captures: (1) The specific problem and market size, (2) Unique solution and defensible advantage, (3) Financial opportunity and growth trajectory, (4) Funding ask and key milestone. Must be immediately compelling to busy investors.",
+  "pitchDeckSlides": {
+    "problemSlide": {
+      "headline": "Specific, Quantified Problem Statement",
+      "problemStatement": "Detailed description of the pain point affecting specific customer segments",
+      "marketPainPoints": ["$X cost annually", "Y hours wasted per transaction", "Z% failure rate in current solutions"],
+      "urgency": "Why this problem is getting worse and needs solving now",
+      "personalConnection": "Relatable scenario that makes the problem tangible"
     },
-    "solution": {
-      "title": "The Solution", 
-      "content": "1-2 sentences describing the product/service",
-      "keyFeatures": ["feature1", "feature2", "feature3"]
+    "solutionSlide": {
+      "headline": "Revolutionary Solution That Addresses Root Cause",
+      "solutionDescription": "Clear explanation of how the product/service solves the problem uniquely",
+      "keyDifferentiators": ["Specific advantage 1", "Specific advantage 2", "Specific advantage 3"],
+      "productDemo": "Visual or conceptual description of the user experience",
+      "proofOfConcept": "Evidence that the solution works (prototype, pilot, early results)"
     },
-    "marketOpportunity": {
-      "title": "Market Opportunity",
-      "tam": "$X.XB",
-      "sam": "$X.XM",
-      "marketTrends": "Key trends driving market growth"
+    "marketOpportunitySlide": {
+      "headline": "Massive Market Opportunity with Clear Entry Point",
+      "marketSizing": {
+        "tam": "$X.XB Total Addressable Market with methodology",
+        "sam": "$X.XM Serviceable Addressable Market with constraints",
+        "som": "$X.XM Serviceable Obtainable Market (3-5 year target)"
+      },
+      "marketTrends": ["Trend 1 driving X% growth", "Trend 2 creating new demand", "Trend 3 disrupting incumbents"],
+      "timingRationale": "Why now is the perfect time for this solution"
     },
-    "uniqueValue": {
-      "title": "Unique Value & Data Moat",
-      "dataMoat": "How data creates competitive advantage",
-      "defensibility": "What makes this defensible",
-      "networkEffects": "Any network effects present"
+    "businessModelSlide": {
+      "headline": "Proven Revenue Model with Strong Unit Economics",
+      "revenueModel": "Primary business model with specific pricing strategy",
+      "unitEconomics": {
+        "customerAcquisitionCost": "$XXX CAC with 12-month payback",
+        "lifetimeValue": "$X,XXX LTV resulting in X:1 LTV/CAC ratio",
+        "grossMargin": "XX% gross margin improving to XX% at scale"
+      },
+      "revenueStreams": "Primary and secondary revenue sources with relative contribution",
+      "scalabilityFactors": "How revenue scales with customer growth and market expansion"
     },
-    "businessModel": {
-      "title": "Business Model",
-      "revenueStreams": "Primary revenue streams",
-      "pricingStrategy": "How pricing works",
-      "unitEconomics": "Key unit economics metrics"
+    "tractionSlide": {
+      "headline": "Strong Early Traction Validates Product-Market Fit",
+      "keyMetrics": {
+        "customers": "XXX paying customers with XX% month-over-month growth",
+        "revenue": "$XXX MRR with $X,XXX average deal size",
+        "retention": "XX% retention rate and XX% net revenue retention"
+      },
+      "socialProof": ["Customer testimonial highlighting specific value", "Industry recognition or awards"],
+      "milestoneProgression": "Key achievements in chronological order showing momentum",
+      "marketValidation": "Proof points that confirm market demand and willingness to pay"
     },
-    "traction": {
-      "title": "Traction",
-      "keyMilestones": ["milestone1", "milestone2", "milestone3"],
-      "proofPoints": "Evidence of market validation",
-      "earlyCustomers": "Early adopter information"
+    "competitionSlide": {
+      "headline": "Defensible Competitive Position with Clear Moats",
+      "competitiveLandscape": "Direct and indirect competitors with their limitations",
+      "competitiveAdvantages": [
+        {
+          "advantage": "Technology/Data/Network advantage",
+          "description": "Specific description of the moat",
+          "defensibility": "Why competitors cannot easily replicate this"
+        }
+      ],
+      "marketPositioning": "How the company positions against alternatives",
+      "winningStrategy": "Specific plan to capture market share from incumbents"
     },
-    "financialHighlights": {
-      "title": "Financial Highlights",
-      "revenueProjection": "Projecting $XM revenue in Year 3",
-      "grossMargin": "X% gross margin",
-      "profitability": "Path to profitability timeline"
+    "financialProjectionsSlide": {
+      "headline": "Path to $XXM Revenue with Clear Profitability Timeline",
+      "revenueGrowth": {
+        "year1": "$XXX,XXX revenue",
+        "year2": "$X.XM revenue (XXX% growth)",
+        "year3": "$X.XM revenue (XXX% growth)",
+        "year5": "$XXM revenue target"
+      },
+      "profitabilityMetrics": {
+        "grossMargin": "XX% gross margin by Year 3",
+        "ebitdaMargin": "XX% EBITDA margin by Year 5",
+        "breakEven": "Break-even in Month XX"
+      },
+      "keyDrivers": "Primary metrics driving financial performance",
+      "sensitivityAnalysis": "Upside and downside scenarios with probability estimates"
     },
-    "theAsk": {
-      "title": "The Ask",
-      "fundingAmount": "$1.5M",
-      "useOfFunds": "What the money will be used for",
-      "keyMilestone": "Key milestone to achieve with funding",
-      "timeline": "18-month runway"
+    "fundingAskSlide": {
+      "headline": "Strategic $1.5M Investment to Achieve Market Leadership",
+      "fundingAmount": "$1,500,000 Series Seed",
+      "useOfFunds": {
+        "productDevelopment": "XX% ($XXX,XXX) - Specific development milestones",
+        "salesMarketing": "XX% ($XXX,XXX) - Customer acquisition scaling",
+        "teamExpansion": "XX% ($XXX,XXX) - Key hires with titles and timing",
+        "workingCapital": "XX% ($XXX,XXX) - Operations and contingency"
+      },
+      "keyMilestones": "Critical achievements this funding will enable",
+      "nextFundingRound": "Series A target: $X-YM in Month XX at $XM-YM valuation",
+      "investorReturns": "Projected X-Y multiple return based on exit scenarios"
     },
-    "team": {
-      "title": "The Team", 
-      "teamStrength": "Brief description of founding team expertise",
-      "advisors": "Key advisors or board members",
-      "hiringPlan": "Key roles to hire"
+    "teamSlide": {
+      "headline": "Proven Team with Domain Expertise and Execution Track Record",
+      "founderBios": "Brief but compelling backgrounds highlighting relevant experience",
+      "teamStrengths": "Complementary skills covering technology, business, and market expertise",
+      "advisorBoard": "Industry advisors and their specific contributions",
+      "hiringPlan": "Key roles to be filled with funding and their impact on growth",
+      "culturalAdvantage": "Unique team dynamics or hiring advantages"
     },
-    "exitStrategy": {
-      "title": "Exit Strategy",
-      "potentialAcquirers": ["acquirer1", "acquirer2"],
-      "exitTimeline": "5-7 years",
-      "valuationMultiple": "X-Y revenue multiple expected"
+    "exitStrategySlide": {
+      "headline": "Clear Path to Liquidity with Multiple Exit Options",
+      "exitScenarios": [
+        {
+          "type": "Strategic Acquisition",
+          "potentialAcquirers": ["Company A (rationale)", "Company B (rationale)"],
+          "valuationRange": "$X-YM based on revenue multiples",
+          "strategicRationale": "Why acquirers would pay premium"
+        },
+        {
+          "type": "IPO Path",
+          "timeline": "Year 5-7 at $XXM+ revenue",
+          "comparablePublicCos": "Trading at X-Y revenue multiples",
+          "marketReadiness": "Path to IPO-ready scale and metrics"
+        }
+      ],
+      "investorReturns": "Target X-Y multiple return over 5-7 year period",
+      "liquidityEvents": "Potential secondary opportunities or partial exits"
     }
   },
-  "investorFAQ": [
+  "investorQA": [
     {
-      "question": "What is your competitive advantage?",
-      "answer": "Detailed answer addressing defensibility"
+      "question": "What is your sustainable competitive advantage?",
+      "answer": "Detailed explanation of defensible moats with specific examples and timeline for building them"
     },
     {
-      "question": "How do you plan to acquire customers?",
-      "answer": "Customer acquisition strategy and costs"
+      "question": "How do you plan to acquire customers cost-effectively?",
+      "answer": "Multi-channel acquisition strategy with specific CAC targets and scaling plan"
     },
     {
-      "question": "What are the key risks?",
-      "answer": "Main risks and mitigation strategies"
+      "question": "What are the biggest risks to your business model?",
+      "answer": "Honest assessment of key risks with specific mitigation strategies and contingency plans"
+    },
+    {
+      "question": "How does this scale to a billion-dollar company?",
+      "answer": "Long-term vision with market expansion opportunities and revenue scale potential"
+    },
+    {
+      "question": "Why is this the right team to execute on this opportunity?",
+      "answer": "Team credibility based on relevant experience, domain expertise, and execution capability"
+    },
+    {
+      "question": "What happens if a big tech company enters your market?",
+      "answer": "Competitive response strategy and advantages that protect against big tech disruption"
     }
-  ]
+  ],
+  "appendixData": {
+    "marketResearch": "Key market size and trend data with sources",
+    "customerReferences": "Customer testimonials and case studies",
+    "technicalDetails": "Product architecture and technical differentiation",
+    "financialModel": "Detailed unit economics and assumption sensitivity",
+    "competitorAnalysis": "In-depth competitive positioning and response plan"
+  }
 }
 
-**Core Principles:**
-- Investor-Focused: Write for sophisticated investors
-- Compelling Narrative: Tell a cohesive story
-- Data-Driven: Support claims with concrete numbers
-- Action-Oriented: Clear next steps and asks
+**QUALITY STANDARDS:**
+- Every claim must be backed by specific data or logical reasoning
+- Financial projections must align with provided business plan
+- Narrative must flow logically from problem to solution to opportunity
+- Address investor concerns proactively without appearing defensive
+- Balance ambitious vision with realistic near-term execution
+- Include specific metrics, timelines, and success criteria throughout
 
-Generate investor-ready pitch content now.`;
+Generate a compelling, investment-grade pitch presentation now. Return ONLY the JSON object.`;
 
 export async function POST(request: NextRequest) {
   try {
