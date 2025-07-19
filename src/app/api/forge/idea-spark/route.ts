@@ -75,11 +75,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify session project exists and user owns it
-    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    // Verify project exists in database and user owns it
+    const dbProject = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        userId: user.id,
+      },
+    });
+
+    if (!dbProject) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Check if project has expired
+    if (dbProject.expiresAt && dbProject.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get or create session storage for this project
+    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    if (!sessionProject) {
+      SessionStorageService.createProjectSession(
+        user.id,
+        dbProject.name,
+        dbProject.storageMode === 'PERSISTENT',
+        dbProject.expiresAt || undefined,
+        dbProject.id
+      );
+      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    }
 
     if (!sessionProject) {
-      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
+      return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
     // Call OpenAI API

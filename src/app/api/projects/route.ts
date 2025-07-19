@@ -32,17 +32,9 @@ export async function POST(request: NextRequest) {
     const shouldUsePersistentStorage = persistentStorage && user.allowPersistentStorage;
     const storageMode = shouldUsePersistentStorage ? 'PERSISTENT' : 'MEMORY_ONLY';
 
-    // Create session-based project
-    const sessionProjectId = SessionStorageService.createProjectSession(
-      user.id, 
-      name.trim(),
-      shouldUsePersistentStorage
-    );
-
-    // Create database record with appropriate storage mode
+    // Create database record first to get proper ID
     const project = await prisma.project.create({
       data: {
-        id: sessionProjectId,
         name: name.trim(),
         userId: user.id,
         storageMode: storageMode as any,
@@ -50,6 +42,15 @@ export async function POST(request: NextRequest) {
         // Content fields remain null - populated based on storage mode
       },
     });
+
+    // Create session-based storage using the database project ID
+    SessionStorageService.createProjectSession(
+      user.id, 
+      name.trim(),
+      shouldUsePersistentStorage,
+      project.expiresAt || undefined,
+      project.id // Use the database project ID
+    );
 
     return NextResponse.json({ project }, { status: 201 });
   } catch (error) {
@@ -78,23 +79,39 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get session-based projects (active memory only)
-    const sessionProjects = SessionStorageService.getUserProjectSessions(user.id);
-    
-    // Convert to expected format
-    const projects = sessionProjects.map(sessionProject => ({
-      id: sessionProject.id,
-      name: sessionProject.name,
-      createdAt: sessionProject.createdAt.toISOString(),
-      userId: sessionProject.userId,
-      // Include session data for compatibility
-      ideaOutput: sessionProject.data.ideaOutput,
-      researchOutput: sessionProject.data.researchOutput,
-      blueprintOutput: sessionProject.data.blueprintOutput,
-      financialOutput: sessionProject.data.financialOutput,
-      pitchOutput: sessionProject.data.pitchOutput,
-      gtmOutput: sessionProject.data.gtmOutput,
-    }));
+    // Get database projects and merge with session data
+    const dbProjects = await prisma.project.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Convert to expected format, merging with session data
+    const projects = dbProjects.map(dbProject => {
+      const sessionProject = SessionStorageService.getProjectSession(dbProject.id, user.id);
+      
+      return {
+        id: dbProject.id,
+        name: dbProject.name,
+        createdAt: dbProject.createdAt.toISOString(),
+        updatedAt: dbProject.updatedAt.toISOString(),
+        userId: dbProject.userId,
+        storageMode: dbProject.storageMode,
+        expiresAt: dbProject.expiresAt?.toISOString(),
+        // Use session data if available, otherwise database data
+        ideaOutput: sessionProject?.data.ideaOutput || dbProject.ideaOutput,
+        researchOutput: sessionProject?.data.researchOutput || dbProject.researchOutput,
+        blueprintOutput: sessionProject?.data.blueprintOutput || dbProject.blueprintOutput,
+        financialOutput: sessionProject?.data.financialOutput || dbProject.financialOutput,
+        pitchOutput: sessionProject?.data.pitchOutput || dbProject.pitchOutput,
+        gtmOutput: sessionProject?.data.gtmOutput || dbProject.gtmOutput,
+      };
+    }).filter(project => {
+      // Filter out expired memory-only projects
+      if (project.storageMode === 'MEMORY_ONLY' && project.expiresAt) {
+        return new Date(project.expiresAt) > new Date();
+      }
+      return true;
+    });
 
     return NextResponse.json({ projects });
   } catch (error) {

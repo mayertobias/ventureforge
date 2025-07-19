@@ -48,11 +48,12 @@ class SessionStorageService {
     userId: string, 
     projectName: string,
     isPersistent: boolean = false,
-    customExpiration?: Date
+    customExpiration?: Date,
+    customProjectId?: string
   ): string {
-    const projectId = isPersistent 
+    const projectId = customProjectId || (isPersistent 
       ? `persistent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      : `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      : `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
     
     const now = new Date();
     const defaultExpiration = isPersistent 

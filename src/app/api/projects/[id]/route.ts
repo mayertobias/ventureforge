@@ -26,30 +26,48 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get session-based project data
-    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    // Get database project first
+    const dbProject = await prisma.project.findFirst({
+      where: {
+        id: projectId,
+        userId: user.id,
+      },
+    });
 
-    if (!sessionProject) {
-      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
+    if (!dbProject) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Convert session data to expected project format
+    // Check if project has expired
+    if (dbProject.expiresAt && dbProject.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get session data if available
+    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+
+    // Convert to expected project format, prioritizing session data
     const project = {
-      id: sessionProject.id,
-      name: sessionProject.name,
-      createdAt: sessionProject.createdAt.toISOString(),
-      updatedAt: sessionProject.lastAccessed.toISOString(),
-      userId: sessionProject.userId,
-      ideaOutput: sessionProject.data.ideaOutput,
-      researchOutput: sessionProject.data.researchOutput,
-      blueprintOutput: sessionProject.data.blueprintOutput,
-      financialOutput: sessionProject.data.financialOutput,
-      pitchOutput: sessionProject.data.pitchOutput,
-      gtmOutput: sessionProject.data.gtmOutput,
+      id: dbProject.id,
+      name: dbProject.name,
+      createdAt: dbProject.createdAt.toISOString(),
+      updatedAt: dbProject.updatedAt.toISOString(),
+      userId: dbProject.userId,
+      storageMode: dbProject.storageMode,
+      expiresAt: dbProject.expiresAt?.toISOString(),
+      // Use session data if available, otherwise database data (for persistent projects)
+      ideaOutput: sessionProject?.data.ideaOutput || dbProject.ideaOutput,
+      researchOutput: sessionProject?.data.researchOutput || dbProject.researchOutput,
+      blueprintOutput: sessionProject?.data.blueprintOutput || dbProject.blueprintOutput,
+      financialOutput: sessionProject?.data.financialOutput || dbProject.financialOutput,
+      pitchOutput: sessionProject?.data.pitchOutput || dbProject.pitchOutput,
+      gtmOutput: sessionProject?.data.gtmOutput || dbProject.gtmOutput,
     };
 
-    // Extend session when user accesses the project
-    SessionStorageService.extendSession(projectId, user.id, 2);
+    // Extend session when user accesses the project (if session exists)
+    if (sessionProject) {
+      SessionStorageService.extendSession(projectId, user.id, 2);
+    }
 
     return NextResponse.json({ project });
   } catch (error) {
