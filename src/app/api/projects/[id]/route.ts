@@ -45,6 +45,16 @@ export async function GET(
 
     // Get session data if available
     const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    console.log(`[PROJECT_FETCH] Project ID: ${projectId}, User ID: ${user.id}`);
+    console.log(`[PROJECT_FETCH] Session found:`, !!sessionProject);
+    if (sessionProject) {
+      console.log(`[PROJECT_FETCH] Session data keys:`, Object.keys(sessionProject.data));
+      console.log(`[PROJECT_FETCH] ideaOutput exists:`, !!sessionProject.data.ideaOutput);
+      console.log(`[PROJECT_FETCH] researchOutput exists:`, !!sessionProject.data.researchOutput);
+      if (sessionProject.data.researchOutput) {
+        console.log(`[PROJECT_FETCH] researchOutput structure:`, sessionProject.data.researchOutput);
+      }
+    }
 
     // Convert to expected project format, prioritizing session data
     const project = {
@@ -63,6 +73,8 @@ export async function GET(
       pitchOutput: sessionProject?.data.pitchOutput || dbProject.pitchOutput,
       gtmOutput: sessionProject?.data.gtmOutput || dbProject.gtmOutput,
     };
+
+    console.log(`[PROJECT_FETCH] Final project researchOutput:`, project.researchOutput);
 
     // Extend session when user accesses the project (if session exists)
     if (sessionProject) {

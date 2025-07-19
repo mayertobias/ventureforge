@@ -194,6 +194,9 @@ Return the response as a properly formatted JSON object.`;
     }
 
     // Store research output in session memory (no database persistence for privacy)
+    console.log(`[RESEARCH] Storing data for project ${projectId}, user ${user.id}`);
+    console.log(`[RESEARCH] Data to store:`, parsedResponse);
+    
     const updateSuccess = SessionStorageService.updateProjectData(
       projectId,
       user.id,
@@ -201,8 +204,17 @@ Return the response as a properly formatted JSON object.`;
       parsedResponse
     );
 
+    console.log(`[RESEARCH] Update success:`, updateSuccess);
     if (!updateSuccess) {
+      console.error(`[RESEARCH] Failed to update session data`);
       return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+    
+    // Verify the data was stored correctly
+    const verifySession = SessionStorageService.getProjectSession(projectId, user.id);
+    console.log(`[RESEARCH] Verification - session exists:`, !!verifySession);
+    if (verifySession) {
+      console.log(`[RESEARCH] Verification - researchOutput stored:`, !!verifySession.data.researchOutput);
     }
 
     // Track usage and deduct credits
