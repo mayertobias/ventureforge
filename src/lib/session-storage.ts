@@ -44,9 +44,20 @@ class SessionStorageService {
   /**
    * Create a new project session
    */
-  static createProjectSession(userId: string, projectName: string): string {
-    const projectId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  static createProjectSession(
+    userId: string, 
+    projectName: string,
+    isPersistent: boolean = false,
+    customExpiration?: Date
+  ): string {
+    const projectId = isPersistent 
+      ? `persistent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      : `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
     const now = new Date();
+    const defaultExpiration = isPersistent 
+      ? new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 days for persistent
+      : new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours for memory-only
     
     const session: ProjectSession = {
       id: projectId,
@@ -54,12 +65,12 @@ class SessionStorageService {
       name: projectName,
       createdAt: now,
       lastAccessed: now,
-      expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), // 24 hours
+      expiresAt: customExpiration || defaultExpiration,
       data: {}
     };
 
     this.sessions.set(projectId, session);
-    console.log(`Created session project: ${projectId} for user: ${userId}`);
+    console.log(`Created ${isPersistent ? 'persistent' : 'session'} project: ${projectId} for user: ${userId}`);
     
     return projectId;
   }

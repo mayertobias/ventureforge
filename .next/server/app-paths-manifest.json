@@ -11,8 +11,8 @@
   "/api/forge/financials/route": "app/api/forge/financials/route.js",
   "/api/forge/blueprint/route": "app/api/forge/blueprint/route.js",
   "/api/forge/gtm/route": "app/api/forge/gtm/route.js",
-  "/api/forge/research-gemini/route": "app/api/forge/research-gemini/route.js",
   "/api/forge/research/route": "app/api/forge/research/route.js",
+  "/api/forge/research-gemini/route": "app/api/forge/research-gemini/route.js",
   "/api/forge/pitch/route": "app/api/forge/pitch/route.js",
   "/api/reports/generate/route": "app/api/reports/generate/route.js",
   "/page": "app/page.js",
@@ -21,7 +21,7 @@
   "/trust/page": "app/trust/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/marketplace/page": "app/marketplace/page.js",
+  "/projects/page": "app/projects/page.js",
   "/settings/page": "app/settings/page.js",
-  "/projects/[id]/page": "app/projects/[id]/page.js",
-  "/projects/page": "app/projects/page.js"
+  "/projects/[id]/page": "app/projects/[id]/page.js"
 }

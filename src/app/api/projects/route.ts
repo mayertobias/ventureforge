@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name } = await request.json();
+    const { name, persistentStorage } = await request.json();
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return NextResponse.json({ error: "Project name is required" }, { status: 400 });
@@ -21,22 +21,33 @@ export async function POST(request: NextRequest) {
     // Find the user by email
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
+      include: { preferences: true }
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Create session-based project (no database storage for privacy)
-    const sessionProjectId = SessionStorageService.createProjectSession(user.id, name.trim());
+    // Determine storage mode based on user preference and request
+    const shouldUsePersistentStorage = persistentStorage && user.allowPersistentStorage;
+    const storageMode = shouldUsePersistentStorage ? 'PERSISTENT' : 'MEMORY_ONLY';
 
-    // Create minimal database record for project listing (no sensitive data)
+    // Create session-based project
+    const sessionProjectId = SessionStorageService.createProjectSession(
+      user.id, 
+      name.trim(),
+      shouldUsePersistentStorage
+    );
+
+    // Create database record with appropriate storage mode
     const project = await prisma.project.create({
       data: {
-        id: sessionProjectId, // Use session ID as project ID
+        id: sessionProjectId,
         name: name.trim(),
         userId: user.id,
-        // All output fields will remain null - data stored in session only
+        storageMode: storageMode as any,
+        expiresAt: shouldUsePersistentStorage ? null : new Date(Date.now() + 24 * 60 * 60 * 1000),
+        // Content fields remain null - populated based on storage mode
       },
     });
 

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
 import { SessionStorageService } from "@/lib/session-storage";
+import { UsageTrackingService } from "@/lib/usage-tracking";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -65,8 +66,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has enough credits
-    if (user.credits < IDEA_SPARK_COST) {
+    // Check if user has enough credits using tracking service
+    const hasCredits = await UsageTrackingService.checkCredits(user.id, IDEA_SPARK_COST);
+    if (!hasCredits) {
       return NextResponse.json(
         { error: "Insufficient credits", required: IDEA_SPARK_COST, current: user.credits },
         { status: 402 }
@@ -135,12 +137,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
     }
 
-    // Deduct credits from user account
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        credits: user.credits - IDEA_SPARK_COST,
-      },
+    // Track usage and deduct credits
+    await UsageTrackingService.trackUsage({
+      userId: user.id,
+      action: 'IDEA_GENERATION',
+      creditsUsed: IDEA_SPARK_COST,
+      projectId: projectId,
+      projectName: sessionProject.name,
+      metadata: {
+        aiModel: 'gpt-4',
+        inputLength: userInput.length,
+        ideaCount: parsedResponse.ideas?.length || 0
+      }
     });
 
     return NextResponse.json({
