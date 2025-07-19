@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
-import { KMSService } from "@/lib/kms";
+import { SessionStorageService } from "@/lib/session-storage";
+import { UsageTrackingService } from "@/lib/usage-tracking";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -211,8 +212,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has enough credits
-    if (user.credits < FINANCIALS_COST) {
+    // Check if user has enough credits using tracking service
+    const hasCredits = await UsageTrackingService.checkCredits(user.id, FINANCIALS_COST);
+    if (!hasCredits) {
       return NextResponse.json(
         { error: "Insufficient credits", required: FINANCIALS_COST, current: user.credits },
         { status: 402 }
@@ -231,23 +233,41 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    if (!project.blueprintOutput) {
+    // Check if project has expired
+    if (project.expiresAt && project.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get or create session storage for this project
+    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    if (!sessionProject) {
+      SessionStorageService.createProjectSession(
+        user.id,
+        project.name,
+        project.storageMode === 'PERSISTENT',
+        project.expiresAt || undefined,
+        project.id
+      );
+      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    }
+
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
+    }
+
+    // Check if blueprint output exists in session storage
+    if (!sessionProject.data.blueprintOutput) {
       return NextResponse.json(
         { error: "Business blueprint must be completed before financial projections" },
         { status: 400 }
       );
     }
 
-    // Decrypt all previous outputs before using them
-    const decryptedIdeaOutput = project.ideaOutput ? await KMSService.decryptUserData(user.id, project.ideaOutput) : null;
-    const decryptedResearchOutput = project.researchOutput ? await KMSService.decryptUserData(user.id, project.researchOutput) : null;
-    const decryptedBlueprintOutput = await KMSService.decryptUserData(user.id, project.blueprintOutput);
-
-    // Combine all previous outputs for context
+    // Get all previous outputs from session storage
     const businessPlan = {
-      idea: decryptedIdeaOutput,
-      research: decryptedResearchOutput,
-      blueprint: decryptedBlueprintOutput
+      idea: sessionProject.data.ideaOutput || null,
+      research: sessionProject.data.researchOutput || null,
+      blueprint: sessionProject.data.blueprintOutput
     };
 
     // Use the new AI service with retry mechanism
@@ -286,25 +306,31 @@ export async function POST(request: NextRequest) {
       parsedResponse._retryCount = aiResult.retryCount;
     }
 
-    // Encrypt the financial output before storing
-    const encryptedFinancialOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+    // Store financial output in session memory (no database persistence for privacy)
+    const updateSuccess = SessionStorageService.updateProjectData(
+      projectId,
+      user.id,
+      'financialOutput',
+      parsedResponse
+    );
 
-    // Update project with the encrypted financial output and deduct credits
-    await prisma.$transaction([
-      prisma.project.update({
-        where: { id: projectId },
-        data: {
-          financialOutput: encryptedFinancialOutput,
-          updatedAt: new Date(),
-        },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: user.credits - FINANCIALS_COST,
-        },
-      }),
-    ]);
+    if (!updateSuccess) {
+      return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+
+    // Track usage and deduct credits
+    await UsageTrackingService.trackUsage({
+      userId: user.id,
+      action: 'FINANCIALS',
+      creditsUsed: FINANCIALS_COST,
+      projectId: projectId,
+      projectName: sessionProject.name,
+      metadata: {
+        aiModel: 'gpt-4',
+        retryCount: aiResult.retryCount,
+        successful: aiResult.successful
+      }
+    });
 
     return NextResponse.json({
       success: true,

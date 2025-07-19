@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
-import { KMSService } from "@/lib/kms";
+import { SessionStorageService } from "@/lib/session-storage";
+import { UsageTrackingService } from "@/lib/usage-tracking";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -103,24 +104,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has enough credits
-    if (user.credits < RESEARCH_COST) {
+    // Check if user has enough credits using tracking service
+    const hasCredits = await UsageTrackingService.checkCredits(user.id, RESEARCH_COST);
+    if (!hasCredits) {
       return NextResponse.json(
         { error: "Insufficient credits", required: RESEARCH_COST, current: user.credits },
         { status: 402 }
       );
     }
 
-    // Verify project ownership
-    const project = await prisma.project.findFirst({
+    // Verify project exists in database and user owns it
+    const dbProject = await prisma.project.findFirst({
       where: {
         id: projectId,
         userId: user.id,
       },
     });
 
-    if (!project) {
+    if (!dbProject) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Check if project has expired
+    if (dbProject.expiresAt && dbProject.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get or create session storage for this project
+    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    if (!sessionProject) {
+      SessionStorageService.createProjectSession(
+        user.id,
+        dbProject.name,
+        dbProject.storageMode === 'PERSISTENT',
+        dbProject.expiresAt || undefined,
+        dbProject.id
+      );
+      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    }
+
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
     // Create the research prompt
@@ -169,25 +193,31 @@ Return the response as a properly formatted JSON object.`;
       parsedResponse._retryCount = aiResult.retryCount;
     }
 
-    // Encrypt the research output before storing
-    const encryptedResearchOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+    // Store research output in session memory (no database persistence for privacy)
+    const updateSuccess = SessionStorageService.updateProjectData(
+      projectId,
+      user.id,
+      'researchOutput',
+      parsedResponse
+    );
 
-    // Update project with the encrypted research output and deduct credits
-    await prisma.$transaction([
-      prisma.project.update({
-        where: { id: projectId },
-        data: {
-          researchOutput: encryptedResearchOutput,
-          updatedAt: new Date(),
-        },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: user.credits - RESEARCH_COST,
-        },
-      }),
-    ]);
+    if (!updateSuccess) {
+      return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+
+    // Track usage and deduct credits
+    await UsageTrackingService.trackUsage({
+      userId: user.id,
+      action: 'RESEARCH',
+      creditsUsed: RESEARCH_COST,
+      projectId: projectId,
+      projectName: sessionProject.name,
+      metadata: {
+        aiModel: 'gemini-1.5-flash',
+        selectedIdea: selectedIdea?.title || 'Unknown',
+        retryCount: aiResult?.retryCount || 0
+      }
+    });
 
     return NextResponse.json({
       success: true,

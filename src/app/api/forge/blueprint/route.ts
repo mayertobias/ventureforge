@@ -4,7 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { geminiModel } from "@/lib/gemini";
 import { AIService } from "@/lib/ai-service";
-import { KMSService } from "@/lib/kms";
+import { SessionStorageService } from "@/lib/session-storage";
+import { UsageTrackingService } from "@/lib/usage-tracking";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
@@ -226,8 +227,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has enough credits
-    if (user.credits < BLUEPRINT_COST) {
+    // Check if user has enough credits using tracking service
+    const hasCredits = await UsageTrackingService.checkCredits(user.id, BLUEPRINT_COST);
+    if (!hasCredits) {
       return NextResponse.json(
         { error: "Insufficient credits", required: BLUEPRINT_COST, current: user.credits },
         { status: 402 }
@@ -246,20 +248,42 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    if (!project.researchOutput) {
+    // Check if project has expired
+    if (project.expiresAt && project.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get or create session storage for this project
+    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    if (!sessionProject) {
+      SessionStorageService.createProjectSession(
+        user.id,
+        project.name,
+        project.storageMode === 'PERSISTENT',
+        project.expiresAt || undefined,
+        project.id
+      );
+      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    }
+
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
+    }
+
+    // Check if research output exists in session storage
+    if (!sessionProject.data.researchOutput) {
       return NextResponse.json(
         { error: "Research must be completed before creating blueprint" },
         { status: 400 }
       );
     }
 
-    // Decrypt the research output before using it
-    const decryptedResearchOutput = await KMSService.decryptUserData(user.id, project.researchOutput);
+    const researchOutput = sessionProject.data.researchOutput;
 
     // Use the new AI service with retry mechanism and phased generation for complex blueprints
     console.log(`[BLUEPRINT] Starting blueprint generation for project ${projectId}`);
     
-    const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(decryptedResearchOutput));
+    const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(researchOutput));
     const userPrompt = `Please create a comprehensive business blueprint based on the research data.`;
 
     // For complex blueprints, use phased generation
@@ -267,7 +291,7 @@ export async function POST(request: NextRequest) {
       {
         prompt: prompt + "\n\nPHASE 1: Focus on executive summary, core business model, and revenue architecture only.",
         userPrompt: userPrompt + " Return only executiveSummary, coreBusinessModel, and revenueArchitecture sections.",
-        context: { phase: 1, research: project.researchOutput }
+        context: { phase: 1, research: researchOutput }
       },
       {
         prompt: prompt + "\n\nPHASE 2: Focus on customer strategy and operational blueprint.",
@@ -326,25 +350,31 @@ export async function POST(request: NextRequest) {
       parsedResponse._phaseResults = phasedResult.phases.map(p => ({ successful: p.successful, retryCount: p.retryCount }));
     }
 
-    // Encrypt the blueprint output before storing
-    const encryptedBlueprintOutput = await KMSService.encryptUserData(user.id, parsedResponse);
+    // Store blueprint output in session memory (no database persistence for privacy)
+    const updateSuccess = SessionStorageService.updateProjectData(
+      projectId,
+      user.id,
+      'blueprintOutput',
+      parsedResponse
+    );
 
-    // Update project with the encrypted blueprint output and deduct credits
-    await prisma.$transaction([
-      prisma.project.update({
-        where: { id: projectId },
-        data: {
-          blueprintOutput: encryptedBlueprintOutput,
-          updatedAt: new Date(),
-        },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: user.credits - BLUEPRINT_COST,
-        },
-      }),
-    ]);
+    if (!updateSuccess) {
+      return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+
+    // Track usage and deduct credits
+    await UsageTrackingService.trackUsage({
+      userId: user.id,
+      action: 'BLUEPRINT',
+      creditsUsed: BLUEPRINT_COST,
+      projectId: projectId,
+      projectName: sessionProject.name,
+      metadata: {
+        aiModel: 'gpt-4',
+        phasedGeneration: phasedResult.successful,
+        phaseCount: phasedResult.phases.length
+      }
+    });
 
     return NextResponse.json({
       success: true,
