@@ -48,9 +48,6 @@ export default function ProjectPage() {
       const response = await fetch(`/api/projects/${projectId}`);
       if (response.ok) {
         const data = await response.json();
-        console.log("Project data fetched:", data.project);
-        console.log("ideaOutput:", data.project.ideaOutput);
-        console.log("researchOutput:", data.project.researchOutput);
         setProject(data.project);
         
         // Determine current step based on URL parameter or what's completed
@@ -108,7 +105,6 @@ export default function ProjectPage() {
       });
 
       const data = await response.json();
-      console.log(`${endpoint} API response:`, data);
       
       if (!response.ok) {
         if (response.status === 402) {
@@ -125,7 +121,6 @@ export default function ProjectPage() {
       }
 
       // Refresh project data
-      console.log("Refreshing project data after AI generation...");
       await fetchProject();
       
       // Show success toast with animation
