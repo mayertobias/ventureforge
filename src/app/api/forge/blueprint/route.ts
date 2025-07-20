@@ -280,34 +280,34 @@ export async function POST(request: NextRequest) {
 
     const researchOutput = sessionProject.data.researchOutput;
 
-    // Use the new AI service with retry mechanism and phased generation for complex blueprints
+    // Use phased generation approach to handle timeouts while ensuring comprehensive output
     console.log(`[BLUEPRINT] Starting blueprint generation for project ${projectId}`);
     
     const prompt = BLUEPRINT_PROMPT.replace("{research_report}", JSON.stringify(researchOutput));
     const userPrompt = `Please create a comprehensive business blueprint based on the research data.`;
 
-    // For complex blueprints, use phased generation
+    // Break into phases to handle timeout but ensure comprehensive output
     const phases = [
       {
-        prompt: prompt + "\n\nPHASE 1: Focus on executive summary, core business model, and revenue architecture only.",
-        userPrompt: userPrompt + " Return only executiveSummary, coreBusinessModel, and revenueArchitecture sections.",
+        prompt: prompt + "\n\nPHASE 1: Generate executiveSummary, coreBusinessModel, and revenueArchitecture sections. Be comprehensive and detailed.",
+        userPrompt: userPrompt + " Focus on executive summary, business model, and revenue architecture. Return complete JSON for these sections.",
         context: { phase: 1, research: researchOutput }
       },
       {
-        prompt: prompt + "\n\nPHASE 2: Focus on customer strategy and operational blueprint.",
-        userPrompt: userPrompt + " Return only customerStrategy and operationalBlueprint sections.",
-        context: { phase: 2 }
+        prompt: prompt + "\n\nPHASE 2: Generate customerStrategy and operationalBlueprint sections. Be comprehensive and detailed.",
+        userPrompt: userPrompt + " Focus on customer strategy and operational blueprint. Return complete JSON for these sections.",
+        context: { phase: 2, research: researchOutput }
       },
       {
-        prompt: prompt + "\n\nPHASE 3: Focus on go-to-market execution, competitive strategy, and risk management.",
-        userPrompt: userPrompt + " Return only goToMarketExecution, competitiveStrategy, and riskManagement sections.",
-        context: { phase: 3 }
+        prompt: prompt + "\n\nPHASE 3: Generate goToMarketExecution, competitiveStrategy, and riskManagement sections. Be comprehensive and detailed.",
+        userPrompt: userPrompt + " Focus on go-to-market, competitive strategy, and risk management. Return complete JSON for these sections.",
+        context: { phase: 3, research: researchOutput }
       }
     ];
 
     const phasedResult = await AIService.generateInPhases(phases, {
       maxRetries: 3,
-      timeoutMs: 180000, // 3 minutes per phase
+      timeoutMs: 120000, // 2 minutes per phase (safer than single 5 minute request)
       backoffMs: 2000
     });
 
@@ -318,27 +318,36 @@ export async function POST(request: NextRequest) {
       
       // Try to parse each phase and combine them
       const combinedBlueprint: any = {};
+      let hasValidContent = false;
       
       for (let i = 0; i < phasedResult.phases.length; i++) {
         const phase = phasedResult.phases[i];
-        if (phase.successful) {
+        console.log(`[BLUEPRINT] Processing phase ${i + 1}: successful=${phase.successful}`);
+        
+        if (phase.successful && phase.content) {
           const jsonResult = AIService.parseJSONResponse(phase.content);
           if (jsonResult.success) {
+            console.log(`[BLUEPRINT] Phase ${i + 1} parsed successfully, keys:`, Object.keys(jsonResult.parsed));
             Object.assign(combinedBlueprint, jsonResult.parsed);
+            hasValidContent = true;
+          } else {
+            console.warn(`[BLUEPRINT] Phase ${i + 1} JSON parsing failed:`, jsonResult.error);
           }
         }
       }
 
-      // If we have some content, use it; otherwise fall back
-      if (Object.keys(combinedBlueprint).length > 0) {
+      // If we have some valid content, use it; otherwise try the combined content
+      if (hasValidContent) {
         parsedResponse = combinedBlueprint;
+        console.log(`[BLUEPRINT] Successfully combined phases, final keys:`, Object.keys(parsedResponse));
       } else {
-        console.warn(`[BLUEPRINT] Phase parsing failed, trying full response`);
+        console.warn(`[BLUEPRINT] Phase parsing failed, trying combined content`);
         const jsonResult = AIService.parseJSONResponse(phasedResult.combinedContent);
         
         if (jsonResult.success) {
           parsedResponse = jsonResult.parsed;
         } else {
+          console.error(`[BLUEPRINT] All parsing failed, using fallback`);
           parsedResponse = AIService.createFallbackResponse('blueprint', prompt);
           parsedResponse._originalResponse = phasedResult.combinedContent.substring(0, 500);
         }
@@ -370,9 +379,10 @@ export async function POST(request: NextRequest) {
       projectId: projectId,
       projectName: sessionProject.name,
       metadata: {
-        aiModel: 'gpt-4',
+        aiModel: 'gemini-1.5-flash',
         phasedGeneration: phasedResult.successful,
-        phaseCount: phasedResult.phases.length
+        phaseCount: phasedResult.phases.length,
+        successfulPhases: phasedResult.phases.filter(p => p.successful).length
       }
     });
 
