@@ -44,7 +44,7 @@ export async function GET(
     }
 
     // Get session data if available
-    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    const sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     console.log(`[PROJECT_FETCH] Project ID: ${projectId}, User ID: ${user.id}`);
     console.log(`[PROJECT_FETCH] Session found:`, !!sessionProject);
     if (sessionProject) {
@@ -78,7 +78,7 @@ export async function GET(
 
     // Extend session when user accesses the project (if session exists)
     if (sessionProject) {
-      SessionStorageService.extendSession(projectId, user.id, 2);
+      await SessionStorageService.extendSession(projectId, user.id, 2);
     }
 
     return NextResponse.json({ project });

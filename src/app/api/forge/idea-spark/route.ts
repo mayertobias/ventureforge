@@ -93,16 +93,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create session storage for this project
-    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     if (!sessionProject) {
-      SessionStorageService.createProjectSession(
+      await SessionStorageService.createProjectSession(
         user.id,
         dbProject.name,
         dbProject.storageMode === 'PERSISTENT',
         dbProject.expiresAt || undefined,
         dbProject.id
       );
-      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+      sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     }
 
     if (!sessionProject) {
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store idea output in session memory (no database persistence for privacy)
-    const updateSuccess = SessionStorageService.updateProjectData(
+    const updateSuccess = await SessionStorageService.updateProjectData(
       projectId,
       user.id,
       'ideaOutput',

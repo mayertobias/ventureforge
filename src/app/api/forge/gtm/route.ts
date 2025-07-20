@@ -312,16 +312,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create session storage for this project
-    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     if (!sessionProject) {
-      SessionStorageService.createProjectSession(
+      await SessionStorageService.createProjectSession(
         user.id,
         project.name,
         project.storageMode === 'PERSISTENT',
         project.expiresAt || undefined,
         project.id
       );
-      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+      sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     }
 
     if (!sessionProject) {
@@ -415,7 +415,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Store GTM output in session memory (no database persistence for privacy)
-    const updateSuccess = SessionStorageService.updateProjectData(
+    const updateSuccess = await SessionStorageService.updateProjectData(
       projectId,
       user.id,
       'gtmOutput',

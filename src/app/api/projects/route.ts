@@ -86,8 +86,8 @@ export async function GET(request: NextRequest) {
     });
 
     // Convert to expected format, merging with session data
-    const projects = dbProjects.map(dbProject => {
-      const sessionProject = SessionStorageService.getProjectSession(dbProject.id, user.id);
+    const projects = await Promise.all(dbProjects.map(async (dbProject) => {
+      const sessionProject = await SessionStorageService.getProjectSession(dbProject.id, user.id);
       
       return {
         id: dbProject.id,
@@ -105,15 +105,17 @@ export async function GET(request: NextRequest) {
         pitchOutput: sessionProject?.data.pitchOutput || dbProject.pitchOutput,
         gtmOutput: sessionProject?.data.gtmOutput || dbProject.gtmOutput,
       };
-    }).filter(project => {
-      // Filter out expired memory-only projects
+    }));
+
+    // Filter out expired memory-only projects
+    const filteredProjects = projects.filter(project => {
       if (project.storageMode === 'MEMORY_ONLY' && project.expiresAt) {
         return new Date(project.expiresAt) > new Date();
       }
       return true;
     });
 
-    return NextResponse.json({ projects });
+    return NextResponse.json({ projects: filteredProjects });
   } catch (error) {
     console.error("Error fetching projects:", error);
     return NextResponse.json(

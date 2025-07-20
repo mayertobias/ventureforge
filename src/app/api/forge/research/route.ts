@@ -3,12 +3,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { openai } from "@/lib/openai";
+import { SessionStorageService } from "@/lib/session-storage";
+import { UsageTrackingService } from "@/lib/usage-tracking";
 
 export const maxDuration = 300; // Set timeout to 300 seconds (5 minutes)
 
-const RESEARCH_COST = 8; // Credits required for deep research (reduced cost)
+const RESEARCH_COST = 8; // Credits required for deep research (legacy route - being phased out)
 
-const RESEARCH_PROMPT = `You are the 'Deep Dive Research' module of VentureForge AI.
+const RESEARCH_PROMPT = `You are the 'Deep Dive Research' module of VentureForge AI (Legacy Route).
+
+**PRIVACY NOTE:** This is a legacy research route that is being phased out in favor of research-gemini for better privacy compliance.
 
 **Task:** Conduct exhaustive, data-backed research on the selected business idea. Synthesize information and provide comprehensive market analysis.
 
@@ -99,24 +103,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user has enough credits
-    if (user.credits < RESEARCH_COST) {
+    // Check if user has enough credits using tracking service
+    const hasCredits = await UsageTrackingService.checkCredits(user.id, RESEARCH_COST);
+    if (!hasCredits) {
       return NextResponse.json(
         { error: "Insufficient credits", required: RESEARCH_COST, current: user.credits },
         { status: 402 }
       );
     }
 
-    // Verify project ownership
-    const project = await prisma.project.findFirst({
+    // Verify project exists in database and user owns it
+    const dbProject = await prisma.project.findFirst({
       where: {
         id: projectId,
         userId: user.id,
       },
     });
 
-    if (!project) {
+    if (!dbProject) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Check if project has expired
+    if (dbProject.expiresAt && dbProject.expiresAt < new Date()) {
+      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
+    }
+
+    // Get or create session storage for this project
+    let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
+    if (!sessionProject) {
+      await SessionStorageService.createProjectSession(
+        user.id,
+        dbProject.name,
+        dbProject.storageMode === 'PERSISTENT',
+        dbProject.expiresAt || undefined,
+        dbProject.id
+      );
+      sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
+    }
+
+    if (!sessionProject) {
+      return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
     // Call OpenAI API with faster model and reduced tokens to avoid timeout
@@ -176,22 +203,43 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    // Update project with the research output and deduct credits
-    await prisma.$transaction([
-      prisma.project.update({
-        where: { id: projectId },
-        data: {
-          researchOutput: parsedResponse,
-          updatedAt: new Date(),
-        },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: user.credits - RESEARCH_COST,
-        },
-      }),
-    ]);
+    // Store research output in session memory (respects privacy preferences)
+    console.log(`[RESEARCH-LEGACY] Storing data for project ${projectId}, user ${user.id}`);
+    console.log(`[RESEARCH-LEGACY] Data to store:`, parsedResponse);
+    
+    const updateSuccess = await SessionStorageService.updateProjectData(
+      projectId,
+      user.id,
+      'researchOutput',
+      parsedResponse
+    );
+
+    console.log(`[RESEARCH-LEGACY] Update success:`, updateSuccess);
+    if (!updateSuccess) {
+      console.error(`[RESEARCH-LEGACY] Failed to update session data`);
+      return NextResponse.json({ error: "Failed to update project data" }, { status: 500 });
+    }
+    
+    // Verify the data was stored correctly
+    const verifySession = await SessionStorageService.getProjectSession(projectId, user.id);
+    console.log(`[RESEARCH-LEGACY] Verification - session exists:`, !!verifySession);
+    if (verifySession) {
+      console.log(`[RESEARCH-LEGACY] Verification - researchOutput stored:`, !!verifySession.data.researchOutput);
+    }
+
+    // Track usage and deduct credits
+    await UsageTrackingService.trackUsage({
+      userId: user.id,
+      action: 'RESEARCH',
+      creditsUsed: RESEARCH_COST,
+      projectId: projectId,
+      projectName: sessionProject.name,
+      metadata: {
+        aiModel: 'gpt-4o-mini',
+        selectedIdea: selectedIdea?.title || 'Unknown',
+        routeType: 'legacy'
+      }
+    });
 
     return NextResponse.json({
       success: true,

@@ -7,12 +7,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle, Calendar, BarChart3, ArrowRight, Trash2, Download, Eye, CheckCircle, Lock } from "lucide-react";
 import { NewProjectDialog } from "@/components/new-project-dialog";
+import { ExportDeleteDialog } from "@/components/export-delete-dialog";
+import { StorageWarning, StorageModeBadge, ProjectValidationSummary } from "@/components/storage-warning";
+import { StorageValidationService } from "@/lib/storage-validation";
 import Link from "next/link";
 
 interface Project {
   id: string;
   name: string;
-  createdAt: string;
+  createdAt: string | Date;
+  storageMode?: string;
   ideaOutput?: any;
   researchOutput?: any;
   blueprintOutput?: any;
@@ -25,6 +29,8 @@ export default function ProjectsPage() {
   const { data: session } = useSession();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -44,6 +50,26 @@ export default function ProjectsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteProject = (project: Project) => {
+    setProjectToDelete(project);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteSuccess = () => {
+    // Refresh projects list after successful deletion
+    fetchProjects();
+    setProjectToDelete(null);
+  };
+
+  // Validate projects for storage mode consistency
+  const projectValidation = StorageValidationService.validateProjects(projects);
+  const { validProjects, problematicProjects } = projectValidation;
+
+  // Helper function to format date consistently
+  const formatDate = (date: string | Date) => {
+    return new Date(date).toLocaleDateString();
   };
 
   const getProjectProgress = (project: Project) => {
@@ -99,10 +125,82 @@ export default function ProjectsPage() {
         <NewProjectDialog hasExistingProjects={projects.length > 0} />
       </div>
 
+      {/* Privacy Validation Summary */}
+      <ProjectValidationSummary projects={projects} className="mb-6" />
+      
       {/* Projects Grid */}
       {projects.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => {
+        <div className="space-y-6">
+          {/* Problematic Projects - Show First */}
+          {problematicProjects.length > 0 && (
+            <div>
+              <h3 className="text-lg font-medium mb-4 text-red-600">
+                🚨 Projects Requiring Immediate Attention
+              </h3>
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+                {problematicProjects.map((project) => {
+                  const progress = getProjectProgress(project);
+                  const displayData = StorageValidationService.shouldDisplayData(project);
+                  
+                  return (
+                    <Card key={project.id} className="border-red-200 bg-red-50">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            {project.name}
+                            <StorageModeBadge storageMode={project.storageMode} />
+                          </CardTitle>
+                        </div>
+                        <CardDescription className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Created {formatDate(project.createdAt)}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Privacy Warning */}
+                        <StorageWarning 
+                          project={project}
+                          onExport={() => {
+                            // Handle export action
+                            window.open(`/projects/${project.id}?action=export`, '_blank');
+                          }}
+                          onDelete={() => handleDeleteProject(project)}
+                          onUpgrade={() => {
+                            // Handle storage upgrade
+                            console.log('Storage upgrade requested for', project.id);
+                          }}
+                        />
+                        
+                        {/* Minimal Actions */}
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDeleteProject(project)}
+                            className="flex-1"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Export & Delete
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          
+          {/* Valid Projects */}
+          {validProjects.length > 0 && (
+            <div>
+              {problematicProjects.length > 0 && (
+                <h3 className="text-lg font-medium mb-4 text-green-600">
+                  ✅ Healthy Projects
+                </h3>
+              )}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {validProjects.map((project) => {
             const progress = getProjectProgress(project);
             const status = getProjectStatus(project);
             const completedSteps = getCompletedStepNames(project);
@@ -115,16 +213,11 @@ export default function ProjectsPage() {
                     <div className="space-y-1">
                       <CardTitle className="text-lg flex items-center gap-2">
                         {project.name}
-                        <div className="group relative">
-                          <Lock className="h-4 w-4 text-green-600" />
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                            This project is encrypted with a key only you can access
-                          </div>
-                        </div>
+                        <StorageModeBadge storageMode={project.storageMode} />
                       </CardTitle>
                       <CardDescription className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        {new Date(project.createdAt).toLocaleDateString()}
+                        {formatDate(project.createdAt)}
                       </CardDescription>
                     </div>
                     <Badge className={status.color}>
@@ -149,6 +242,20 @@ export default function ProjectsPage() {
                       />
                     </div>
                   </div>
+
+                  {/* Storage Warning for Memory-Only Projects */}
+                  {project.storageMode === 'MEMORY_ONLY' && (
+                    <StorageWarning 
+                      project={project}
+                      onExport={() => {
+                        window.open(`/projects/${project.id}?action=export`, '_blank');
+                      }}
+                      onUpgrade={() => {
+                        console.log('Storage upgrade requested for', project.id);
+                      }}
+                      className="text-xs"
+                    />
+                  )}
 
                   {/* Completed Steps */}
                   {completedSteps.length > 0 && (
@@ -189,14 +296,22 @@ export default function ProjectsPage() {
                         </Link>
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDeleteProject(project)}
+                      title="Export and delete project"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             );
-          })}
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Empty State */
@@ -214,6 +329,18 @@ export default function ProjectsPage() {
             <NewProjectDialog hasExistingProjects={false} />
           </div>
         </div>
+      )}
+      
+      {/* Export and Delete Dialog */}
+      {projectToDelete && (
+        <ExportDeleteDialog
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          projectId={projectToDelete.id}
+          projectName={projectToDelete.name}
+          storageMode={projectToDelete.storageMode}
+          onSuccess={handleDeleteSuccess}
+        />
       )}
     </div>
   );

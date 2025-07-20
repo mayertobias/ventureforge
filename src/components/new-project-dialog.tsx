@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Sparkles, ArrowRight, Lightbulb } from "lucide-react";
+import { Plus, Sparkles, ArrowRight, Lightbulb, Shield, Database, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,18 +14,60 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useSession } from "next-auth/react";
 
 interface NewProjectDialogProps {
   hasExistingProjects?: boolean;
 }
 
+interface UserPreferences {
+  allowPersistentStorage: boolean;
+  defaultStorageMode?: string;
+}
+
 export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDialogProps) {
+  const { data: session } = useSession();
   const [open, setOpen] = React.useState(false);
   const [projectName, setProjectName] = React.useState("");
+  const [storageMode, setStorageMode] = React.useState<"MEMORY_ONLY" | "PERSISTENT">("MEMORY_ONLY");
+  const [understandsMemoryMode, setUnderstandsMemoryMode] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [userPreferences, setUserPreferences] = React.useState<UserPreferences | null>(null);
+
+  // Fetch user preferences when dialog opens
+  React.useEffect(() => {
+    if (open && session?.user) {
+      fetchUserPreferences();
+    }
+  }, [open, session]);
+
+  const fetchUserPreferences = async () => {
+    try {
+      const response = await fetch('/api/user/preferences');
+      if (response.ok) {
+        const prefs = await response.json();
+        setUserPreferences(prefs);
+        // Set default storage mode based on user preference
+        if (prefs.allowPersistentStorage && prefs.defaultStorageMode) {
+          setStorageMode(prefs.defaultStorageMode as "MEMORY_ONLY" | "PERSISTENT");
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch user preferences:', error);
+    }
+  };
 
   const handleCreateProject = async () => {
     if (!projectName.trim()) return;
+    
+    // For memory-only projects, require user confirmation
+    if (storageMode === "MEMORY_ONLY" && !understandsMemoryMode) {
+      alert("Please confirm that you understand memory-only storage before creating the project.");
+      return;
+    }
     
     setIsLoading(true);
     try {
@@ -34,7 +76,10 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: projectName }),
+        body: JSON.stringify({ 
+          name: projectName,
+          persistentStorage: storageMode === "PERSISTENT"
+        }),
       });
 
       if (!response.ok) {
@@ -43,7 +88,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
 
       const { project } = await response.json();
       setOpen(false);
-      setProjectName("");
+      resetForm();
       
       // Redirect to project workspace
       window.location.href = `/projects/${project.id}`;
@@ -55,8 +100,21 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
     }
   };
 
+  const resetForm = () => {
+    setProjectName("");
+    setStorageMode("MEMORY_ONLY");
+    setUnderstandsMemoryMode(false);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setOpen(open);
+    if (!open) {
+      resetForm();
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogClose}>
       <DialogTrigger asChild>
         <Button 
           className={`${
@@ -111,6 +169,88 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
               Choose a name that reflects your vision and target market
             </p>
           </div>
+
+          {/* Storage Mode Selection */}
+          <div className="space-y-4">
+            <Label className="text-sm font-medium text-gray-700">
+              Data Storage Preference
+            </Label>
+            <RadioGroup value={storageMode} onValueChange={(value) => setStorageMode(value as "MEMORY_ONLY" | "PERSISTENT")}>
+              <div className="space-y-3">
+                {/* Memory Only Option */}
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem value="MEMORY_ONLY" id="memory-only" className="mt-1" />
+                  <div className="flex-1">
+                    <Label htmlFor="memory-only" className="cursor-pointer">
+                      <div className="flex items-center gap-2 font-medium">
+                        <Shield className="h-4 w-4 text-green-600" />
+                        Memory Only (Recommended)
+                      </div>
+                    </Label>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Maximum privacy - your data is stored temporarily in memory only
+                    </p>
+                  </div>
+                </div>
+
+                {/* Persistent Storage Option */}
+                <div className="flex items-start space-x-3">
+                  <RadioGroupItem 
+                    value="PERSISTENT" 
+                    id="persistent" 
+                    className="mt-1" 
+                    disabled={!userPreferences?.allowPersistentStorage}
+                  />
+                  <div className="flex-1">
+                    <Label htmlFor="persistent" className={`cursor-pointer ${!userPreferences?.allowPersistentStorage ? 'opacity-50' : ''}`}>
+                      <div className="flex items-center gap-2 font-medium">
+                        <Database className="h-4 w-4 text-blue-600" />
+                        Persistent Storage
+                        {!userPreferences?.allowPersistentStorage && (
+                          <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">Disabled</span>
+                        )}
+                      </div>
+                    </Label>
+                    <p className="text-xs text-gray-600 mt-1">
+                      {userPreferences?.allowPersistentStorage 
+                        ? "Your data will be saved in our secure database for easy access"
+                        : "Enable persistent storage in your account settings to use this option"
+                      }
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Memory Mode Confirmation */}
+          {storageMode === "MEMORY_ONLY" && (
+            <Alert>
+              <Clock className="h-4 w-4" />
+              <AlertTitle>Privacy-First Storage</AlertTitle>
+              <AlertDescription className="space-y-3">
+                <p className="text-sm">
+                  With memory-only storage, your project data:
+                </p>
+                <ul className="text-xs space-y-1 ml-4">
+                  <li>• Is stored temporarily in your browser session</li>
+                  <li>• Expires after 24 hours automatically</li>
+                  <li>• Can be exported at any time as a download</li>
+                  <li>• Will be permanently deleted when you close your browser</li>
+                </ul>
+                <div className="flex items-top space-x-2 mt-3">
+                  <Checkbox 
+                    id="understand-memory" 
+                    checked={understandsMemoryMode}
+                    onCheckedChange={(checked) => setUnderstandsMemoryMode(checked as boolean)}
+                  />
+                  <Label htmlFor="understand-memory" className="text-xs leading-4">
+                    I understand that my data will not be permanently saved and I should export my project regularly.
+                  </Label>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
           
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-semibold text-blue-900 text-sm mb-2">What happens next?</h4>
@@ -133,7 +273,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
         <DialogFooter className="space-x-3">
           <Button
             variant="outline"
-            onClick={() => setOpen(false)}
+            onClick={() => handleDialogClose(false)}
             disabled={isLoading}
           >
             Cancel
@@ -141,7 +281,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
           <Button
             type="submit"
             onClick={handleCreateProject}
-            disabled={!projectName.trim() || isLoading}
+            disabled={!projectName.trim() || isLoading || (storageMode === "MEMORY_ONLY" && !understandsMemoryMode)}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
           >
             {isLoading ? (

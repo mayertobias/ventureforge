@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get session-based project data for report generation
-    const sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    const sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
 
     if (!sessionProject) {
       return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });

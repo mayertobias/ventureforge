@@ -131,16 +131,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create session storage for this project
-    let sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+    let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     if (!sessionProject) {
-      SessionStorageService.createProjectSession(
+      await SessionStorageService.createProjectSession(
         user.id,
         dbProject.name,
         dbProject.storageMode === 'PERSISTENT',
         dbProject.expiresAt || undefined,
         dbProject.id
       );
-      sessionProject = SessionStorageService.getProjectSession(projectId, user.id);
+      sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
     }
 
     if (!sessionProject) {
@@ -197,7 +197,7 @@ Return the response as a properly formatted JSON object.`;
     console.log(`[RESEARCH] Storing data for project ${projectId}, user ${user.id}`);
     console.log(`[RESEARCH] Data to store:`, parsedResponse);
     
-    const updateSuccess = SessionStorageService.updateProjectData(
+    const updateSuccess = await SessionStorageService.updateProjectData(
       projectId,
       user.id,
       'researchOutput',
@@ -211,7 +211,7 @@ Return the response as a properly formatted JSON object.`;
     }
     
     // Verify the data was stored correctly
-    const verifySession = SessionStorageService.getProjectSession(projectId, user.id);
+    const verifySession = await SessionStorageService.getProjectSession(projectId, user.id);
     console.log(`[RESEARCH] Verification - session exists:`, !!verifySession);
     if (verifySession) {
       console.log(`[RESEARCH] Verification - researchOutput stored:`, !!verifySession.data.researchOutput);

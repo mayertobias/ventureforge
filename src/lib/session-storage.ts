@@ -1,12 +1,17 @@
 /**
- * Session-Based Project Storage for VentureForge
+ * Privacy-First Project Storage for VentureForge
  * 
- * This service implements a memory-only storage model where:
- * - Project data is stored in server-side session memory only
- * - No sensitive business data is persisted to database
- * - Data is automatically cleared after export or session timeout
- * - Ultimate privacy: impossible for staff to access user data
+ * This service implements a dual storage model respecting user privacy preferences:
+ * - MEMORY_ONLY: AI responses stored in memory only, never persisted to database
+ * - PERSISTENT: User opted for database storage with automatic expiration
+ * - Database only stores project metadata, not sensitive business data for MEMORY_ONLY
+ * - Ultimate privacy: memory-only projects leave no database trace of AI responses
  */
+
+import { prisma } from './prisma';
+
+// In-memory storage for MEMORY_ONLY projects (serverless-compatible with limitations)
+const memoryStorage = new Map<string, ProjectSession>();
 
 interface ProjectSession {
   id: string;
@@ -26,31 +31,27 @@ interface ProjectSession {
 }
 
 class SessionStorageService {
-  private static sessions = new Map<string, ProjectSession>();
+  // Remove memory-based storage for serverless compatibility
   private static cleanupInterval: NodeJS.Timeout | null = null;
 
   /**
    * Initialize the session cleanup process
    */
   static initialize() {
-    if (!this.cleanupInterval) {
-      // Clean up expired sessions every 5 minutes
-      this.cleanupInterval = setInterval(() => {
-        this.cleanupExpiredSessions();
-      }, 5 * 60 * 1000);
-    }
+    // Serverless functions don't support intervals, cleanup happens on-demand
+    console.log('SessionStorageService initialized for serverless environment');
   }
 
   /**
    * Create a new project session
    */
-  static createProjectSession(
+  static async createProjectSession(
     userId: string, 
     projectName: string,
     isPersistent: boolean = false,
     customExpiration?: Date,
     customProjectId?: string
-  ): string {
+  ): Promise<string> {
     const projectId = customProjectId || (isPersistent 
       ? `persistent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
       : `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`);
@@ -60,172 +61,516 @@ class SessionStorageService {
       ? new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // 30 days for persistent
       : new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours for memory-only
     
-    const session: ProjectSession = {
-      id: projectId,
-      userId,
-      name: projectName,
-      createdAt: now,
-      lastAccessed: now,
-      expiresAt: customExpiration || defaultExpiration,
-      data: {}
-    };
+    try {
+      // Store session data in database temporarily
+      await prisma.project.upsert({
+        where: { id: projectId },
+        update: {
+          name: projectName,
+          expiresAt: customExpiration || defaultExpiration,
+          // Clear any existing session data
+          ideaOutput: undefined,
+          researchOutput: undefined,
+          blueprintOutput: undefined,
+          financialOutput: undefined,
+          pitchOutput: undefined,
+          gtmOutput: undefined,
+        },
+        create: {
+          id: projectId,
+          name: projectName,
+          userId,
+          storageMode: isPersistent ? 'PERSISTENT' : 'MEMORY_ONLY',
+          expiresAt: customExpiration || defaultExpiration,
+        }
+      });
 
-    this.sessions.set(projectId, session);
-    console.log(`Created ${isPersistent ? 'persistent' : 'session'} project: ${projectId} for user: ${userId}`);
-    
-    return projectId;
+      console.log(`Created ${isPersistent ? 'persistent' : 'session'} project: ${projectId} for user: ${userId}`);
+      return projectId;
+    } catch (error) {
+      console.error('Failed to create project session:', error);
+      throw new Error('Failed to create project session');
+    }
   }
 
   /**
-   * Get project session data
+   * Get project session data - respects privacy preferences
+   * MEMORY_ONLY: retrieves from memory storage
+   * PERSISTENT: retrieves from database
    */
-  static getProjectSession(projectId: string, userId: string): ProjectSession | null {
-    const session = this.sessions.get(projectId);
-    
-    if (!session || session.userId !== userId) {
+  static async getProjectSession(projectId: string, userId: string): Promise<ProjectSession | null> {
+    try {
+      const project = await prisma.project.findFirst({
+        where: {
+          id: projectId,
+          userId: userId,
+        }
+      });
+
+      if (!project) {
+        return null;
+      }
+
+      // Check if session has expired
+      if (project.expiresAt && project.expiresAt < new Date()) {
+        // Auto-delete expired sessions
+        await this.deleteProjectSession(projectId, userId);
+        return null;
+      }
+
+      const isMemoryOnly = project.storageMode === 'MEMORY_ONLY';
+      console.log(`[PRIVACY] Getting project ${projectId} - Mode: ${project.storageMode}`);
+
+      if (isMemoryOnly) {
+        // MEMORY_ONLY: Get from memory storage
+        const memoryKey = `${projectId}_${userId}`;
+        const memoryProject = memoryStorage.get(memoryKey);
+        
+        if (memoryProject) {
+          // Update last accessed time
+          memoryProject.lastAccessed = new Date();
+          console.log(`[PRIVACY] Retrieved MEMORY_ONLY project ${projectId} from memory`);
+          return memoryProject;
+        } else {
+          // Memory project not found, return project shell without AI data
+          console.log(`[PRIVACY] MEMORY_ONLY project ${projectId} not found in memory, returning empty shell`);
+          return {
+            id: project.id,
+            userId: project.userId,
+            name: project.name,
+            createdAt: project.createdAt,
+            lastAccessed: new Date(),
+            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+            data: {}
+          };
+        }
+      } else {
+        // PERSISTENT: Get from database as before
+        console.log(`[PRIVACY] Retrieved PERSISTENT project ${projectId} from database`);
+        return {
+          id: project.id,
+          userId: project.userId,
+          name: project.name,
+          createdAt: project.createdAt,
+          lastAccessed: new Date(),
+          expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+          data: {
+            ideaOutput: project.ideaOutput,
+            researchOutput: project.researchOutput,
+            blueprintOutput: project.blueprintOutput,
+            financialOutput: project.financialOutput,
+            pitchOutput: project.pitchOutput,
+            gtmOutput: project.gtmOutput,
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Failed to get project session:', error);
       return null;
     }
-
-    if (session.expiresAt < new Date()) {
-      this.sessions.delete(projectId);
-      return null;
-    }
-
-    // Update last accessed time
-    session.lastAccessed = new Date();
-    return session;
   }
 
   /**
-   * Update project session data
+   * Update project session data - respects privacy preferences
+   * MEMORY_ONLY: stores in memory only, clears database fields
+   * PERSISTENT: stores in database
    */
-  static updateProjectData(
+  static async updateProjectData(
     projectId: string, 
     userId: string, 
     field: keyof ProjectSession['data'], 
     data: any
-  ): boolean {
-    const session = this.getProjectSession(projectId, userId);
-    
-    if (!session) {
-      return false;
-    }
+  ): Promise<boolean> {
+    try {
+      // Verify project exists and user owns it
+      const project = await prisma.project.findFirst({
+        where: {
+          id: projectId,
+          userId: userId,
+        }
+      });
 
-    session.data[field] = data;
-    session.lastAccessed = new Date();
-    
-    console.log(`Updated ${field} for session project: ${projectId}`);
-    return true;
-  }
-
-  /**
-   * Get all project sessions for a user
-   */
-  static getUserProjectSessions(userId: string): ProjectSession[] {
-    const userSessions: ProjectSession[] = [];
-    const now = new Date();
-
-    this.sessions.forEach((session, projectId) => {
-      if (session.userId === userId && session.expiresAt > now) {
-        userSessions.push(session);
+      if (!project) {
+        console.error(`Project ${projectId} not found for user ${userId}`);
+        return false;
       }
-    });
 
-    return userSessions.sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime());
+      // Check if session has expired
+      if (project.expiresAt && project.expiresAt < new Date()) {
+        console.error(`Project ${projectId} has expired`);
+        await this.deleteProjectSession(projectId, userId);
+        return false;
+      }
+
+      const isMemoryOnly = project.storageMode === 'MEMORY_ONLY';
+      console.log(`[PRIVACY] Updating ${field} for project ${projectId} - Mode: ${project.storageMode}`);
+
+      if (isMemoryOnly) {
+        // MEMORY_ONLY: Store in memory, clear database fields to ensure privacy
+        const memoryKey = `${projectId}_${userId}`;
+        let memoryProject = memoryStorage.get(memoryKey);
+        
+        if (!memoryProject) {
+          // Initialize memory project from database (without AI data)
+          memoryProject = {
+            id: project.id,
+            userId: project.userId,
+            name: project.name,
+            createdAt: project.createdAt,
+            lastAccessed: new Date(),
+            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+            data: {}
+          };
+        }
+        
+        // Store data in memory
+        memoryProject.data[field] = data;
+        memoryProject.lastAccessed = new Date();
+        memoryStorage.set(memoryKey, memoryProject);
+        
+        // CRITICAL PRIVACY: Ensure database fields remain null for sensitive data
+        const dbClearData: any = {};
+        if (['ideaOutput', 'researchOutput', 'blueprintOutput', 'financialOutput', 'pitchOutput', 'gtmOutput'].includes(field)) {
+          dbClearData[field] = null; // Explicitly clear database field
+        }
+        
+        // Only update database if we need to clear sensitive fields
+        if (Object.keys(dbClearData).length > 0) {
+          await prisma.project.update({
+            where: { id: projectId },
+            data: dbClearData
+          });
+        }
+        
+        console.log(`[PRIVACY] Stored ${field} in memory for MEMORY_ONLY project ${projectId}`);
+        return true;
+        
+      } else {
+        // PERSISTENT: Store in database as before
+        const updateData: any = {
+          [field]: data
+        };
+
+        await prisma.project.update({
+          where: { id: projectId },
+          data: updateData
+        });
+        
+        console.log(`[PRIVACY] Stored ${field} in database for PERSISTENT project ${projectId}`);
+        return true;
+      }
+    } catch (error) {
+      console.error(`Failed to update project data for ${projectId}:`, error);
+      return false;
+    }
   }
 
   /**
-   * Delete a specific project session
+   * Get all project sessions for a user - respects privacy preferences
    */
-  static deleteProjectSession(projectId: string, userId: string): boolean {
-    const session = this.sessions.get(projectId);
-    
-    if (!session || session.userId !== userId) {
+  static async getUserProjectSessions(userId: string): Promise<ProjectSession[]> {
+    try {
+      const projects = await prisma.project.findMany({
+        where: {
+          userId: userId,
+          expiresAt: {
+            gt: new Date() // Only get non-expired projects
+          }
+        },
+        orderBy: {
+          updatedAt: 'desc'
+        }
+      });
+
+      return projects.map(project => {
+        const isMemoryOnly = project.storageMode === 'MEMORY_ONLY';
+        
+        if (isMemoryOnly) {
+          // For MEMORY_ONLY projects, get data from memory storage
+          const memoryKey = `${project.id}_${userId}`;
+          const memoryProject = memoryStorage.get(memoryKey);
+          
+          return {
+            id: project.id,
+            userId: project.userId,
+            name: project.name,
+            createdAt: project.createdAt,
+            lastAccessed: project.updatedAt,
+            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+            data: memoryProject?.data || {} // Memory data or empty object
+          };
+        } else {
+          // For PERSISTENT projects, get data from database
+          return {
+            id: project.id,
+            userId: project.userId,
+            name: project.name,
+            createdAt: project.createdAt,
+            lastAccessed: project.updatedAt,
+            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+            data: {
+              ideaOutput: project.ideaOutput,
+              researchOutput: project.researchOutput,
+              blueprintOutput: project.blueprintOutput,
+              financialOutput: project.financialOutput,
+              pitchOutput: project.pitchOutput,
+              gtmOutput: project.gtmOutput,
+            }
+          };
+        }
+      });
+    } catch (error) {
+      console.error('Failed to get user project sessions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Delete a specific project session - clears both memory and database
+   */
+  static async deleteProjectSession(projectId: string, userId: string): Promise<boolean> {
+    try {
+      // Delete from memory storage
+      const memoryKey = `${projectId}_${userId}`;
+      memoryStorage.delete(memoryKey);
+      
+      // Delete from database
+      const result = await prisma.project.deleteMany({
+        where: {
+          id: projectId,
+          userId: userId,
+        }
+      });
+
+      if (result.count > 0) {
+        console.log(`[PRIVACY] Deleted project: ${projectId} for user: ${userId} (memory and database)`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(`Failed to delete project session ${projectId}:`, error);
       return false;
     }
-
-    this.sessions.delete(projectId);
-    console.log(`Deleted session project: ${projectId} for user: ${userId}`);
-    return true;
   }
 
   /**
    * Export project data and optionally delete after export
+   * Critical for MEMORY_ONLY projects - once exported, data is permanently deleted
    */
-  static exportAndDelete(projectId: string, userId: string): ProjectSession | null {
-    const session = this.getProjectSession(projectId, userId);
-    
-    if (!session) {
+  static async exportAndDelete(projectId: string, userId: string): Promise<ProjectSession | null> {
+    try {
+      const session = await this.getProjectSession(projectId, userId);
+      
+      if (!session) {
+        return null;
+      }
+
+      // Create a deep copy for export
+      const exportData = JSON.parse(JSON.stringify(session));
+      
+      // Delete the session (privacy by design)
+      await this.deleteProjectSession(projectId, userId);
+      console.log(`[PRIVACY] Exported and deleted project: ${projectId} for user: ${userId}`);
+      
+      return exportData;
+    } catch (error) {
+      console.error(`Failed to export and delete project ${projectId}:`, error);
       return null;
     }
-
-    // Create a copy for export
-    const exportData = { ...session };
-    
-    // Delete the session (privacy by design)
-    this.sessions.delete(projectId);
-    console.log(`Exported and deleted session project: ${projectId} for user: ${userId}`);
-    
-    return exportData;
   }
 
   /**
-   * Clean up expired sessions
+   * Clean up expired sessions - clears both memory and database
    */
-  private static cleanupExpiredSessions() {
-    const now = new Date();
-    let cleanedCount = 0;
-
-    this.sessions.forEach((session, projectId) => {
-      if (session.expiresAt < now) {
-        this.sessions.delete(projectId);
-        cleanedCount++;
+  static async cleanupExpiredSessions(): Promise<number> {
+    try {
+      // Get expired project IDs first
+      const expiredProjects = await prisma.project.findMany({
+        where: {
+          expiresAt: {
+            lt: new Date()
+          }
+        },
+        select: { id: true, userId: true }
+      });
+      
+      // Clean up memory storage for expired projects
+      for (const project of expiredProjects) {
+        const memoryKey = `${project.id}_${project.userId}`;
+        memoryStorage.delete(memoryKey);
       }
-    });
+      
+      // Delete from database
+      const result = await prisma.project.deleteMany({
+        where: {
+          expiresAt: {
+            lt: new Date()
+          }
+        }
+      });
 
-    if (cleanedCount > 0) {
-      console.log(`Cleaned up ${cleanedCount} expired session projects`);
+      if (result.count > 0) {
+        console.log(`[PRIVACY] Cleaned up ${result.count} expired projects (memory and database)`);
+      }
+      
+      return result.count;
+    } catch (error) {
+      console.error('Failed to cleanup expired sessions:', error);
+      return 0;
     }
   }
 
   /**
    * Extend session expiration (when user is actively working)
    */
-  static extendSession(projectId: string, userId: string, hoursToAdd: number = 2): boolean {
-    const session = this.getProjectSession(projectId, userId);
-    
-    if (!session) {
+  static async extendSession(projectId: string, userId: string, hoursToAdd: number = 2): Promise<boolean> {
+    try {
+      const project = await prisma.project.findFirst({
+        where: {
+          id: projectId,
+          userId: userId,
+        }
+      });
+
+      if (!project) {
+        return false;
+      }
+
+      await prisma.project.update({
+        where: { id: projectId },
+        data: {
+          expiresAt: new Date((project.expiresAt || new Date()).getTime() + hoursToAdd * 60 * 60 * 1000)
+        }
+      });
+      
+      return true;
+    } catch (error) {
+      console.error(`Failed to extend session ${projectId}:`, error);
       return false;
     }
-
-    session.expiresAt = new Date(session.expiresAt.getTime() + hoursToAdd * 60 * 60 * 1000);
-    session.lastAccessed = new Date();
-    
-    return true;
   }
 
   /**
    * Get session statistics (for admin/monitoring)
    */
-  static getStats() {
-    const now = new Date();
-    let activeSessions = 0;
-    let expiredSessions = 0;
+  static async getStats() {
+    try {
+      const now = new Date();
+      
+      const [totalProjects, activeProjects, expiredProjects, memoryOnlyProjects] = await Promise.all([
+        prisma.project.count(),
+        prisma.project.count({
+          where: {
+            expiresAt: {
+              gt: now
+            }
+          }
+        }),
+        prisma.project.count({
+          where: {
+            expiresAt: {
+              lte: now
+            }
+          }
+        }),
+        prisma.project.count({
+          where: {
+            storageMode: 'MEMORY_ONLY',
+            expiresAt: {
+              gt: now
+            }
+          }
+        })
+      ]);
 
-    this.sessions.forEach((session) => {
-      if (session.expiresAt > now) {
-        activeSessions++;
-      } else {
-        expiredSessions++;
+      return {
+        total: totalProjects,
+        active: activeProjects,
+        expired: expiredProjects,
+        memoryOnly: memoryOnlyProjects,
+        persistent: activeProjects - memoryOnlyProjects,
+        memoryStorageSize: memoryStorage.size,
+        memoryUsage: process.memoryUsage()
+      };
+    } catch (error) {
+      console.error('Failed to get session stats:', error);
+      return {
+        total: 0,
+        active: 0,
+        expired: 0,
+        memoryOnly: 0,
+        persistent: 0,
+        memoryStorageSize: 0,
+        memoryUsage: process.memoryUsage()
+      };
+    }
+  }
+
+  /**
+   * Clean up orphaned memory storage entries
+   * Should be called periodically to prevent memory leaks
+   */
+  static async cleanupOrphanedMemory(): Promise<number> {
+    try {
+      let cleanedCount = 0;
+      const activeProjectIds = new Set();
+      
+      // Get all active project IDs from database
+      const activeProjects = await prisma.project.findMany({
+        where: {
+          expiresAt: {
+            gt: new Date()
+          }
+        },
+        select: { id: true, userId: true }
+      });
+      
+      activeProjects.forEach(p => {
+        activeProjectIds.add(`${p.id}_${p.userId}`);
+      });
+      
+      // Remove memory entries that don't have corresponding database entries
+      const memoryKeys = Array.from(memoryStorage.keys());
+      for (const memoryKey of memoryKeys) {
+        if (!activeProjectIds.has(memoryKey)) {
+          memoryStorage.delete(memoryKey);
+          cleanedCount++;
+        }
       }
-    });
+      
+      if (cleanedCount > 0) {
+        console.log(`[PRIVACY] Cleaned up ${cleanedCount} orphaned memory entries`);
+      }
+      
+      return cleanedCount;
+    } catch (error) {
+      console.error('Failed to cleanup orphaned memory:', error);
+      return 0;
+    }
+  }
 
-    return {
-      total: this.sessions.size,
-      active: activeSessions,
-      expired: expiredSessions,
-      memoryUsage: process.memoryUsage()
-    };
+  /**
+   * WARNING: Memory-only storage limitations in serverless
+   * This method explains the privacy tradeoffs
+   */
+  static getPrivacyNotice(): string {
+    return `
+PRIVACY NOTICE - Memory-Only Storage:
+
+PROS:
+- Ultimate privacy: AI responses never touch database
+- Zero persistence of sensitive business data
+- Automatic cleanup when function ends
+
+LIMITATIONS (Serverless Environment):
+- Data lost if serverless function restarts
+- Limited to single function execution context
+- Requires immediate export after generation
+
+RECOMMENDATION:
+For maximum privacy: Generate → Export → Delete immediately
+For reliability: Use PERSISTENT mode with understanding that data is stored securely but retrievably
+`;
   }
 }
 
