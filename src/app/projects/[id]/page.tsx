@@ -187,13 +187,7 @@ export default function ProjectPage() {
         (window as any).animateCreditsUsed(data.creditsUsed);
       }
       
-      // Auto-advance to next step if specified BEFORE fetching project
-      if (nextStep) {
-        setCurrentStep(nextStep);
-        console.log(`[NAVIGATION] Auto-advancing to step: ${nextStep}`);
-      }
-
-      // Refresh project data after step advancement (skip step update to preserve navigation)
+      // Refresh project data (skip step update to preserve current step)
       await fetchProject(true);
       
     } catch (error) {
@@ -225,18 +219,18 @@ export default function ProjectPage() {
     const payload = project?.storageMode === 'MEMORY_ONLY' 
       ? { researchData: project.researchOutput }
       : {};
-    await handleAIGeneration("blueprint", payload, "Business blueprint created!", "financials", "blueprintOutput");
+    await handleAIGeneration("blueprint", payload, "Business blueprint created!", undefined, "blueprintOutput");
   };
 
   const handleFinancialsGeneration = async () => {
     const payload = project?.storageMode === 'MEMORY_ONLY' 
       ? { blueprintData: project.blueprintOutput }
       : {};
-    await handleAIGeneration("financials", payload, "Financial projections completed!", "pitch", "financialOutput");
+    await handleAIGeneration("financials", payload, "Financial projections completed!", undefined, "financialOutput");
   };
 
   const handlePitchGeneration = async () => {
-    await handleAIGeneration("pitch", {}, "Investor pitch created!", "gtm", "pitchOutput");
+    await handleAIGeneration("pitch", {}, "Investor pitch created!", undefined, "pitchOutput");
   };
 
   const handleGTMGeneration = async () => {
