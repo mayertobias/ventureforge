@@ -53,7 +53,8 @@ export async function POST(request: NextRequest) {
     // Get request body to determine target user (optional - defaults to self)
     const body = await request.json().catch(() => ({}));
     const targetEmail = body.targetEmail || body.email || session.user.email;
-    const newCredits = body.credits || 100;
+    const credits = body.credits || 100;
+    const operation = body.operation || 'set'; // 'set', 'add', or 'subtract'
 
     // Get current user data
     const currentUser = await prisma.user.findUnique({
@@ -65,9 +66,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Target user not found" }, { status: 404 });
     }
 
+    // Calculate new credits based on operation
+    let newCredits: number;
+    switch (operation) {
+      case 'add':
+        newCredits = currentUser.credits + credits;
+        break;
+      case 'subtract':
+        newCredits = Math.max(0, currentUser.credits - credits);
+        break;
+      case 'set':
+      default:
+        newCredits = credits;
+        break;
+    }
+
     // Add proper audit logging
     await logAdminAction({
-      action: "CREDIT_UPDATE",
+      action: `CREDIT_${operation.toUpperCase()}`,
       adminEmail: session.user.email,
       targetUser: targetEmail,
       oldCredits: currentUser.credits,

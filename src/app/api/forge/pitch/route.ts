@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId } = await request.json();
+    const { projectId, allData } = await request.json();
 
     if (!projectId) {
       return NextResponse.json(

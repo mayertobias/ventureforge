@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId } = await request.json();
+    const { projectId, blueprintData } = await request.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -255,19 +255,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
-    // Check if blueprint output exists in session storage
-    if (!sessionProject.data.blueprintOutput) {
-      return NextResponse.json(
-        { error: "Business blueprint must be completed before financial projections" },
-        { status: 400 }
-      );
+    // For memory-only projects, blueprint data comes from client
+    // For persistent projects, blueprint data comes from database
+    let blueprintOutput;
+    
+    if (project.storageMode === 'MEMORY_ONLY') {
+      // Memory-only project: blueprint data provided by client
+      if (!blueprintData) {
+        return NextResponse.json(
+          { error: "Blueprint data is required for memory-only projects" },
+          { status: 400 }
+        );
+      }
+      blueprintOutput = blueprintData;
+      console.log(`[FINANCIALS] Using client-provided blueprint data for memory-only project ${projectId}`);
+    } else {
+      // Persistent project: blueprint data from server storage
+      if (!sessionProject.data.blueprintOutput) {
+        return NextResponse.json(
+          { error: "Business blueprint must be completed before financial projections" },
+          { status: 400 }
+        );
+      }
+      blueprintOutput = sessionProject.data.blueprintOutput;
+      console.log(`[FINANCIALS] Using server-stored blueprint data for persistent project ${projectId}`);
     }
 
-    // Get all previous outputs from session storage
+    // Get all previous outputs from session storage or client
     const businessPlan = {
       idea: sessionProject.data.ideaOutput || null,
       research: sessionProject.data.researchOutput || null,
-      blueprint: sessionProject.data.blueprintOutput
+      blueprint: blueprintOutput
     };
 
     // Use the new AI service with retry mechanism

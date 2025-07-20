@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId } = await request.json();
+    const { projectId, researchData } = await request.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -270,15 +270,31 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
-    // Check if research output exists in session storage
-    if (!sessionProject.data.researchOutput) {
-      return NextResponse.json(
-        { error: "Research must be completed before creating blueprint" },
-        { status: 400 }
-      );
+    // For memory-only projects, research data comes from client
+    // For persistent projects, research data comes from database
+    let researchOutput;
+    
+    if (project.storageMode === 'MEMORY_ONLY') {
+      // Memory-only project: research data provided by client
+      if (!researchData) {
+        return NextResponse.json(
+          { error: "Research data is required for memory-only projects" },
+          { status: 400 }
+        );
+      }
+      researchOutput = researchData;
+      console.log(`[BLUEPRINT] Using client-provided research data for memory-only project ${projectId}`);
+    } else {
+      // Persistent project: research data from server storage
+      if (!sessionProject.data.researchOutput) {
+        return NextResponse.json(
+          { error: "Research must be completed before creating blueprint" },
+          { status: 400 }
+        );
+      }
+      researchOutput = sessionProject.data.researchOutput;
+      console.log(`[BLUEPRINT] Using server-stored research data for persistent project ${projectId}`);
     }
-
-    const researchOutput = sessionProject.data.researchOutput;
 
     // Use phased generation approach to handle timeouts while ensuring comprehensive output
     console.log(`[BLUEPRINT] Starting blueprint generation for project ${projectId}`);
