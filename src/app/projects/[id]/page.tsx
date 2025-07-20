@@ -45,7 +45,7 @@ export default function ProjectPage() {
   const [selectedIdea, setSelectedIdea] = useState<any>(null);
   const [hasAutoNavigated, setHasAutoNavigated] = useState(false);
 
-  const fetchProject = useCallback(async () => {
+  const fetchProject = useCallback(async (skipStepUpdate = false) => {
     try {
       const response = await fetch(`/api/projects/${projectId}`);
       if (response.ok) {
@@ -53,12 +53,13 @@ export default function ProjectPage() {
         const dbProject = data.project;
         
         // For MEMORY_ONLY projects, merge with client-side data
+        let finalProject;
         if (dbProject.storageMode === 'MEMORY_ONLY') {
           const clientProject = ClientStorageService.getProject(projectId);
           
           if (clientProject) {
             // Merge database metadata with client AI responses
-            const mergedProject = {
+            finalProject = {
               ...dbProject,
               ideaOutput: clientProject.ideaOutput,
               researchOutput: clientProject.researchOutput,
@@ -67,36 +68,41 @@ export default function ProjectPage() {
               pitchOutput: clientProject.pitchOutput,
               gtmOutput: clientProject.gtmOutput,
             };
-            setProject(mergedProject);
+            setProject(finalProject);
             console.log('[CLIENT_STORAGE] Merged client data with database metadata');
           } else {
             // Initialize client storage for this project
             ClientStorageService.initializeProject(projectId, dbProject.name);
+            finalProject = dbProject;
             setProject(dbProject);
             console.log('[CLIENT_STORAGE] Initialized client storage for memory-only project');
           }
         } else {
           // PERSISTENT projects use database data directly
+          finalProject = dbProject;
           setProject(dbProject);
           console.log('[DB_STORAGE] Using database data for persistent project');
         }
         
         // Determine current step based on URL parameter or what's completed
-        if (stepFromUrl) {
-          // Validate that the step from URL is accessible
-          const validSteps = ["idea", "research", "blueprint", "financials", "pitch", "gtm", "complete"];
-          if (validSteps.includes(stepFromUrl)) {
-            setCurrentStep(stepFromUrl);
+        if (!skipStepUpdate) {
+          if (stepFromUrl) {
+            // Validate that the step from URL is accessible
+            const validSteps = ["idea", "research", "blueprint", "financials", "pitch", "gtm", "complete"];
+            if (validSteps.includes(stepFromUrl)) {
+              setCurrentStep(stepFromUrl);
+            }
+          } else {
+            // Auto-set based on completion status only if no URL step specified
+            // Use finalProject (merged data) instead of data.project for accurate step determination
+            if (finalProject.gtmOutput) setCurrentStep("complete");
+            else if (finalProject.pitchOutput) setCurrentStep("gtm");
+            else if (finalProject.financialOutput) setCurrentStep("pitch");
+            else if (finalProject.blueprintOutput) setCurrentStep("financials");
+            else if (finalProject.researchOutput) setCurrentStep("blueprint");
+            else if (finalProject.ideaOutput) setCurrentStep("research");
+            else setCurrentStep("idea");
           }
-        } else {
-          // Auto-set based on completion status only if no URL step specified
-          if (data.project.gtmOutput) setCurrentStep("gtm");
-          else if (data.project.pitchOutput) setCurrentStep("pitch");
-          else if (data.project.financialOutput) setCurrentStep("financials");
-          else if (data.project.blueprintOutput) setCurrentStep("blueprint");
-          else if (data.project.researchOutput) setCurrentStep("research");
-          else if (data.project.ideaOutput) setCurrentStep("research");
-          else setCurrentStep("idea");
         }
       }
     } catch (error) {
@@ -162,9 +168,6 @@ export default function ProjectPage() {
         ClientStorageService.saveAIResponse(projectId, stepField, data.output);
         console.log(`[CLIENT_STORAGE] Saved ${stepField} to client storage`);
       }
-
-      // Refresh project data
-      await fetchProject();
       
       // Show success toast with animation
       toast.success(
@@ -184,12 +187,14 @@ export default function ProjectPage() {
         (window as any).animateCreditsUsed(data.creditsUsed);
       }
       
-      // Auto-advance to next step if specified
+      // Auto-advance to next step if specified BEFORE fetching project
       if (nextStep) {
-        setTimeout(() => {
-          setCurrentStep(nextStep);
-        }, 1000);
+        setCurrentStep(nextStep);
+        console.log(`[NAVIGATION] Auto-advancing to step: ${nextStep}`);
       }
+
+      // Refresh project data after step advancement (skip step update to preserve navigation)
+      await fetchProject(true);
       
     } catch (error) {
       console.error(`Error in ${endpoint}:`, error);
@@ -217,11 +222,17 @@ export default function ProjectPage() {
   };
 
   const handleBlueprintGeneration = async () => {
-    await handleAIGeneration("blueprint", {}, "Business blueprint created!", "financials", "blueprintOutput");
+    const payload = project?.storageMode === 'MEMORY_ONLY' 
+      ? { researchData: project.researchOutput }
+      : {};
+    await handleAIGeneration("blueprint", payload, "Business blueprint created!", "financials", "blueprintOutput");
   };
 
   const handleFinancialsGeneration = async () => {
-    await handleAIGeneration("financials", {}, "Financial projections completed!", "pitch", "financialOutput");
+    const payload = project?.storageMode === 'MEMORY_ONLY' 
+      ? { blueprintData: project.blueprintOutput }
+      : {};
+    await handleAIGeneration("financials", payload, "Financial projections completed!", "pitch", "financialOutput");
   };
 
   const handlePitchGeneration = async () => {
