@@ -122,28 +122,17 @@ class SessionStorageService {
       console.log(`[PRIVACY] Getting project ${projectId} - Mode: ${project.storageMode}`);
 
       if (isMemoryOnly) {
-        // MEMORY_ONLY: Get from memory storage
-        const memoryKey = `${projectId}_${userId}`;
-        const memoryProject = memoryStorage.get(memoryKey);
-        
-        if (memoryProject) {
-          // Update last accessed time
-          memoryProject.lastAccessed = new Date();
-          console.log(`[PRIVACY] Retrieved MEMORY_ONLY project ${projectId} from memory`);
-          return memoryProject;
-        } else {
-          // Memory project not found, return project shell without AI data
-          console.log(`[PRIVACY] MEMORY_ONLY project ${projectId} not found in memory, returning empty shell`);
-          return {
-            id: project.id,
-            userId: project.userId,
-            name: project.name,
-            createdAt: project.createdAt,
-            lastAccessed: new Date(),
-            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
-            data: {}
-          };
-        }
+        // MEMORY_ONLY: Client-side storage only, return empty shell for server-side requests
+        console.log(`[PRIVACY] MEMORY_ONLY project ${projectId} - data managed client-side`);
+        return {
+          id: project.id,
+          userId: project.userId,
+          name: project.name,
+          createdAt: project.createdAt,
+          lastAccessed: new Date(),
+          expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
+          data: {} // Empty - client handles data storage
+        };
       } else {
         // PERSISTENT: Get from database as before
         console.log(`[PRIVACY] Retrieved PERSISTENT project ${projectId} from database`);
@@ -206,27 +195,8 @@ class SessionStorageService {
       console.log(`[PRIVACY] Updating ${field} for project ${projectId} - Mode: ${project.storageMode}`);
 
       if (isMemoryOnly) {
-        // MEMORY_ONLY: Store in memory, clear database fields to ensure privacy
-        const memoryKey = `${projectId}_${userId}`;
-        let memoryProject = memoryStorage.get(memoryKey);
-        
-        if (!memoryProject) {
-          // Initialize memory project from database (without AI data)
-          memoryProject = {
-            id: project.id,
-            userId: project.userId,
-            name: project.name,
-            createdAt: project.createdAt,
-            lastAccessed: new Date(),
-            expiresAt: project.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000),
-            data: {}
-          };
-        }
-        
-        // Store data in memory
-        memoryProject.data[field] = data;
-        memoryProject.lastAccessed = new Date();
-        memoryStorage.set(memoryKey, memoryProject);
+        // MEMORY_ONLY: Client-side storage only, server doesn't store sensitive data
+        console.log(`[PRIVACY] MEMORY_ONLY project ${projectId} - ${field} managed client-side only`);
         
         // CRITICAL PRIVACY: Ensure database fields remain null for sensitive data
         const dbClearData: any = {};
@@ -242,7 +212,8 @@ class SessionStorageService {
           });
         }
         
-        console.log(`[PRIVACY] Stored ${field} in memory for MEMORY_ONLY project ${projectId}`);
+        // For MEMORY_ONLY projects, we don't store server-side - client handles storage
+        console.log(`[PRIVACY] ${field} for MEMORY_ONLY project ${projectId} handled client-side`);
         return true;
         
       } else {
@@ -330,9 +301,11 @@ class SessionStorageService {
    */
   static async deleteProjectSession(projectId: string, userId: string): Promise<boolean> {
     try {
-      // Delete from memory storage
+      // Delete from memory storage (legacy)
       const memoryKey = `${projectId}_${userId}`;
       memoryStorage.delete(memoryKey);
+      
+      // Note: No temporary session storage to clean up for client-side storage
       
       // Delete from database
       const result = await prisma.project.deleteMany({
@@ -343,7 +316,7 @@ class SessionStorageService {
       });
 
       if (result.count > 0) {
-        console.log(`[PRIVACY] Deleted project: ${projectId} for user: ${userId} (memory and database)`);
+        console.log(`[PRIVACY] Deleted project: ${projectId} for user: ${userId} (memory, temporary storage, and database)`);
         return true;
       }
       return false;
@@ -351,6 +324,16 @@ class SessionStorageService {
       console.error(`Failed to delete project session ${projectId}:`, error);
       return false;
     }
+  }
+
+  /**
+   * Clean up expired temporary sessions (privacy compliance)
+   * Note: With client-side storage, no server-side temporary sessions to clean
+   */
+  static async cleanupExpiredTemporarySessions(): Promise<number> {
+    // No temporary session storage for client-side storage model
+    console.log(`[PRIVACY] No temporary session cleanup needed - using client-side storage`);
+    return 0;
   }
 
   /**

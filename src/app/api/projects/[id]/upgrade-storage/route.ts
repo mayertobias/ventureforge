@@ -61,13 +61,7 @@ export async function POST(
       },
     });
 
-    // Clean up any temporary session storage for this project
-    await prisma.temporarySessionStorage.deleteMany({
-      where: {
-        projectId: projectId,
-        userId: user.id,
-      },
-    });
+    // Note: No temporary session storage cleanup needed for client-side storage
 
     console.log(`[STORAGE_UPGRADE] Successfully upgraded project ${projectId} to persistent storage`);
 
