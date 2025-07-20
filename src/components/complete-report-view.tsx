@@ -21,15 +21,19 @@ import {
   Rocket,
   Copy,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Database,
+  Shield
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { ReportGenerator } from "@/components/report-generator";
+import { ClientStorageService } from "@/lib/client-storage";
 
 interface Project {
   id: string;
   name: string;
   createdAt: string;
+  storageMode?: 'MEMORY_ONLY' | 'PERSISTENT';
   ideaOutput?: any;
   researchOutput?: any;
   blueprintOutput?: any;
@@ -44,6 +48,8 @@ interface CompleteReportViewProps {
 
 export function CompleteReportView({ project }: CompleteReportViewProps) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   
   // Helper functions to extract data from AI output structures
   const getSelectedIdea = () => {
@@ -126,6 +132,75 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
     }
   };
 
+  const handleStorageUpgrade = async () => {
+    if (!project.storageMode || project.storageMode === 'PERSISTENT') {
+      toast.error('This project is already stored persistently');
+      return;
+    }
+
+    setIsUpgrading(true);
+    try {
+      // Get the complete project data from client storage
+      const clientProject = ClientStorageService.getProject(project.id);
+      if (!clientProject) {
+        throw new Error('Client project data not found');
+      }
+
+      // Call the upgrade API
+      const response = await fetch(`/api/projects/${project.id}/upgrade-storage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectData: {
+            ideaOutput: clientProject.ideaOutput,
+            researchOutput: clientProject.researchOutput,
+            blueprintOutput: clientProject.blueprintOutput,
+            financialOutput: clientProject.financialOutput,
+            pitchOutput: clientProject.pitchOutput,
+            gtmOutput: clientProject.gtmOutput,
+          }
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to upgrade storage');
+      }
+
+      // Clear client storage after successful upgrade
+      ClientStorageService.deleteProject(project.id);
+
+      toast.success(
+        '🎉 Project upgraded to persistent storage! Your data is now safely stored in our secure database.',
+        {
+          duration: 5000,
+          icon: '🔒',
+        }
+      );
+
+      // Refresh the page to update the project view
+      window.location.reload();
+
+    } catch (error) {
+      console.error('Storage upgrade error:', error);
+      toast.error('Failed to upgrade storage. Please try again.', {
+        duration: 4000,
+        icon: '❌',
+      });
+    } finally {
+      setIsUpgrading(false);
+      setShowUpgradePrompt(false);
+    }
+  };
+
+  const handleExportAndUpgrade = () => {
+    // Show the upgrade prompt after export
+    setShowUpgradePrompt(true);
+  };
+
 
   const completedSteps = [
     { id: 'idea', name: 'Business Idea', icon: Lightbulb, completed: !!project.ideaOutput },
@@ -179,6 +254,102 @@ export function CompleteReportView({ project }: CompleteReportViewProps) {
               Share
             </Button>
           </div>
+
+          {/* Memory-Only Storage Notice */}
+          {project.storageMode === 'MEMORY_ONLY' && (
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-medium text-blue-900 mb-1">Privacy-First Storage</h4>
+                  <p className="text-sm text-blue-700 mb-3">
+                    This project is stored locally in your browser for maximum privacy. Your business data never touched our servers.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setShowUpgradePrompt(true)}
+                      className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                    >
+                      <Database className="mr-2 h-4 w-4" />
+                      Upgrade to Persistent Storage
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Storage Upgrade Modal */}
+          {showUpgradePrompt && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <Card className="w-full max-w-md mx-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Database className="h-5 w-5" />
+                    Upgrade to Persistent Storage
+                  </CardTitle>
+                  <CardDescription>
+                    Move your project from local browser storage to our secure database
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-sm space-y-2">
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                      <span>Your data will be encrypted and securely stored</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                      <span>Access your project from any device</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                      <span>No expiration - permanent storage</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600 mt-0.5" />
+                      <span>Enhanced collaboration features</span>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p className="text-sm text-amber-800">
+                      <strong>Note:</strong> Once upgraded, your project will be permanently moved to our database. 
+                      This action cannot be undone.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowUpgradePrompt(false)}
+                      disabled={isUpgrading}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleStorageUpgrade}
+                      disabled={isUpgrading}
+                      className="flex-1"
+                    >
+                      {isUpgrading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Upgrading...
+                        </>
+                      ) : (
+                        <>
+                          <Database className="mr-2 h-4 w-4" />
+                          Upgrade Storage
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </CardContent>
       </Card>
 

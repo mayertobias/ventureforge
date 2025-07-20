@@ -233,7 +233,7 @@ Return the response as a properly formatted JSON object.`;
 
     return NextResponse.json({
       success: true,
-      result: parsedResponse,
+      output: parsedResponse, // Change 'result' to 'output' to match client expectations
       creditsUsed: RESEARCH_COST,
       creditsRemaining: user.credits - RESEARCH_COST,
     });

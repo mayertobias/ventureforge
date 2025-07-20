@@ -243,7 +243,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      result: parsedResponse,
+      output: parsedResponse,
       creditsUsed: RESEARCH_COST,
       creditsRemaining: user.credits - RESEARCH_COST,
     });

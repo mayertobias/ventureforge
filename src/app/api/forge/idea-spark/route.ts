@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      result: parsedResponse,
+      output: parsedResponse, // Change 'result' to 'output' to match client expectations
       creditsUsed: IDEA_SPARK_COST,
       creditsRemaining: user.credits - IDEA_SPARK_COST,
     });

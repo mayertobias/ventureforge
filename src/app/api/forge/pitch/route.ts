@@ -338,7 +338,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      result: parsedResponse,
+      output: parsedResponse,
       creditsUsed: PITCH_COST,
       creditsRemaining: user.credits - PITCH_COST,
     });

@@ -12,7 +12,8 @@ import { ProjectStepper } from "@/components/project-stepper";
 import { CreditDisplay } from "@/components/credit-display";
 import { VentureForgeLoader } from "@/components/ui/venture-forge-loader";
 import { CompleteReportView } from "@/components/complete-report-view";
-import { Loader2, Coins, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, Coins, ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { ClientStorageService } from "@/lib/client-storage";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -20,6 +21,7 @@ interface Project {
   id: string;
   name: string;
   createdAt: string;
+  storageMode?: 'MEMORY_ONLY' | 'PERSISTENT';
   ideaOutput?: any;
   researchOutput?: any;
   blueprintOutput?: any;
@@ -48,10 +50,36 @@ export default function ProjectPage() {
       const response = await fetch(`/api/projects/${projectId}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('[DEBUG] Project data received:', data.project);
-        console.log('[DEBUG] ideaOutput:', data.project.ideaOutput);
-        console.log('[DEBUG] ideaOutput.ideas:', data.project.ideaOutput?.ideas);
-        setProject(data.project);
+        const dbProject = data.project;
+        
+        // For MEMORY_ONLY projects, merge with client-side data
+        if (dbProject.storageMode === 'MEMORY_ONLY') {
+          const clientProject = ClientStorageService.getProject(projectId);
+          
+          if (clientProject) {
+            // Merge database metadata with client AI responses
+            const mergedProject = {
+              ...dbProject,
+              ideaOutput: clientProject.ideaOutput,
+              researchOutput: clientProject.researchOutput,
+              blueprintOutput: clientProject.blueprintOutput,
+              financialOutput: clientProject.financialOutput,
+              pitchOutput: clientProject.pitchOutput,
+              gtmOutput: clientProject.gtmOutput,
+            };
+            setProject(mergedProject);
+            console.log('[CLIENT_STORAGE] Merged client data with database metadata');
+          } else {
+            // Initialize client storage for this project
+            ClientStorageService.initializeProject(projectId, dbProject.name);
+            setProject(dbProject);
+            console.log('[CLIENT_STORAGE] Initialized client storage for memory-only project');
+          }
+        } else {
+          // PERSISTENT projects use database data directly
+          setProject(dbProject);
+          console.log('[DB_STORAGE] Using database data for persistent project');
+        }
         
         // Determine current step based on URL parameter or what's completed
         if (stepFromUrl) {
@@ -96,7 +124,13 @@ export default function ProjectPage() {
     return completed;
   }, [project]);
 
-  const handleAIGeneration = async (endpoint: string, payload: any, successMessage: string, nextStep?: string) => {
+  const handleAIGeneration = async (
+    endpoint: string, 
+    payload: any, 
+    successMessage: string, 
+    nextStep?: string,
+    stepField?: 'ideaOutput' | 'researchOutput' | 'blueprintOutput' | 'financialOutput' | 'pitchOutput' | 'gtmOutput'
+  ) => {
     setIsGenerating(true);
     try {
       const response = await fetch(`/api/forge/${endpoint}`, {
@@ -121,6 +155,12 @@ export default function ProjectPage() {
           return;
         }
         throw new Error(data.error || "Failed to generate content");
+      }
+
+      // For MEMORY_ONLY projects, also save to client storage
+      if (project?.storageMode === 'MEMORY_ONLY' && stepField && data.output) {
+        ClientStorageService.saveAIResponse(projectId, stepField, data.output);
+        console.log(`[CLIENT_STORAGE] Saved ${stepField} to client storage`);
       }
 
       // Refresh project data
@@ -167,29 +207,29 @@ export default function ProjectPage() {
 
   const handleIdeaGeneration = async () => {
     if (!userInput.trim()) return;
-    await handleAIGeneration("idea-spark", { userInput: userInput.trim() }, "Ideas generated successfully!");
+    await handleAIGeneration("idea-spark", { userInput: userInput.trim() }, "Ideas generated successfully!", undefined, "ideaOutput");
     setUserInput("");
   };
 
   const handleResearchGeneration = async () => {
     if (!selectedIdea) return;
-    await handleAIGeneration("research-gemini", { selectedIdea }, "Market research completed!");
+    await handleAIGeneration("research-gemini", { selectedIdea }, "Market research completed!", undefined, "researchOutput");
   };
 
   const handleBlueprintGeneration = async () => {
-    await handleAIGeneration("blueprint", {}, "Business blueprint created!", "financials");
+    await handleAIGeneration("blueprint", {}, "Business blueprint created!", "financials", "blueprintOutput");
   };
 
   const handleFinancialsGeneration = async () => {
-    await handleAIGeneration("financials", {}, "Financial projections completed!", "pitch");
+    await handleAIGeneration("financials", {}, "Financial projections completed!", "pitch", "financialOutput");
   };
 
   const handlePitchGeneration = async () => {
-    await handleAIGeneration("pitch", {}, "Investor pitch created!", "gtm");
+    await handleAIGeneration("pitch", {}, "Investor pitch created!", "gtm", "pitchOutput");
   };
 
   const handleGTMGeneration = async () => {
-    await handleAIGeneration("gtm", {}, "Go-to-market strategy completed!");
+    await handleAIGeneration("gtm", {}, "Go-to-market strategy completed!", undefined, "gtmOutput");
   };
 
   // Navigation helpers

@@ -442,7 +442,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      result: parsedResponse,
+      output: parsedResponse,
       creditsUsed: GTM_COST,
       creditsRemaining: user.credits - GTM_COST,
     });
