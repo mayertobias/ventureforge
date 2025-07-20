@@ -230,11 +230,32 @@ export default function ProjectPage() {
   };
 
   const handlePitchGeneration = async () => {
-    await handleAIGeneration("pitch", {}, "Investor pitch created!", undefined, "pitchOutput");
+    const payload = project?.storageMode === 'MEMORY_ONLY' 
+      ? { 
+          allData: {
+            idea: project.ideaOutput,
+            research: project.researchOutput,
+            blueprint: project.blueprintOutput,
+            financials: project.financialOutput
+          }
+        }
+      : {};
+    await handleAIGeneration("pitch", payload, "Investor pitch created!", undefined, "pitchOutput");
   };
 
   const handleGTMGeneration = async () => {
-    await handleAIGeneration("gtm", {}, "Go-to-market strategy completed!", undefined, "gtmOutput");
+    const payload = project?.storageMode === 'MEMORY_ONLY' 
+      ? { 
+          allData: {
+            idea: project.ideaOutput,
+            research: project.researchOutput,
+            blueprint: project.blueprintOutput,
+            financials: project.financialOutput,
+            pitch: project.pitchOutput
+          }
+        }
+      : {};
+    await handleAIGeneration("gtm", payload, "Go-to-market strategy completed!", undefined, "gtmOutput");
   };
 
   // Navigation helpers
@@ -549,7 +570,40 @@ export default function ProjectPage() {
 
             {project.researchOutput && (
               <div className="mt-6 space-y-4">
-                <h3 className="font-semibold">Market Research Results:</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Market Research Results:</h3>
+                  {project.researchOutput._fallback && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-xs">
+                        ⚠️ AI Service Error
+                      </Badge>
+                      <Button
+                        onClick={handleResearchGeneration}
+                        disabled={isGenerating}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        🔄 Regenerate Research
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {project.researchOutput._fallback && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-4">
+                    <div className="flex items-start gap-2">
+                      <div className="text-amber-600 mt-0.5">⚠️</div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">Research Generation Incomplete</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          {project.researchOutput._reason || "The AI service encountered an issue while conducting market research. Please try regenerating for a complete analysis."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-4">
                   {/* Market Landscape */}
                   <Card className="p-4">
@@ -712,12 +766,14 @@ export default function ProjectPage() {
                   )}
                 </div>
                 
-                <Button 
-                  onClick={() => setCurrentStep("blueprint")}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                >
-                  Continue to Business Blueprint →
-                </Button>
+                {!project.researchOutput._fallback && (
+                  <Button 
+                    onClick={() => setCurrentStep("blueprint")}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    Continue to Business Blueprint →
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -765,7 +821,40 @@ export default function ProjectPage() {
 
             {project.blueprintOutput && (
               <div className="mt-6 space-y-4">
-                <h3 className="font-semibold">Business Blueprint:</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Business Blueprint:</h3>
+                  {project.blueprintOutput._fallback && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-xs">
+                        ⚠️ AI Service Error
+                      </Badge>
+                      <Button
+                        onClick={handleBlueprintGeneration}
+                        disabled={isGenerating}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        🔄 Regenerate Blueprint
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {project.blueprintOutput._fallback && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-4">
+                    <div className="flex items-start gap-2">
+                      <div className="text-amber-600 mt-0.5">⚠️</div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">Blueprint Generation Incomplete</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          {project.blueprintOutput._reason || "The AI service encountered an issue while generating your business blueprint. Please try regenerating for a complete analysis."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-4">
                   {/* Core Business Model */}
                   <Card className="p-4">
@@ -951,6 +1040,15 @@ export default function ProjectPage() {
                     </Card>
                   )}
                 </div>
+                
+                {!project.blueprintOutput._fallback && (
+                  <Button 
+                    onClick={() => setCurrentStep("financials")}
+                    className="w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700"
+                  >
+                    Continue to Financial Projections →
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -998,7 +1096,40 @@ export default function ProjectPage() {
 
             {project.financialOutput && (
               <div className="mt-6 space-y-4">
-                <h3 className="font-semibold">Financial Projections:</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Financial Projections:</h3>
+                  {project.financialOutput._fallback && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-xs">
+                        ⚠️ AI Service Error
+                      </Badge>
+                      <Button
+                        onClick={handleFinancialsGeneration}
+                        disabled={isGenerating}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        🔄 Regenerate Financials
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {project.financialOutput._fallback && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-4">
+                    <div className="flex items-start gap-2">
+                      <div className="text-amber-600 mt-0.5">⚠️</div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">Financial Projections Incomplete</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          {project.financialOutput._reason || "The AI service encountered an issue while generating financial projections. Please try regenerating for a complete analysis."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-4">
                   {/* Funding Analysis */}
                   <Card className="p-4">
@@ -1206,6 +1337,15 @@ export default function ProjectPage() {
                     </Card>
                   )}
                 </div>
+                
+                {!project.financialOutput._fallback && (
+                  <Button 
+                    onClick={() => setCurrentStep("pitch")}
+                    className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700"
+                  >
+                    Continue to Investor Pitch →
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -1253,7 +1393,40 @@ export default function ProjectPage() {
 
             {project.pitchOutput && (
               <div className="mt-6 space-y-4">
-                <h3 className="font-semibold">Investor Pitch:</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Investor Pitch:</h3>
+                  {project.pitchOutput._fallback && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-xs">
+                        ⚠️ AI Service Error
+                      </Badge>
+                      <Button
+                        onClick={handlePitchGeneration}
+                        disabled={isGenerating}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        🔄 Regenerate Pitch
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {project.pitchOutput._fallback && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-4">
+                    <div className="flex items-start gap-2">
+                      <div className="text-amber-600 mt-0.5">⚠️</div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">Pitch Generation Incomplete</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          {project.pitchOutput._reason || "The AI service encountered an issue while creating your investor pitch. Please try regenerating for a complete presentation."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-4">
                   {/* Executive Summary */}
                   <Card className="p-4">
@@ -1492,6 +1665,15 @@ export default function ProjectPage() {
                     </Card>
                   )}
                 </div>
+                
+                {!project.pitchOutput._fallback && (
+                  <Button 
+                    onClick={() => setCurrentStep("gtm")}
+                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700"
+                  >
+                    Continue to Go-to-Market Strategy →
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
@@ -1539,7 +1721,40 @@ export default function ProjectPage() {
 
             {project.gtmOutput && (
               <div className="mt-6 space-y-4">
-                <h3 className="font-semibold">Go-to-Market Strategy:</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Go-to-Market Strategy:</h3>
+                  {project.gtmOutput._fallback && (
+                    <div className="flex items-center gap-2">
+                      <Badge variant="destructive" className="text-xs">
+                        ⚠️ AI Service Error
+                      </Badge>
+                      <Button
+                        onClick={handleGTMGeneration}
+                        disabled={isGenerating}
+                        size="sm"
+                        variant="outline"
+                        className="text-xs"
+                      >
+                        🔄 Regenerate GTM Strategy
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {project.gtmOutput._fallback && (
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mb-4">
+                    <div className="flex items-start gap-2">
+                      <div className="text-amber-600 mt-0.5">⚠️</div>
+                      <div>
+                        <p className="text-sm font-medium text-amber-800">Go-to-Market Strategy Incomplete</p>
+                        <p className="text-sm text-amber-700 mt-1">
+                          {project.gtmOutput._reason || "The AI service encountered an issue while creating your go-to-market strategy. Please try regenerating for a complete strategy."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid gap-4">
                   {/* Launch Timeline */}
                   <Card className="p-4">
@@ -1727,26 +1942,28 @@ export default function ProjectPage() {
                   )}
                 </div>
                 
-                {/* Show complete report button when all steps are done */}
-                <div className="mt-6 pt-6 border-t">
-                  <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-                    <CardContent className="pt-6">
-                      <div className="text-center space-y-3">
-                        <h3 className="text-lg font-semibold text-green-800">🎉 Business Plan Complete!</h3>
-                        <p className="text-sm text-green-700">All sections have been generated. View your complete business plan and export it.</p>
-                        <Button 
-                          onClick={() => {
-                            setCurrentStep("complete");
-                            setHasAutoNavigated(true); // Prevent auto-navigation from interfering
-                          }}
-                          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                        >
-                          View Complete Report & Export →
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                {/* Show complete report button when all steps are done and no fallbacks */}
+                {!project.gtmOutput._fallback && (
+                  <div className="mt-6 pt-6 border-t">
+                    <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                      <CardContent className="pt-6">
+                        <div className="text-center space-y-3">
+                          <h3 className="text-lg font-semibold text-green-800">🎉 Business Plan Complete!</h3>
+                          <p className="text-sm text-green-700">All sections have been generated. View your complete business plan and export it.</p>
+                          <Button 
+                            onClick={() => {
+                              setCurrentStep("complete");
+                              setHasAutoNavigated(true); // Prevent auto-navigation from interfering
+                            }}
+                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                          >
+                            View Complete Report & Export →
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
               </div>
             )}
           </CardContent>

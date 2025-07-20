@@ -230,16 +230,26 @@ export async function POST(request: NextRequest) {
         id: projectId,
         userId: user.id,
       },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+        ideaOutput: true,
+        researchOutput: true,
+        blueprintOutput: true,
+        financialOutput: true,
+        pitchOutput: true,
+        gtmOutput: true
+      }
     });
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Check if project has expired
-    if (project.expiresAt && project.expiresAt < new Date()) {
-      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
-    }
+    // Note: Expiry checks handled by SessionStorageService
 
     // Get or create session storage for this project
     let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
@@ -247,8 +257,8 @@ export async function POST(request: NextRequest) {
       await SessionStorageService.createProjectSession(
         user.id,
         project.name,
-        project.storageMode === 'PERSISTENT',
-        project.expiresAt || undefined,
+        false, // Default to memory-only for new sessions
+        undefined,
         project.id
       );
       sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
@@ -258,21 +268,47 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
-    // Check if financial output exists in session storage
-    if (!sessionProject.data.financialOutput) {
-      return NextResponse.json(
-        { error: "Financial projections must be completed before creating pitch" },
-        { status: 400 }
-      );
+    // For memory-only projects, all data comes from client
+    // For persistent projects, all data comes from database
+    let fullBusinessPlan;
+    
+    // Determine if this is a memory-only project by checking if data exists in session
+    // and if allData was provided by client
+    const isMemoryOnly = !sessionProject.data.financialOutput && allData;
+    
+    if (isMemoryOnly && allData) {
+      // Memory-only project: all data provided by client
+      if (!allData.financials) {
+        return NextResponse.json(
+          { error: "Financial projections data is required for memory-only projects" },
+          { status: 400 }
+        );
+      }
+      
+      fullBusinessPlan = {
+        idea: allData.idea || null,
+        research: allData.research || null,
+        blueprint: allData.blueprint || null,
+        financials: allData.financials
+      };
+      console.log(`[PITCH] Using client-provided data for memory-only project ${projectId}`);
+    } else {
+      // Persistent project: data from server storage
+      if (!sessionProject.data.financialOutput) {
+        return NextResponse.json(
+          { error: "Financial projections must be completed before creating pitch" },
+          { status: 400 }
+        );
+      }
+      
+      fullBusinessPlan = {
+        idea: sessionProject.data.ideaOutput || null,
+        research: sessionProject.data.researchOutput || null,
+        blueprint: sessionProject.data.blueprintOutput || null,
+        financials: sessionProject.data.financialOutput
+      };
+      console.log(`[PITCH] Using server-stored data for persistent project ${projectId}`);
     }
-
-    // Get all previous outputs from session storage
-    const fullBusinessPlan = {
-      idea: sessionProject.data.ideaOutput || null,
-      research: sessionProject.data.researchOutput || null,
-      blueprint: sessionProject.data.blueprintOutput || null,
-      financials: sessionProject.data.financialOutput
-    };
 
     // Use the new AI service with retry mechanism
     console.log(`[PITCH] Starting pitch generation for project ${projectId}`);

@@ -274,14 +274,12 @@ export async function POST(request: NextRequest) {
     // For persistent projects, research data comes from database
     let researchOutput;
     
-    if (project.storageMode === 'MEMORY_ONLY') {
+    // Determine if this is a memory-only project by checking if data exists in session
+    // and if researchData was provided by client
+    const isMemoryOnly = !sessionProject.data.researchOutput && researchData;
+    
+    if (isMemoryOnly && researchData) {
       // Memory-only project: research data provided by client
-      if (!researchData) {
-        return NextResponse.json(
-          { error: "Research data is required for memory-only projects" },
-          { status: 400 }
-        );
-      }
       researchOutput = researchData;
       console.log(`[BLUEPRINT] Using client-provided research data for memory-only project ${projectId}`);
     } else {
@@ -364,8 +362,15 @@ export async function POST(request: NextRequest) {
           parsedResponse = jsonResult.parsed;
         } else {
           console.error(`[BLUEPRINT] All parsing failed, using fallback`);
+          console.error(`[BLUEPRINT] Combined content length: ${phasedResult.combinedContent.length}`);
+          console.error(`[BLUEPRINT] Combined content preview: ${phasedResult.combinedContent.substring(0, 1000)}`);
           parsedResponse = AIService.createFallbackResponse('blueprint', prompt);
           parsedResponse._originalResponse = phasedResult.combinedContent.substring(0, 500);
+          parsedResponse._debugInfo = {
+            combinedContentLength: phasedResult.combinedContent.length,
+            phaseSuccessful: phasedResult.successful,
+            phaseCount: phasedResult.phases.length
+          };
         }
       }
     } else {

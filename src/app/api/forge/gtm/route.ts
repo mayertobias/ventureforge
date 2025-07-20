@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { projectId } = await request.json();
+    const { projectId, allData } = await request.json();
 
     if (!projectId) {
       return NextResponse.json(
@@ -300,16 +300,26 @@ export async function POST(request: NextRequest) {
         id: projectId,
         userId: user.id,
       },
+      select: {
+        id: true,
+        name: true,
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+        ideaOutput: true,
+        researchOutput: true,
+        blueprintOutput: true,
+        financialOutput: true,
+        pitchOutput: true,
+        gtmOutput: true
+      }
     });
 
     if (!project) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Check if project has expired
-    if (project.expiresAt && project.expiresAt < new Date()) {
-      return NextResponse.json({ error: "Project has expired" }, { status: 404 });
-    }
+    // Note: Expiry checks handled by SessionStorageService
 
     // Get or create session storage for this project
     let sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
@@ -317,8 +327,8 @@ export async function POST(request: NextRequest) {
       await SessionStorageService.createProjectSession(
         user.id,
         project.name,
-        project.storageMode === 'PERSISTENT',
-        project.expiresAt || undefined,
+        false, // Default to memory-only for new sessions
+        undefined,
         project.id
       );
       sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
@@ -328,20 +338,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to initialize project session" }, { status: 500 });
     }
 
-    // Check if pitch output exists in session storage
-    if (!sessionProject.data.pitchOutput) {
-      return NextResponse.json(
-        { error: "Investor pitch must be completed before GTM strategy" },
-        { status: 400 }
-      );
+    // For memory-only projects, all data comes from client
+    // For persistent projects, all data comes from database
+    let ideaOutput, researchOutput, blueprintOutput, financialOutput, pitchOutput;
+    
+    // Determine if this is a memory-only project by checking if data exists in session
+    // and if allData was provided by client
+    const isMemoryOnly = !sessionProject.data.pitchOutput && allData;
+    
+    if (isMemoryOnly && allData) {
+      // Memory-only project: all data provided by client
+      if (!allData.pitch) {
+        return NextResponse.json(
+          { error: "Investor pitch data is required for memory-only projects" },
+          { status: 400 }
+        );
+      }
+      
+      ideaOutput = allData.idea || {};
+      researchOutput = allData.research || {};
+      blueprintOutput = allData.blueprint || {};
+      financialOutput = allData.financials || {};
+      pitchOutput = allData.pitch || {};
+      console.log(`[GTM] Using client-provided data for memory-only project ${projectId}`);
+    } else {
+      // Persistent project: data from server storage
+      if (!sessionProject.data.pitchOutput) {
+        return NextResponse.json(
+          { error: "Investor pitch must be completed before GTM strategy" },
+          { status: 400 }
+        );
+      }
+      
+      ideaOutput = sessionProject.data.ideaOutput as any;
+      researchOutput = sessionProject.data.researchOutput as any;
+      blueprintOutput = sessionProject.data.blueprintOutput as any;
+      financialOutput = sessionProject.data.financialOutput as any;
+      pitchOutput = sessionProject.data.pitchOutput as any;
+      console.log(`[GTM] Using server-stored data for persistent project ${projectId}`);
     }
-
-    // Get all previous outputs from session storage
-    const ideaOutput = sessionProject.data.ideaOutput as any;
-    const researchOutput = sessionProject.data.researchOutput as any;
-    const blueprintOutput = sessionProject.data.blueprintOutput as any;
-    const financialOutput = sessionProject.data.financialOutput as any;
-    const pitchOutput = sessionProject.data.pitchOutput as any;
     
     const businessContext = {
       businessIdea: ideaOutput?.selectedIdea?.title || "Business concept",

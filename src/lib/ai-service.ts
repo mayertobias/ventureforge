@@ -195,10 +195,36 @@ export class AIService {
       
       blueprint: {
         executiveSummary: {
-          businessConcept: "Business analysis interrupted - will be completed when AI service is restored",
-          marketOpportunity: "Analysis pending",
-          uniqueAdvantage: "To be determined",
+          businessConcept: "Business analysis temporarily unavailable - please try again",
+          marketOpportunity: "Analysis pending - service will retry automatically",
+          uniqueAdvantage: "Analysis in progress",
           revenueProjection: "Financial analysis will be completed when service recovers"
+        },
+        coreBusinessModel: {
+          primaryModel: "Analysis in progress",
+          rationale: "The business model analysis is temporarily unavailable due to AI service limitations. Please try regenerating this section.",
+          businessModelCanvas: {
+            keyPartners: ["Analysis pending"],
+            keyActivities: ["Analysis pending"], 
+            keyResources: ["Analysis pending"],
+            costStructure: ["Analysis pending"]
+          }
+        },
+        revenueArchitecture: {
+          primaryStreams: [{
+            streamName: "Analysis pending",
+            model: "Analysis pending", 
+            targetSegment: "Analysis pending",
+            pricingStrategy: "Analysis pending",
+            justification: "Revenue analysis temporarily unavailable"
+          }]
+        },
+        customerStrategy: {
+          primarySegments: [{
+            segmentName: "Analysis pending",
+            size: "Analysis pending",
+            characteristics: "Customer analysis temporarily unavailable"
+          }]
         },
         _fallback: true,
         _timestamp: timestamp,
