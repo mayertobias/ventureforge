@@ -48,6 +48,9 @@ export default function ProjectPage() {
       const response = await fetch(`/api/projects/${projectId}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('[DEBUG] Project data received:', data.project);
+        console.log('[DEBUG] ideaOutput:', data.project.ideaOutput);
+        console.log('[DEBUG] ideaOutput.ideas:', data.project.ideaOutput?.ideas);
         setProject(data.project);
         
         // Determine current step based on URL parameter or what's completed
@@ -383,7 +386,9 @@ export default function ProjectPage() {
             {project.ideaOutput && (
               <div className="mt-6 space-y-4">
                 <h3 className="font-semibold">Generated Ideas:</h3>
-                {project.ideaOutput.ideas?.map((idea: any, index: number) => (
+                {console.log('[DEBUG] About to render ideas:', project.ideaOutput.ideas)}
+                {project.ideaOutput.ideas && project.ideaOutput.ideas.length > 0 ? (
+                  project.ideaOutput.ideas.map((idea: any, index: number) => (
                   <Card key={index} className={`p-4 cursor-pointer transition-colors ${selectedIdea === idea ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'}`} onClick={() => setSelectedIdea(idea)}>
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{idea.title}</h4>
@@ -405,7 +410,17 @@ export default function ProjectPage() {
                       </div>
                     </div>
                   </Card>
-                ))}
+                ))
+                ) : (
+                  <div className="p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Debug:</strong> Ideas were generated but the data structure is unexpected.
+                    </p>
+                    <p className="text-xs text-yellow-700 mt-2">
+                      Raw data: {JSON.stringify(project.ideaOutput, null, 2)}
+                    </p>
+                  </div>
+                )}
                 {selectedIdea && (
                   <div className="mt-4 space-y-3">
                     <p className="text-sm text-muted-foreground mb-2">
