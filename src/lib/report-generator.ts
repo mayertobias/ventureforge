@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import { jsPDF } from 'jspdf';
+import { ProfessionalReportGenerator } from './professional-report-generator';
 
 export interface ProjectData {
   id: string;
@@ -14,7 +15,7 @@ export interface ProjectData {
 }
 
 export interface ReportOptions {
-  format: 'pdf' | 'html';
+  format: 'pdf' | 'html' | 'json';
   template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive';
   includeCharts: boolean;
   branding?: {
@@ -78,6 +79,17 @@ export class ReportGenerator {
   }
 
   static generateHTML(projectData: ProjectData, options: ReportOptions): string {
+    // Use the professional template by default
+    try {
+      return ProfessionalReportGenerator.generateProfessionalHTML(projectData, options);
+    } catch (error) {
+      console.warn('[REPORT] Professional template failed, falling back to basic template:', error);
+      // Fallback to original template
+      return this.generateBasicHTML(projectData, options);
+    }
+  }
+
+  static generateBasicHTML(projectData: ProjectData, options: ReportOptions): string {
     const financialMetrics = this.extractFinancialMetrics(projectData);
     const executiveSummary = this.generateExecutiveSummary(projectData);
     const primaryColor = options.branding?.primaryColor || '#3B82F6';
@@ -1333,14 +1345,22 @@ export class ReportGenerator {
   }
 
   static async generatePDF(projectData: ProjectData, options: ReportOptions): Promise<Buffer> {
-    console.log('[PDF] Starting PDF generation process...');
+    console.log('[PDF] Starting professional PDF generation process...');
     
-    // First try jsPDF (more reliable in serverless environments)
+    // Try professional generator first
     try {
-      console.log('[PDF] Attempting jsPDF generation...');
-      return this.generateSimplePDF(projectData, options);
-    } catch (jsPdfError) {
-      console.warn('[PDF] jsPDF failed, falling back to Puppeteer:', jsPdfError);
+      console.log('[PDF] Attempting professional PDF generation...');
+      return await ProfessionalReportGenerator.generatePDF(projectData, options);
+    } catch (professionalError) {
+      console.warn('[PDF] Professional PDF generation failed, falling back to simple PDF:', professionalError);
+      
+      // Fallback to simple jsPDF
+      try {
+        console.log('[PDF] Attempting fallback jsPDF generation...');
+        return this.generateSimplePDF(projectData, options);
+      } catch (jsPdfError) {
+        console.warn('[PDF] jsPDF failed, falling back to Puppeteer:', jsPdfError);
+      }
     }
     
     // Fallback to Puppeteer

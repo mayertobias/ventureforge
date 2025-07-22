@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const requestData = await request.json();
-    const { projectId, format, template: reqTemplate, includeCharts: reqIncludeCharts, branding: reqBranding } = requestData;
+    const { projectId, format, template: reqTemplate, includeCharts: reqIncludeCharts, branding: reqBranding, projectData } = requestData;
     
     requestedFormat = format || 'html';
     template = (reqTemplate as 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive') || 'comprehensive';
@@ -45,26 +45,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Get session-based project data for report generation
-    const sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
+    // Handle memory-only projects with data sent from client
+    if (projectData) {
+      // Memory-only project: use data provided by client
+      project = {
+        id: projectData.id,
+        name: projectData.name,
+        createdAt: new Date(), // Use current date for memory-only projects
+        userId: user.id,
+        ideaOutput: projectData.ideaOutput,
+        researchOutput: projectData.researchOutput,
+        blueprintOutput: projectData.blueprintOutput,
+        financialOutput: projectData.financialOutput,
+        pitchOutput: projectData.pitchOutput,
+        gtmOutput: projectData.gtmOutput,
+      };
+      console.log(`[REPORT] Using client-provided data for memory-only project ${projectId}`);
+    } else {
+      // Persistent project: get data from session storage
+      const sessionProject = await SessionStorageService.getProjectSession(projectId, user.id);
 
-    if (!sessionProject) {
-      return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
+      if (!sessionProject) {
+        return NextResponse.json({ error: "Project not found or expired" }, { status: 404 });
+      }
+
+      // Convert session data to expected project format for report generator
+      project = {
+        id: sessionProject.id,
+        name: sessionProject.name,
+        createdAt: sessionProject.createdAt,
+        userId: sessionProject.userId,
+        ideaOutput: sessionProject.data.ideaOutput,
+        researchOutput: sessionProject.data.researchOutput,
+        blueprintOutput: sessionProject.data.blueprintOutput,
+        financialOutput: sessionProject.data.financialOutput,
+        pitchOutput: sessionProject.data.pitchOutput,
+        gtmOutput: sessionProject.data.gtmOutput,
+      };
+      console.log(`[REPORT] Using session-stored data for persistent project ${projectId}`);
     }
-
-    // Convert session data to expected project format for report generator
-    project = {
-      id: sessionProject.id,
-      name: sessionProject.name,
-      createdAt: sessionProject.createdAt,
-      userId: sessionProject.userId,
-      ideaOutput: sessionProject.data.ideaOutput,
-      researchOutput: sessionProject.data.researchOutput,
-      blueprintOutput: sessionProject.data.blueprintOutput,
-      financialOutput: sessionProject.data.financialOutput,
-      pitchOutput: sessionProject.data.pitchOutput,
-      gtmOutput: sessionProject.data.gtmOutput,
-    };
 
     // Check if project has enough content for report generation
     if (!project.ideaOutput) {
@@ -86,7 +105,51 @@ export async function POST(request: NextRequest) {
 
     console.log(`[REPORT] Generating ${options.format} report for project ${projectId}`);
 
-    if (options.format === 'pdf') {
+    if (options.format === 'json') {
+      console.log(`[REPORT API] Starting JSON export for project: ${project.name}`);
+      
+      // Generate comprehensive JSON export
+      const jsonExport = {
+        metadata: {
+          projectId: project.id,
+          projectName: project.name,
+          generatedAt: new Date().toISOString(),
+          generatedBy: 'VentureForge AI',
+          exportFormat: 'json',
+          template: options.template
+        },
+        businessPlan: {
+          idea: project.ideaOutput || null,
+          research: project.researchOutput || null,
+          blueprint: project.blueprintOutput || null,
+          financials: project.financialOutput || null,
+          pitch: project.pitchOutput || null,
+          gtm: project.gtmOutput || null
+        },
+        summary: {
+          executiveSummary: ReportGenerator.generateExecutiveSummary(project),
+          keyMetrics: ReportGenerator.extractFinancialMetrics(project),
+          createdDate: project.createdAt
+        }
+      };
+      
+      const sanitizedProjectName = project.name.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').toLowerCase();
+      const filename = `${sanitizedProjectName || 'business-plan'}-${Date.now()}.json`;
+      console.log(`[REPORT API] Returning JSON with filename: ${filename}`);
+      
+      const jsonString = JSON.stringify(jsonExport, null, 2);
+      
+      return new NextResponse(jsonString, {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          'Content-Disposition': `attachment; filename="${filename}"`,
+          'Content-Length': jsonString.length.toString(),
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+    } else if (options.format === 'pdf') {
       console.log(`[REPORT API] Starting PDF generation for project: ${project.name}`);
       
       const projectData = {

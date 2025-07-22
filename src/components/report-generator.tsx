@@ -26,10 +26,11 @@ import { toast } from "react-hot-toast";
 interface ReportGeneratorProps {
   projectId: string;
   projectName: string;
+  project?: any; // For memory-only projects
 }
 
 interface ReportOptions {
-  format: 'pdf' | 'html';
+  format: 'pdf' | 'html' | 'json';
   template: 'executive' | 'investor' | 'comprehensive' | 'pitch-deck' | 'full-comprehensive';
   includeCharts: boolean;
   branding: {
@@ -90,7 +91,7 @@ const colorPresets = [
   { name: 'Bold Red', value: '#EF4444' },
 ];
 
-export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps) {
+export function ReportGenerator({ projectId, projectName, project }: ReportGeneratorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [options, setOptions] = useState<ReportOptions>({
@@ -109,15 +110,31 @@ export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps
     setIsGenerating(true);
     
     try {
+      const requestBody: any = {
+        projectId,
+        ...options
+      };
+
+      // For memory-only projects, include the project data in the request
+      if (project?.storageMode === 'MEMORY_ONLY') {
+        requestBody.projectData = {
+          id: project.id,
+          name: project.name,
+          ideaOutput: project.ideaOutput,
+          researchOutput: project.researchOutput,
+          blueprintOutput: project.blueprintOutput,
+          financialOutput: project.financialOutput,
+          pitchOutput: project.pitchOutput,
+          gtmOutput: project.gtmOutput,
+        };
+      }
+
       const response = await fetch('/api/reports/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          projectId,
-          ...options
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -138,18 +155,30 @@ export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps
           toast.success('Preview opened in new tab');
         }
       } else {
-        // Download PDF
-        const blob = await response.blob();
+        // Download file (PDF or JSON)
+        let blob = await response.blob();
+        
+        // Ensure correct MIME type for blob
+        if (options.format === 'json') {
+          // For JSON, convert to proper JSON blob
+          const jsonText = await blob.text();
+          blob = new Blob([jsonText], { type: 'application/json' });
+        }
+        
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${projectName}-business-plan.pdf`;
+        
+        // Set correct file extension based on format
+        const fileExtension = options.format === 'json' ? 'json' : 'pdf';
+        a.download = `${projectName}-business-plan.${fileExtension}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
-        toast.success('PDF downloaded successfully!');
+        const formatName = options.format === 'json' ? 'JSON export' : 'PDF report';
+        toast.success(`${formatName} downloaded successfully!`);
       }
       
       setIsOpen(false);
@@ -241,7 +270,7 @@ export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <Label className="text-lg font-semibold">Output Format</Label>
-              <Select value={options.format} onValueChange={(value: 'pdf' | 'html') => 
+              <Select value={options.format} onValueChange={(value: 'pdf' | 'html' | 'json') => 
                 setOptions(prev => ({ ...prev, format: value }))
               }>
                 <SelectTrigger>
@@ -250,6 +279,7 @@ export function ReportGenerator({ projectId, projectName }: ReportGeneratorProps
                 <SelectContent>
                   <SelectItem value="html">HTML (Interactive Preview)</SelectItem>
                   <SelectItem value="pdf">PDF (Print Ready)</SelectItem>
+                  <SelectItem value="json">JSON (Data Export)</SelectItem>
                 </SelectContent>
               </Select>
               

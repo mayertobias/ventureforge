@@ -856,123 +856,110 @@ export default function ProjectPage() {
                 )}
                 
                 <div className="grid gap-4">
+                  {/* Executive Summary */}
+                  {project.blueprintOutput.executiveSummary && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📋 Executive Summary
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.executiveSummary.businessConcept && (
+                          <div>
+                            <p className="text-sm"><strong>Business Concept:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.executiveSummary.businessConcept}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.executiveSummary.marketOpportunity && (
+                          <div>
+                            <p className="text-sm"><strong>Market Opportunity:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.executiveSummary.marketOpportunity}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.executiveSummary.uniqueAdvantage && (
+                          <div>
+                            <p className="text-sm"><strong>Unique Advantage:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.executiveSummary.uniqueAdvantage}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.executiveSummary.revenueProjection && (
+                          <div>
+                            <p className="text-sm"><strong>Revenue Projection:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.executiveSummary.revenueProjection}</p>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
                   {/* Core Business Model */}
-                  <Card className="p-4">
-                    <h4 className="font-medium mb-3 flex items-center gap-2">
-                      🏗️ Core Business Model
-                    </h4>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm"><strong>Business Model:</strong></p>
-                        <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel?.model}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm"><strong>Rationale:</strong></p>
-                        <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel?.rationale}</p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Revenue Streams */}
-                  {project.blueprintOutput.revenueStreams && (
+                  {project.blueprintOutput.coreBusinessModel && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        💰 Revenue Streams
+                        🏗️ Core Business Model
                       </h4>
                       <div className="space-y-3">
-                        {project.blueprintOutput.revenueStreams.primary && (
+                        {project.blueprintOutput.coreBusinessModel.primaryModel && (
                           <div>
-                            <p className="text-sm"><strong>Primary Revenue Stream:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueStreams.primary}</p>
+                            <p className="text-sm"><strong>Primary Model:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel.primaryModel}</p>
                           </div>
                         )}
-                        {project.blueprintOutput.revenueStreams.secondary && project.blueprintOutput.revenueStreams.secondary.length > 0 && (
+                        {project.blueprintOutput.coreBusinessModel.rationale && (
                           <div>
-                            <p className="text-sm"><strong>Secondary Revenue Streams:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.revenueStreams.secondary.map((stream: string, index: number) => (
-                                <li key={index}>{stream}</li>
-                              ))}
-                            </ul>
+                            <p className="text-sm"><strong>Rationale:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel.rationale}</p>
                           </div>
                         )}
-                        {project.blueprintOutput.revenueStreams.pricingStrategy && (
+                        {project.blueprintOutput.coreBusinessModel.revenueLogic && (
                           <div>
-                            <p className="text-sm"><strong>Pricing Strategy:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueStreams.pricingStrategy}</p>
+                            <p className="text-sm"><strong>Revenue Logic:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.coreBusinessModel.revenueLogic}</p>
                           </div>
                         )}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Value Proposition */}
-                  {project.blueprintOutput.valueProposition && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        ⭐ Value Proposition
-                      </h4>
-                      <div className="space-y-3">
-                        {project.blueprintOutput.valueProposition.core && (
+                        {project.blueprintOutput.coreBusinessModel.businessModelCanvas && (
                           <div>
-                            <p className="text-sm"><strong>Core Value Proposition:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.valueProposition.core}</p>
-                          </div>
-                        )}
-                        {project.blueprintOutput.valueProposition.keyBenefits && (
-                          <div>
-                            <p className="text-sm"><strong>Key Benefits:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.valueProposition.keyBenefits.map((benefit: string, index: number) => (
-                                <li key={index}>{benefit}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {project.blueprintOutput.valueProposition.differentiation && (
-                          <div>
-                            <p className="text-sm"><strong>Differentiation:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.valueProposition.differentiation}</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Operations Plan */}
-                  {project.blueprintOutput.operationsPlan && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        ⚙️ Operations Plan
-                      </h4>
-                      <div className="space-y-3">
-                        {project.blueprintOutput.operationsPlan.keyActivities && (
-                          <div>
-                            <p className="text-sm"><strong>Key Activities:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.operationsPlan.keyActivities.map((activity: string, index: number) => (
-                                <li key={index}>{activity}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {project.blueprintOutput.operationsPlan.keyResources && (
-                          <div>
-                            <p className="text-sm"><strong>Key Resources:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.operationsPlan.keyResources.map((resource: string, index: number) => (
-                                <li key={index}>{resource}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {project.blueprintOutput.operationsPlan.keyPartners && (
-                          <div>
-                            <p className="text-sm"><strong>Key Partners:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.blueprintOutput.operationsPlan.keyPartners.map((partner: string, index: number) => (
-                                <Badge key={index} variant="outline" className="text-xs">{partner}</Badge>
-                              ))}
+                            <p className="text-sm"><strong>Business Model Canvas:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners && Array.isArray(project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners) && (
+                                <div>
+                                  <p className="text-xs font-medium">Key Partners:</p>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyPartners.map((partner: string, index: number) => (
+                                      <Badge key={index} variant="outline" className="text-xs">{partner}</Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities && Array.isArray(project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities) && (
+                                <div>
+                                  <p className="text-xs font-medium">Key Activities:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyActivities.map((activity: string, index: number) => (
+                                      <li key={index}>{activity}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources && Array.isArray(project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources) && (
+                                <div>
+                                  <p className="text-xs font-medium">Key Resources:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.blueprintOutput.coreBusinessModel.businessModelCanvas.keyResources.map((resource: string, index: number) => (
+                                      <li key={index}>{resource}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure && Array.isArray(project.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure) && (
+                                <div>
+                                  <p className="text-xs font-medium">Cost Structure:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.blueprintOutput.coreBusinessModel.businessModelCanvas.costStructure.map((cost: string, index: number) => (
+                                      <li key={index}>{cost}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -980,60 +967,444 @@ export default function ProjectPage() {
                     </Card>
                   )}
 
-                  {/* Market Entry Strategy */}
-                  {project.blueprintOutput.marketEntryStrategy && (
+                  {/* Revenue Architecture */}
+                  {project.blueprintOutput.revenueArchitecture && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        🎯 Market Entry Strategy
+                        💰 Revenue Architecture
                       </h4>
                       <div className="space-y-3">
-                        {project.blueprintOutput.marketEntryStrategy.approach && (
+                        {project.blueprintOutput.revenueArchitecture.primaryStreams && Array.isArray(project.blueprintOutput.revenueArchitecture.primaryStreams) && (
                           <div>
-                            <p className="text-sm"><strong>Entry Approach:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.approach}</p>
+                            <p className="text-sm"><strong>Primary Revenue Streams:</strong></p>
+                            <div className="mt-2 space-y-3">
+                              {project.blueprintOutput.revenueArchitecture.primaryStreams.map((stream: any, index: number) => (
+                                <div key={index} className="p-3 bg-gray-50 rounded-md">
+                                  <p className="text-sm font-medium">{stream.streamName}</p>
+                                  <div className="mt-2 space-y-1">
+                                    {stream.model && typeof stream.model === 'string' && (
+                                      <p className="text-xs"><strong>Model:</strong> {stream.model}</p>
+                                    )}
+                                    {stream.targetSegment && typeof stream.targetSegment === 'string' && (
+                                      <p className="text-xs"><strong>Target:</strong> {stream.targetSegment}</p>
+                                    )}
+                                    {stream.pricingStrategy && typeof stream.pricingStrategy === 'string' && (
+                                      <p className="text-xs"><strong>Pricing:</strong> {stream.pricingStrategy}</p>
+                                    )}
+                                    {stream.justification && typeof stream.justification === 'string' && (
+                                      <p className="text-xs"><strong>Justification:</strong> {stream.justification}</p>
+                                    )}
+                                    {stream.year3Projection && typeof stream.year3Projection === 'string' && (
+                                      <p className="text-xs"><strong>Year 3 Projection:</strong> {stream.year3Projection}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         )}
-                        {project.blueprintOutput.marketEntryStrategy.initialMarket && (
+                        {project.blueprintOutput.revenueArchitecture.pricingPhilosophy && (
                           <div>
-                            <p className="text-sm"><strong>Initial Target Market:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.initialMarket}</p>
+                            <p className="text-sm"><strong>Pricing Philosophy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueArchitecture.pricingPhilosophy}</p>
                           </div>
                         )}
-                        {project.blueprintOutput.marketEntryStrategy.expansionPlan && (
+                        {project.blueprintOutput.revenueArchitecture.monetizationTimeline && (
                           <div>
-                            <p className="text-sm"><strong>Expansion Plan:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.marketEntryStrategy.expansionPlan}</p>
+                            <p className="text-sm"><strong>Monetization Timeline:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.blueprintOutput.revenueArchitecture.monetizationTimeline}</p>
+                          </div>
+                        )}
+                        {project.blueprintOutput.revenueArchitecture.unitEconomics && (
+                          <div>
+                            <p className="text-sm"><strong>Unit Economics:</strong></p>
+                            <div className="mt-1 space-y-1">
+                              {project.blueprintOutput.revenueArchitecture.unitEconomics.averageRevenuePerUser && (
+                                <p className="text-xs"><strong>ARPU:</strong> {project.blueprintOutput.revenueArchitecture.unitEconomics.averageRevenuePerUser}</p>
+                              )}
+                              {project.blueprintOutput.revenueArchitecture.unitEconomics.customerAcquisitionCost && (
+                                <p className="text-xs"><strong>CAC:</strong> {project.blueprintOutput.revenueArchitecture.unitEconomics.customerAcquisitionCost}</p>
+                              )}
+                              {project.blueprintOutput.revenueArchitecture.unitEconomics.lifetimeValue && (
+                                <p className="text-xs"><strong>LTV:</strong> {project.blueprintOutput.revenueArchitecture.unitEconomics.lifetimeValue}</p>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
                     </Card>
                   )}
 
-                  {/* Risk Analysis */}
-                  {project.blueprintOutput.riskAnalysis && (
+                  {/* Customer Strategy */}
+                  {project.blueprintOutput.customerStrategy && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        ⚠️ Risk Analysis
+                        👥 Customer Strategy
                       </h4>
                       <div className="space-y-3">
-                        {project.blueprintOutput.riskAnalysis.keyRisks && (
+                        {project.blueprintOutput.customerStrategy.targetSegments && Array.isArray(project.blueprintOutput.customerStrategy.targetSegments) && (
                           <div>
-                            <p className="text-sm"><strong>Key Risks:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.riskAnalysis.keyRisks.map((risk: string, index: number) => (
-                                <li key={index}>{risk}</li>
+                            <p className="text-sm"><strong>Target Segments:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.customerStrategy.targetSegments.map((segment: any, index: number) => (
+                                <div key={index} className="p-3 bg-gray-50 rounded-md">
+                                  <p className="text-sm font-medium">{segment.segmentName}</p>
+                                  <div className="mt-1 space-y-1">
+                                    {segment.marketSize && typeof segment.marketSize === 'string' && (
+                                      <p className="text-xs"><strong>Size:</strong> {segment.marketSize}</p>
+                                    )}
+                                    {segment.painPoints && typeof segment.painPoints === 'string' && (
+                                      <p className="text-xs"><strong>Pain Points:</strong> {segment.painPoints}</p>
+                                    )}
+                                    {segment.valueProposition && typeof segment.valueProposition === 'string' && (
+                                      <p className="text-xs"><strong>Value Prop:</strong> {segment.valueProposition}</p>
+                                    )}
+                                  </div>
+                                </div>
                               ))}
-                            </ul>
+                            </div>
                           </div>
                         )}
-                        {project.blueprintOutput.riskAnalysis.mitigationStrategies && (
+                        {project.blueprintOutput.customerStrategy.customerJourney && (
                           <div>
-                            <p className="text-sm"><strong>Mitigation Strategies:</strong></p>
-                            <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                              {project.blueprintOutput.riskAnalysis.mitigationStrategies.map((strategy: string, index: number) => (
-                                <li key={index}>{strategy}</li>
+                            <p className="text-sm"><strong>Customer Journey:</strong></p>
+                            <div className="mt-2 space-y-1">
+                              {project.blueprintOutput.customerStrategy.customerJourney.awareness && (
+                                <p className="text-xs"><strong>Awareness:</strong> {project.blueprintOutput.customerStrategy.customerJourney.awareness}</p>
+                              )}
+                              {project.blueprintOutput.customerStrategy.customerJourney.consideration && (
+                                <p className="text-xs"><strong>Consideration:</strong> {project.blueprintOutput.customerStrategy.customerJourney.consideration}</p>
+                              )}
+                              {project.blueprintOutput.customerStrategy.customerJourney.decision && (
+                                <p className="text-xs"><strong>Decision:</strong> {project.blueprintOutput.customerStrategy.customerJourney.decision}</p>
+                              )}
+                              {project.blueprintOutput.customerStrategy.customerJourney.retention && (
+                                <p className="text-xs"><strong>Retention:</strong> {project.blueprintOutput.customerStrategy.customerJourney.retention}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Operational Blueprint */}
+                  {project.blueprintOutput.operationalBlueprint && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚙️ Operational Blueprint
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.operationalBlueprint.coreOperations && Array.isArray(project.blueprintOutput.operationalBlueprint.coreOperations) && (
+                          <div>
+                            <p className="text-sm"><strong>Core Operations:</strong></p>
+                            <div className="mt-2 space-y-3">
+                              {project.blueprintOutput.operationalBlueprint.coreOperations.map((operation: any, index: number) => (
+                                <div key={index} className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                  <p className="text-sm font-medium text-blue-800">{operation?.operationName || `Operation ${index + 1}`}</p>
+                                  <div className="mt-2 space-y-1">
+                                    {operation?.description && (
+                                      <p className="text-xs text-blue-700"><strong>Description:</strong> {operation.description}</p>
+                                    )}
+                                    {operation?.keyPersonnel && (
+                                      <p className="text-xs text-blue-700"><strong>Key Personnel:</strong> {operation.keyPersonnel}</p>
+                                    )}
+                                    {operation?.toolsAndSystems && (
+                                      <p className="text-xs text-blue-700"><strong>Tools & Systems:</strong> {operation.toolsAndSystems}</p>
+                                    )}
+                                    {operation?.scalingStrategy && (
+                                      <p className="text-xs text-blue-700"><strong>Scaling Strategy:</strong> {operation.scalingStrategy}</p>
+                                    )}
+                                    {operation?.qualityMetrics && (
+                                      <p className="text-xs text-blue-700"><strong>Quality Metrics:</strong> {operation.qualityMetrics}</p>
+                                    )}
+                                  </div>
+                                </div>
                               ))}
-                            </ul>
+                            </div>
+                          </div>
+                        )}
+                        {project.blueprintOutput.operationalBlueprint.technologyArchitecture && (
+                          <div>
+                            <p className="text-sm"><strong>Technology Architecture:</strong></p>
+                            <div className="mt-2 space-y-1">
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.frontend && (
+                                <p className="text-xs"><strong>Frontend:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.frontend}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.backend && (
+                                <p className="text-xs"><strong>Backend:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.backend}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.database && (
+                                <p className="text-xs"><strong>Database:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.database}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.infrastructure && (
+                                <p className="text-xs"><strong>Infrastructure:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.infrastructure}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.aiMlStack && (
+                                <p className="text-xs"><strong>AI/ML Stack:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.aiMlStack}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.technologyArchitecture.securityCompliance && (
+                                <p className="text-xs"><strong>Security & Compliance:</strong> {project.blueprintOutput.operationalBlueprint.technologyArchitecture.securityCompliance}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {project.blueprintOutput.operationalBlueprint.qualityAssurance && typeof project.blueprintOutput.operationalBlueprint.qualityAssurance === 'object' && (
+                          <div>
+                            <p className="text-sm"><strong>Quality Assurance:</strong></p>
+                            <div className="mt-2 space-y-1">
+                              {project.blueprintOutput.operationalBlueprint.qualityAssurance.productQuality && typeof project.blueprintOutput.operationalBlueprint.qualityAssurance.productQuality === 'string' && (
+                                <p className="text-xs"><strong>Product Quality:</strong> {project.blueprintOutput.operationalBlueprint.qualityAssurance.productQuality}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.qualityAssurance.serviceQuality && typeof project.blueprintOutput.operationalBlueprint.qualityAssurance.serviceQuality === 'string' && (
+                                <p className="text-xs"><strong>Service Quality:</strong> {project.blueprintOutput.operationalBlueprint.qualityAssurance.serviceQuality}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.qualityAssurance.dataQuality && typeof project.blueprintOutput.operationalBlueprint.qualityAssurance.dataQuality === 'string' && (
+                                <p className="text-xs"><strong>Data Quality:</strong> {project.blueprintOutput.operationalBlueprint.qualityAssurance.dataQuality}</p>
+                              )}
+                              {project.blueprintOutput.operationalBlueprint.qualityAssurance.continuousImprovement && typeof project.blueprintOutput.operationalBlueprint.qualityAssurance.continuousImprovement === 'string' && (
+                                <p className="text-xs"><strong>Continuous Improvement:</strong> {project.blueprintOutput.operationalBlueprint.qualityAssurance.continuousImprovement}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Go-to-Market Execution */}
+                  {project.blueprintOutput.goToMarketExecution && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🚀 Go-to-Market Execution
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.goToMarketExecution.launchStrategy && typeof project.blueprintOutput.goToMarketExecution.launchStrategy === 'object' && (
+                          <div>
+                            <p className="text-sm"><strong>Launch Strategy:</strong></p>
+                            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-md">
+                              {project.blueprintOutput.goToMarketExecution.launchStrategy.mvpDefinition && (
+                                <p className="text-xs text-green-700 mb-1"><strong>MVP Definition:</strong> {project.blueprintOutput.goToMarketExecution.launchStrategy.mvpDefinition}</p>
+                              )}
+                              {project.blueprintOutput.goToMarketExecution.launchStrategy.targetDate && (
+                                <p className="text-xs text-green-700 mb-1"><strong>Target Date:</strong> {project.blueprintOutput.goToMarketExecution.launchStrategy.targetDate}</p>
+                              )}
+                              {project.blueprintOutput.goToMarketExecution.launchStrategy.initialMarket && (
+                                <p className="text-xs text-green-700 mb-1"><strong>Initial Market:</strong> {project.blueprintOutput.goToMarketExecution.launchStrategy.initialMarket}</p>
+                              )}
+                              {project.blueprintOutput.goToMarketExecution.launchStrategy.successMetrics && (
+                                <p className="text-xs text-green-700"><strong>Success Metrics:</strong> {project.blueprintOutput.goToMarketExecution.launchStrategy.successMetrics}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {project.blueprintOutput.goToMarketExecution.acquisitionChannels && Array.isArray(project.blueprintOutput.goToMarketExecution.acquisitionChannels) && (
+                          <div>
+                            <p className="text-sm"><strong>Acquisition Channels:</strong></p>
+                            <div className="mt-2 space-y-3">
+                              {project.blueprintOutput.goToMarketExecution.acquisitionChannels.map((channel: any, index: number) => (
+                                <div key={index} className="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                                  <p className="text-sm font-medium text-purple-800">{channel.channel || `Channel ${index + 1}`}</p>
+                                  <div className="mt-2 space-y-1">
+                                    {channel.strategy && typeof channel.strategy === 'string' && (
+                                      <p className="text-xs text-purple-700"><strong>Strategy:</strong> {channel.strategy}</p>
+                                    )}
+                                    {channel.investment && typeof channel.investment === 'string' && (
+                                      <p className="text-xs text-purple-700"><strong>Investment:</strong> {channel.investment}</p>
+                                    )}
+                                    {channel.expectedResults && typeof channel.expectedResults === 'string' && (
+                                      <p className="text-xs text-purple-700"><strong>Expected Results:</strong> {channel.expectedResults}</p>
+                                    )}
+                                    {channel.scalability && typeof channel.scalability === 'string' && (
+                                      <p className="text-xs text-purple-700"><strong>Scalability:</strong> {channel.scalability}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.blueprintOutput.goToMarketExecution.partnershipStrategy && typeof project.blueprintOutput.goToMarketExecution.partnershipStrategy === 'object' && (
+                          <div>
+                            <p className="text-sm"><strong>Partnership Strategy:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.goToMarketExecution.partnershipStrategy.strategicPartnerships && Array.isArray(project.blueprintOutput.goToMarketExecution.partnershipStrategy.strategicPartnerships) && (
+                                <div>
+                                  <p className="text-xs font-medium">Strategic Partnerships:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.blueprintOutput.goToMarketExecution.partnershipStrategy.strategicPartnerships.map((partner: string, index: number) => (
+                                      <li key={index}>{partner}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.blueprintOutput.goToMarketExecution.partnershipStrategy.channelPartnerships && typeof project.blueprintOutput.goToMarketExecution.partnershipStrategy.channelPartnerships === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Channel Partnerships:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.goToMarketExecution.partnershipStrategy.channelPartnerships}</p>
+                                </div>
+                              )}
+                              {project.blueprintOutput.goToMarketExecution.partnershipStrategy.technologyPartnerships && typeof project.blueprintOutput.goToMarketExecution.partnershipStrategy.technologyPartnerships === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Technology Partnerships:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.goToMarketExecution.partnershipStrategy.technologyPartnerships}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Competitive Strategy */}
+                  {project.blueprintOutput.competitiveStrategy && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        🎯 Competitive Strategy
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.competitiveStrategy.sustainableAdvantages && Array.isArray(project.blueprintOutput.competitiveStrategy.sustainableAdvantages) && (
+                          <div>
+                            <p className="text-sm"><strong>Sustainable Advantages:</strong></p>
+                            <div className="mt-2 space-y-3">
+                              {project.blueprintOutput.competitiveStrategy.sustainableAdvantages.map((advantage: any, index: number) => (
+                                <div key={index} className="p-3 bg-orange-50 border border-orange-200 rounded-md">
+                                  <p className="text-sm font-medium text-orange-800">{advantage.advantage || `Advantage ${index + 1}`}</p>
+                                  <div className="mt-2 space-y-1">
+                                    {advantage.description && typeof advantage.description === 'string' && (
+                                      <p className="text-xs text-orange-700"><strong>Description:</strong> {advantage.description}</p>
+                                    )}
+                                    {advantage.defensibility && typeof advantage.defensibility === 'string' && (
+                                      <p className="text-xs text-orange-700"><strong>Defensibility:</strong> {advantage.defensibility}</p>
+                                    )}
+                                    {advantage.strengthening && typeof advantage.strengthening === 'string' && (
+                                      <p className="text-xs text-orange-700"><strong>Strengthening:</strong> {advantage.strengthening}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.blueprintOutput.competitiveStrategy.competitiveResponse && typeof project.blueprintOutput.competitiveStrategy.competitiveResponse === 'object' && (
+                          <div>
+                            <p className="text-sm"><strong>Competitive Response:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.competitiveStrategy.competitiveResponse.directCompetitors && typeof project.blueprintOutput.competitiveStrategy.competitiveResponse.directCompetitors === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Direct Competitors:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.competitiveResponse.directCompetitors}</p>
+                                </div>
+                              )}
+                              {project.blueprintOutput.competitiveStrategy.competitiveResponse.indirectThreats && typeof project.blueprintOutput.competitiveStrategy.competitiveResponse.indirectThreats === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Indirect Threats:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.competitiveResponse.indirectThreats}</p>
+                                </div>
+                              )}
+                              {project.blueprintOutput.competitiveStrategy.competitiveResponse.newEntrants && typeof project.blueprintOutput.competitiveStrategy.competitiveResponse.newEntrants === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">New Entrants:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.competitiveResponse.newEntrants}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.blueprintOutput.competitiveStrategy.innovationStrategy && typeof project.blueprintOutput.competitiveStrategy.innovationStrategy === 'object' && (
+                          <div>
+                            <p className="text-sm"><strong>Innovation Strategy:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.competitiveStrategy.innovationStrategy.rdInvestment && typeof project.blueprintOutput.competitiveStrategy.innovationStrategy.rdInvestment === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">R&D Investment:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.innovationStrategy.rdInvestment}</p>
+                                </div>
+                              )}
+                              {project.blueprintOutput.competitiveStrategy.innovationStrategy.innovationAreas && typeof project.blueprintOutput.competitiveStrategy.innovationStrategy.innovationAreas === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Innovation Areas:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.innovationStrategy.innovationAreas}</p>
+                                </div>
+                              )}
+                              {project.blueprintOutput.competitiveStrategy.innovationStrategy.patentStrategy && typeof project.blueprintOutput.competitiveStrategy.innovationStrategy.patentStrategy === 'string' && (
+                                <div>
+                                  <p className="text-xs font-medium">Patent Strategy:</p>
+                                  <p className="text-xs text-muted-foreground">{project.blueprintOutput.competitiveStrategy.innovationStrategy.patentStrategy}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Risk Management */}
+                  {project.blueprintOutput.riskManagement && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚠️ Risk Management
+                      </h4>
+                      <div className="space-y-3">
+                        {project.blueprintOutput.riskManagement.businessRisks && Array.isArray(project.blueprintOutput.riskManagement.businessRisks) && (
+                          <div>
+                            <p className="text-sm"><strong>Business Risks:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.riskManagement.businessRisks.map((risk: any, index: number) => (
+                                <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-md">
+                                  <p className="text-sm font-medium text-red-800">{risk.risk || `Business Risk ${index + 1}`}</p>
+                                  <div className="mt-1 space-y-1">
+                                    {risk.probability && typeof risk.probability === 'string' && (
+                                      <p className="text-xs text-red-700"><strong>Probability:</strong> {risk.probability}</p>
+                                    )}
+                                    {risk.impact && typeof risk.impact === 'string' && (
+                                      <p className="text-xs text-red-700"><strong>Impact:</strong> {risk.impact}</p>
+                                    )}
+                                    {risk.mitigation && typeof risk.mitigation === 'string' && (
+                                      <p className="text-xs text-red-700"><strong>Mitigation:</strong> {risk.mitigation}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.blueprintOutput.riskManagement.operationalRisks && Array.isArray(project.blueprintOutput.riskManagement.operationalRisks) && (
+                          <div>
+                            <p className="text-sm"><strong>Operational Risks:</strong></p>
+                            <div className="mt-2 space-y-2">
+                              {project.blueprintOutput.riskManagement.operationalRisks.map((risk: any, index: number) => (
+                                <div key={index} className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                  <p className="text-sm font-medium text-yellow-800">{risk.risk || `Operational Risk ${index + 1}`}</p>
+                                  <div className="mt-1 space-y-1">
+                                    {risk.probability && typeof risk.probability === 'string' && (
+                                      <p className="text-xs text-yellow-700"><strong>Probability:</strong> {risk.probability}</p>
+                                    )}
+                                    {risk.impact && typeof risk.impact === 'string' && (
+                                      <p className="text-xs text-yellow-700"><strong>Impact:</strong> {risk.impact}</p>
+                                    )}
+                                    {risk.mitigation && typeof risk.mitigation === 'string' && (
+                                      <p className="text-xs text-yellow-700"><strong>Mitigation:</strong> {risk.mitigation}</p>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {project.blueprintOutput.riskManagement.contingencyPlans && typeof project.blueprintOutput.riskManagement.contingencyPlans === 'string' && (
+                          <div>
+                            <p className="text-sm"><strong>Contingency Plans:</strong></p>
+                            <p className="text-sm text-muted-foreground mt-1">{project.blueprintOutput.riskManagement.contingencyPlans}</p>
                           </div>
                         )}
                       </div>
@@ -1436,43 +1807,61 @@ export default function ProjectPage() {
                     <p className="text-sm leading-relaxed">{project.pitchOutput.executiveSummary}</p>
                   </Card>
 
-                  {/* Pitch Deck Content */}
-                  {project.pitchOutput.pitchDeckContent && (
+                  {/* Pitch Deck Slides */}
+                  {project.pitchOutput.pitchDeckSlides && (
                     <>
                       {/* Problem & Solution */}
                       <div className="grid gap-4 md:grid-cols-2">
-                        {project.pitchOutput.pitchDeckContent.problem && (
+                        {project.pitchOutput.pitchDeckSlides.problemSlide && (
                           <Card className="p-4">
                             <h4 className="font-medium mb-3 flex items-center gap-2">
-                              ❗ The Problem
+                              ❗ {project.pitchOutput.pitchDeckSlides.problemSlide.headline || "The Problem"}
                             </h4>
                             <div className="space-y-2">
-                              <p className="text-sm">{project.pitchOutput.pitchDeckContent.problem.content}</p>
-                              {project.pitchOutput.pitchDeckContent.problem.marketSize && (
-                                <div className="text-center p-2 bg-muted rounded">
-                                  <div className="font-bold text-primary">{project.pitchOutput.pitchDeckContent.problem.marketSize}</div>
-                                  <div className="text-xs text-muted-foreground">Market Size Affected</div>
+                              {project.pitchOutput.pitchDeckSlides.problemSlide.problemStatement && (
+                                <p className="text-sm">{project.pitchOutput.pitchDeckSlides.problemSlide.problemStatement}</p>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.problemSlide.marketPainPoints && Array.isArray(project.pitchOutput.pitchDeckSlides.problemSlide.marketPainPoints) && (
+                                <div>
+                                  <p className="text-sm font-medium">Market Pain Points:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.pitchOutput.pitchDeckSlides.problemSlide.marketPainPoints.map((pain: string, index: number) => (
+                                      <li key={index}>{pain}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.problemSlide.urgency && (
+                                <div className="p-2 bg-red-50 border border-red-200 rounded">
+                                  <p className="text-xs text-red-700"><strong>Urgency:</strong> {project.pitchOutput.pitchDeckSlides.problemSlide.urgency}</p>
                                 </div>
                               )}
                             </div>
                           </Card>
                         )}
 
-                        {project.pitchOutput.pitchDeckContent.solution && (
+                        {project.pitchOutput.pitchDeckSlides.solutionSlide && (
                           <Card className="p-4">
                             <h4 className="font-medium mb-3 flex items-center gap-2">
-                              💡 The Solution
+                              💡 {project.pitchOutput.pitchDeckSlides.solutionSlide.headline || "The Solution"}
                             </h4>
                             <div className="space-y-2">
-                              <p className="text-sm">{project.pitchOutput.pitchDeckContent.solution.content}</p>
-                              {project.pitchOutput.pitchDeckContent.solution.keyFeatures && (
+                              {project.pitchOutput.pitchDeckSlides.solutionSlide.solutionDescription && (
+                                <p className="text-sm">{project.pitchOutput.pitchDeckSlides.solutionSlide.solutionDescription}</p>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.solutionSlide.keyDifferentiators && Array.isArray(project.pitchOutput.pitchDeckSlides.solutionSlide.keyDifferentiators) && (
                                 <div>
-                                  <p className="text-sm font-medium">Key Features:</p>
+                                  <p className="text-sm font-medium">Key Differentiators:</p>
                                   <div className="flex flex-wrap gap-1 mt-1">
-                                    {project.pitchOutput.pitchDeckContent.solution.keyFeatures.map((feature: string, index: number) => (
-                                      <Badge key={index} variant="secondary" className="text-xs">{feature}</Badge>
+                                    {project.pitchOutput.pitchDeckSlides.solutionSlide.keyDifferentiators.map((diff: string, index: number) => (
+                                      <Badge key={index} variant="secondary" className="text-xs">{diff}</Badge>
                                     ))}
                                   </div>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.solutionSlide.proofOfConcept && (
+                                <div className="p-2 bg-green-50 border border-green-200 rounded">
+                                  <p className="text-xs text-green-700"><strong>Proof of Concept:</strong> {project.pitchOutput.pitchDeckSlides.solutionSlide.proofOfConcept}</p>
                                 </div>
                               )}
                             </div>
@@ -1481,29 +1870,46 @@ export default function ProjectPage() {
                       </div>
 
                       {/* Market Opportunity */}
-                      {project.pitchOutput.pitchDeckContent.marketOpportunity && (
+                      {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide && (
                         <Card className="p-4">
                           <h4 className="font-medium mb-3 flex items-center gap-2">
-                            🌍 Market Opportunity
+                            🌍 {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.headline || "Market Opportunity"}
                           </h4>
-                          <div className="grid gap-3 md:grid-cols-2">
-                            <div className="text-center p-3 bg-muted rounded-lg">
-                              <div className="text-lg font-bold text-primary">
-                                {project.pitchOutput.pitchDeckContent.marketOpportunity.tam || 'N/A'}
+                          {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing && (
+                            <div className="grid gap-3 md:grid-cols-3 mb-3">
+                              <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="text-lg font-bold text-blue-800">
+                                  {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.tam || 'N/A'}
+                                </div>
+                                <div className="text-xs text-blue-600">Total Addressable Market</div>
                               </div>
-                              <div className="text-xs text-muted-foreground">Total Addressable Market</div>
-                            </div>
-                            <div className="text-center p-3 bg-muted rounded-lg">
-                              <div className="text-lg font-bold text-primary">
-                                {project.pitchOutput.pitchDeckContent.marketOpportunity.sam || 'N/A'}
+                              <div className="text-center p-3 bg-green-50 border border-green-200 rounded-lg">
+                                <div className="text-lg font-bold text-green-800">
+                                  {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.sam || 'N/A'}
+                                </div>
+                                <div className="text-xs text-green-600">Serviceable Addressable Market</div>
                               </div>
-                              <div className="text-xs text-muted-foreground">Serviceable Addressable Market</div>
+                              <div className="text-center p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                                <div className="text-lg font-bold text-purple-800">
+                                  {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketSizing.som || 'N/A'}
+                                </div>
+                                <div className="text-xs text-purple-600">Serviceable Obtainable Market</div>
+                              </div>
                             </div>
-                          </div>
-                          {project.pitchOutput.pitchDeckContent.marketOpportunity.marketTrends && (
-                            <div className="mt-3">
-                              <p className="text-sm"><strong>Market Trends:</strong></p>
-                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.marketOpportunity.marketTrends}</p>
+                          )}
+                          {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketTrends && Array.isArray(project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketTrends) && (
+                            <div className="mb-3">
+                              <p className="text-sm font-medium mb-2">Market Trends:</p>
+                              <ul className="text-sm text-muted-foreground list-disc list-inside">
+                                {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.marketTrends.map((trend: string, index: number) => (
+                                  <li key={index}>{trend}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.timingRationale && (
+                            <div className="p-2 bg-orange-50 border border-orange-200 rounded">
+                              <p className="text-xs text-orange-700"><strong>Why Now:</strong> {project.pitchOutput.pitchDeckSlides.marketOpportunitySlide.timingRationale}</p>
                             </div>
                           )}
                         </Card>
@@ -1511,158 +1917,269 @@ export default function ProjectPage() {
 
                       {/* Business Model & Traction */}
                       <div className="grid gap-4 md:grid-cols-2">
-                        {project.pitchOutput.pitchDeckContent.businessModel && (
+                        {project.pitchOutput.pitchDeckSlides.businessModelSlide && (
                           <Card className="p-4">
                             <h4 className="font-medium mb-3 flex items-center gap-2">
-                              💼 Business Model
+                              💼 {project.pitchOutput.pitchDeckSlides.businessModelSlide.headline || "Business Model"}
                             </h4>
-                            <div className="space-y-2">
-                              <div>
-                                <p className="text-sm"><strong>Revenue Streams:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.revenueStreams}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm"><strong>Pricing Strategy:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.pricingStrategy}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm"><strong>Unit Economics:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.businessModel.unitEconomics}</p>
-                              </div>
+                            <div className="space-y-3">
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.revenueModel && (
+                                <div>
+                                  <p className="text-sm font-medium">Revenue Model:</p>
+                                  <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.businessModelSlide.revenueModel}</p>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics && (
+                                <div>
+                                  <p className="text-sm font-medium">Unit Economics:</p>
+                                  <div className="grid gap-2 mt-1">
+                                    {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.customerAcquisitionCost && (
+                                      <div className="text-xs bg-muted p-2 rounded">
+                                        <strong>CAC:</strong> {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.customerAcquisitionCost}
+                                      </div>
+                                    )}
+                                    {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.lifetimeValue && (
+                                      <div className="text-xs bg-muted p-2 rounded">
+                                        <strong>LTV:</strong> {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.lifetimeValue}
+                                      </div>
+                                    )}
+                                    {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.grossMargin && (
+                                      <div className="text-xs bg-muted p-2 rounded">
+                                        <strong>Gross Margin:</strong> {project.pitchOutput.pitchDeckSlides.businessModelSlide.unitEconomics.grossMargin}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.businessModelSlide.revenueStreams && (
+                                <div>
+                                  <p className="text-sm font-medium">Revenue Streams:</p>
+                                  <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.businessModelSlide.revenueStreams}</p>
+                                </div>
+                              )}
                             </div>
                           </Card>
                         )}
 
-                        {project.pitchOutput.pitchDeckContent.traction && (
+                        {project.pitchOutput.pitchDeckSlides.tractionSlide && (
                           <Card className="p-4">
                             <h4 className="font-medium mb-3 flex items-center gap-2">
-                              🚀 Traction
+                              📈 {project.pitchOutput.pitchDeckSlides.tractionSlide.headline || "Traction"}
                             </h4>
-                            <div className="space-y-2">
-                              {project.pitchOutput.pitchDeckContent.traction.keyMilestones && (
+                            <div className="space-y-3">
+                              {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics && (
                                 <div>
-                                  <p className="text-sm"><strong>Key Milestones:</strong></p>
-                                  <ul className="text-sm text-muted-foreground list-disc list-inside mt-1">
-                                    {project.pitchOutput.pitchDeckContent.traction.keyMilestones.map((milestone: string, index: number) => (
-                                      <li key={index}>{milestone}</li>
+                                  <p className="text-sm font-medium mb-2">Key Metrics:</p>
+                                  <div className="grid gap-2">
+                                    {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.customers && (
+                                      <div className="text-xs bg-green-50 border border-green-200 p-2 rounded">
+                                        <strong>Customers:</strong> {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.customers}
+                                      </div>
+                                    )}
+                                    {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.revenue && (
+                                      <div className="text-xs bg-blue-50 border border-blue-200 p-2 rounded">
+                                        <strong>Revenue:</strong> {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.revenue}
+                                      </div>
+                                    )}
+                                    {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.retention && (
+                                      <div className="text-xs bg-purple-50 border border-purple-200 p-2 rounded">
+                                        <strong>Retention:</strong> {project.pitchOutput.pitchDeckSlides.tractionSlide.keyMetrics.retention}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                              {project.pitchOutput.pitchDeckSlides.tractionSlide.socialProof && Array.isArray(project.pitchOutput.pitchDeckSlides.tractionSlide.socialProof) && (
+                                <div>
+                                  <p className="text-sm font-medium">Social Proof:</p>
+                                  <ul className="text-xs text-muted-foreground list-disc list-inside mt-1">
+                                    {project.pitchOutput.pitchDeckSlides.tractionSlide.socialProof.map((proof: string, index: number) => (
+                                      <li key={index}>{proof}</li>
                                     ))}
                                   </ul>
                                 </div>
                               )}
-                              {project.pitchOutput.pitchDeckContent.traction.proofPoints && (
-                                <div>
-                                  <p className="text-sm"><strong>Proof Points:</strong></p>
-                                  <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.traction.proofPoints}</p>
-                                </div>
-                              )}
                             </div>
                           </Card>
                         )}
                       </div>
 
-                      {/* The Ask */}
-                      {project.pitchOutput.pitchDeckContent.theAsk && (
-                        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+                      {/* Additional Slides */}
+                      {project.pitchOutput.pitchDeckSlides.competitionSlide && (
+                        <Card className="p-4">
                           <h4 className="font-medium mb-3 flex items-center gap-2">
-                            💰 The Ask
+                            🏆 {project.pitchOutput.pitchDeckSlides.competitionSlide.headline || "Competition"}
                           </h4>
-                          <div className="grid gap-3 md:grid-cols-2">
-                            <div className="text-center p-3 bg-white rounded-lg">
-                              <div className="text-2xl font-bold text-primary">
-                                {project.pitchOutput.pitchDeckContent.theAsk.fundingAmount || 'N/A'}
+                          <div className="space-y-3">
+                            {project.pitchOutput.pitchDeckSlides.competitionSlide.competitiveLandscape && (
+                              <div>
+                                <p className="text-sm font-medium">Competitive Landscape:</p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.competitionSlide.competitiveLandscape}</p>
                               </div>
-                              <div className="text-sm text-muted-foreground">Funding Amount</div>
-                            </div>
-                            <div className="text-center p-3 bg-white rounded-lg">
-                              <div className="text-2xl font-bold text-primary">
-                                {project.pitchOutput.pitchDeckContent.theAsk.timeline || 'N/A'}
+                            )}
+                            {project.pitchOutput.pitchDeckSlides.competitionSlide.competitiveAdvantages && Array.isArray(project.pitchOutput.pitchDeckSlides.competitionSlide.competitiveAdvantages) && (
+                              <div>
+                                <p className="text-sm font-medium">Competitive Advantages:</p>
+                                <div className="space-y-2 mt-2">
+                                  {project.pitchOutput.pitchDeckSlides.competitionSlide.competitiveAdvantages.map((adv: any, index: number) => (
+                                    <div key={index} className="p-2 bg-orange-50 border border-orange-200 rounded">
+                                      <p className="text-sm font-medium text-orange-800">{adv.advantage || `Advantage ${index + 1}`}</p>
+                                      {adv.description && (
+                                        <p className="text-xs text-orange-700 mt-1">{adv.description}</p>
+                                      )}
+                                      {adv.defensibility && (
+                                        <p className="text-xs text-orange-600 mt-1"><strong>Defensibility:</strong> {adv.defensibility}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                              <div className="text-sm text-muted-foreground">Runway</div>
-                            </div>
-                          </div>
-                          <div className="mt-3 space-y-2">
-                            <div>
-                              <p className="text-sm"><strong>Use of Funds:</strong></p>
-                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.theAsk.useOfFunds}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm"><strong>Key Milestone:</strong></p>
-                              <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.theAsk.keyMilestone}</p>
-                            </div>
+                            )}
                           </div>
                         </Card>
                       )}
 
-                      {/* Team & Exit Strategy */}
-                      <div className="grid gap-4 md:grid-cols-2">
-                        {project.pitchOutput.pitchDeckContent.team && (
-                          <Card className="p-4">
-                            <h4 className="font-medium mb-3 flex items-center gap-2">
-                              👥 The Team
-                            </h4>
-                            <div className="space-y-2">
+                      {/* Financial Projections */}
+                      {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            💰 {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.headline || "Financial Projections"}
+                          </h4>
+                          <div className="space-y-3">
+                            {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth && (
                               <div>
-                                <p className="text-sm"><strong>Team Strength:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.teamStrength}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm"><strong>Advisors:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.advisors}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm"><strong>Hiring Plan:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.team.hiringPlan}</p>
-                              </div>
-                            </div>
-                          </Card>
-                        )}
-
-                        {project.pitchOutput.pitchDeckContent.exitStrategy && (
-                          <Card className="p-4">
-                            <h4 className="font-medium mb-3 flex items-center gap-2">
-                              🏁 Exit Strategy
-                            </h4>
-                            <div className="space-y-2">
-                              {project.pitchOutput.pitchDeckContent.exitStrategy.potentialAcquirers && (
-                                <div>
-                                  <p className="text-sm"><strong>Potential Acquirers:</strong></p>
-                                  <div className="flex flex-wrap gap-1 mt-1">
-                                    {project.pitchOutput.pitchDeckContent.exitStrategy.potentialAcquirers.map((acquirer: string, index: number) => (
-                                      <Badge key={index} variant="outline" className="text-xs">{acquirer}</Badge>
-                                    ))}
-                                  </div>
+                                <p className="text-sm font-medium mb-2">Revenue Growth:</p>
+                                <div className="grid gap-2 md:grid-cols-2">
+                                  {Object.entries(project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.revenueGrowth).map(([year, revenue], index) => (
+                                    <div key={index} className="text-center p-2 bg-muted rounded">
+                                      <div className="text-sm font-bold">{revenue as string}</div>
+                                      <div className="text-xs text-muted-foreground capitalize">{year.replace(/(\d+)/, ' $1')}</div>
+                                    </div>
+                                  ))}
                                 </div>
-                              )}
-                              <div>
-                                <p className="text-sm"><strong>Exit Timeline:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.exitStrategy.exitTimeline}</p>
                               </div>
+                            )}
+                            {project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.profitabilityMetrics && (
                               <div>
-                                <p className="text-sm"><strong>Valuation Multiple:</strong></p>
-                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckContent.exitStrategy.valuationMultiple}</p>
+                                <p className="text-sm font-medium mb-2">Profitability Metrics:</p>
+                                <div className="grid gap-2 md:grid-cols-3">
+                                  {Object.entries(project.pitchOutput.pitchDeckSlides.financialProjectionsSlide.profitabilityMetrics).map(([metric, value], index) => (
+                                    <div key={index} className="text-center p-2 bg-green-50 border border-green-200 rounded">
+                                      <div className="text-sm font-bold text-green-800">{value as string}</div>
+                                      <div className="text-xs text-green-600 capitalize">{metric.replace(/([A-Z])/g, ' $1')}</div>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          </Card>
-                        )}
-                      </div>
-                    </>
-                  )}
-
-                  {/* Investor FAQ */}
-                  {project.pitchOutput.investorFAQ && project.pitchOutput.investorFAQ.length > 0 && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        ❓ Investor FAQ
-                      </h4>
-                      <div className="space-y-3">
-                        {project.pitchOutput.investorFAQ.map((faq: any, index: number) => (
-                          <div key={index} className="border-l-2 border-muted pl-4">
-                            <p className="text-sm font-medium mb-1">{faq.question}</p>
-                            <p className="text-sm text-muted-foreground">{faq.answer}</p>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    </Card>
+                        </Card>
+                      )}
+
+                      {/* Funding Ask */}
+                      {project.pitchOutput.pitchDeckSlides.fundingAskSlide && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            💎 {project.pitchOutput.pitchDeckSlides.fundingAskSlide.headline || "Funding Ask"}
+                          </h4>
+                          <div className="space-y-3">
+                            {project.pitchOutput.pitchDeckSlides.fundingAskSlide.fundingAmount && (
+                              <div className="text-center p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                <div className="text-xl font-bold text-blue-800">{project.pitchOutput.pitchDeckSlides.fundingAskSlide.fundingAmount}</div>
+                              </div>
+                            )}
+                            {project.pitchOutput.pitchDeckSlides.fundingAskSlide.useOfFunds && (
+                              <div>
+                                <p className="text-sm font-medium mb-2">Use of Funds:</p>
+                                <div className="space-y-2">
+                                  {Object.entries(project.pitchOutput.pitchDeckSlides.fundingAskSlide.useOfFunds).map(([category, details], index) => (
+                                    <div key={index} className="p-2 bg-muted rounded">
+                                      <p className="text-sm font-medium capitalize">{category.replace(/([A-Z])/g, ' $1')}</p>
+                                      <p className="text-xs text-muted-foreground">{details as string}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {project.pitchOutput.pitchDeckSlides.fundingAskSlide.keyMilestones && (
+                              <div>
+                                <p className="text-sm font-medium">Key Milestones:</p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.fundingAskSlide.keyMilestones}</p>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Team */}
+                      {project.pitchOutput.pitchDeckSlides.teamSlide && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            👥 {project.pitchOutput.pitchDeckSlides.teamSlide.headline || "Team"}
+                          </h4>
+                          <div className="space-y-3">
+                            {project.pitchOutput.pitchDeckSlides.teamSlide.founderBios && (
+                              <div>
+                                <p className="text-sm font-medium">Founder Bios:</p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.teamSlide.founderBios}</p>
+                              </div>
+                            )}
+                            {project.pitchOutput.pitchDeckSlides.teamSlide.teamStrengths && (
+                              <div>
+                                <p className="text-sm font-medium">Team Strengths:</p>
+                                <p className="text-sm text-muted-foreground">{project.pitchOutput.pitchDeckSlides.teamSlide.teamStrengths}</p>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Exit Strategy */}
+                      {project.pitchOutput.pitchDeckSlides.exitStrategySlide && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            🚀 {project.pitchOutput.pitchDeckSlides.exitStrategySlide.headline || "Exit Strategy"}
+                          </h4>
+                          <div className="space-y-3">
+                            {project.pitchOutput.pitchDeckSlides.exitStrategySlide.exitScenarios && Array.isArray(project.pitchOutput.pitchDeckSlides.exitStrategySlide.exitScenarios) && (
+                              <div>
+                                <p className="text-sm font-medium mb-2">Exit Scenarios:</p>
+                                <div className="space-y-2">
+                                  {project.pitchOutput.pitchDeckSlides.exitStrategySlide.exitScenarios.map((scenario: any, index: number) => (
+                                    <div key={index} className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded">
+                                      <p className="text-sm font-medium text-purple-800">{scenario.type}</p>
+                                      {scenario.valuationRange && (
+                                        <p className="text-xs text-purple-700 mt-1"><strong>Valuation:</strong> {scenario.valuationRange}</p>
+                                      )}
+                                      {scenario.strategicRationale && (
+                                        <p className="text-xs text-purple-600 mt-1">{scenario.strategicRationale}</p>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      )}
+
+                      {/* Investor Q&A */}
+                      {project.pitchOutput.investorQA && Array.isArray(project.pitchOutput.investorQA) && (
+                        <Card className="p-4">
+                          <h4 className="font-medium mb-3 flex items-center gap-2">
+                            🤔 Investor Q&A
+                          </h4>
+                          <div className="space-y-3">
+                            {project.pitchOutput.investorQA.map((qa: any, index: number) => (
+                              <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
+                                <p className="text-sm font-medium text-blue-800 mb-1">{qa.question}</p>
+                                <p className="text-sm text-muted-foreground">{qa.answer}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </Card>
+                      )}
+                    </>
                   )}
                 </div>
                 
@@ -1756,103 +2273,292 @@ export default function ProjectPage() {
                 )}
                 
                 <div className="grid gap-4">
-                  {/* Launch Timeline */}
-                  <Card className="p-4">
-                    <h4 className="font-medium mb-3 flex items-center gap-2">
-                      ⏰ Launch Timeline
-                    </h4>
-                    <div className="grid gap-3 md:grid-cols-3">
-                      <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Month 1</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.launchTimeline?.month1 || 'Launch activities and goals'}
-                        </div>
-                      </div>
-                      <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Month 3</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.launchTimeline?.month3 || 'Growth milestones'}
-                        </div>
-                      </div>
-                      <div className="text-center p-3 bg-muted rounded-lg">
-                        <div className="text-sm font-bold text-primary">Month 6</div>
-                        <div className="text-xs text-muted-foreground mt-1">
-                          {project.gtmOutput.launchTimeline?.month6 || 'Scale targets'}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Customer Acquisition */}
-                  {project.gtmOutput.customerAcquisition && (
+                  {/* Strategic Overview */}
+                  {project.gtmOutput.strategicOverview && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📈 Customer Acquisition
+                        🎯 Strategic Overview
                       </h4>
                       <div className="space-y-3">
-                        {project.gtmOutput.customerAcquisition.targetPersona && (
+                        {project.gtmOutput.strategicOverview.gtmThesis && (
                           <div>
-                            <p className="text-sm"><strong>Target Persona:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.customerAcquisition.targetPersona}</p>
+                            <p className="text-sm"><strong>GTM Thesis:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.strategicOverview.gtmThesis}</p>
                           </div>
                         )}
-                        {project.gtmOutput.customerAcquisition.acquisitionTactics && (
+                        {project.gtmOutput.strategicOverview.marketEntryStrategy && (
                           <div>
-                            <p className="text-sm"><strong>Acquisition Tactics:</strong></p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {project.gtmOutput.customerAcquisition.acquisitionTactics.map((tactic: string, index: number) => (
-                                <Badge key={index} variant="secondary" className="text-xs">{tactic}</Badge>
-                              ))}
-                            </div>
+                            <p className="text-sm"><strong>Market Entry Strategy:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.strategicOverview.marketEntryStrategy}</p>
                           </div>
                         )}
-                        {project.gtmOutput.customerAcquisition.acquisitionGoals && (
+                        {project.gtmOutput.strategicOverview.primaryObjective && (
                           <div>
-                            <p className="text-sm"><strong>Acquisition Goals:</strong></p>
-                            <div className="space-y-1 mt-1">
-                              {project.gtmOutput.customerAcquisition.acquisitionGoals.paidCustomers && (
-                                <p className="text-sm text-muted-foreground">• Paid Customers: {project.gtmOutput.customerAcquisition.acquisitionGoals.paidCustomers}</p>
-                              )}
-                              {project.gtmOutput.customerAcquisition.acquisitionGoals.pipeline && (
-                                <p className="text-sm text-muted-foreground">• Pipeline: {project.gtmOutput.customerAcquisition.acquisitionGoals.pipeline}</p>
-                              )}
-                            </div>
+                            <p className="text-sm"><strong>Primary Objective:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.strategicOverview.primaryObjective}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.strategicOverview.successMetrics && (
+                          <div>
+                            <p className="text-sm"><strong>Success Metrics:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.strategicOverview.successMetrics}</p>
+                          </div>
+                        )}
+                        {project.gtmOutput.strategicOverview.competitivePositioning && (
+                          <div>
+                            <p className="text-sm"><strong>Competitive Positioning:</strong></p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.strategicOverview.competitivePositioning}</p>
                           </div>
                         )}
                       </div>
                     </Card>
                   )}
 
-                  {/* Marketing Channels */}
-                  {project.gtmOutput.marketingChannels && (
+                  {/* Customer Acquisition Framework */}
+                  {project.gtmOutput.customerAcquisitionFramework && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📢 Marketing Channels
+                        📈 Customer Acquisition Framework
                       </h4>
-                      <div className="space-y-3">
-                        {project.gtmOutput.marketingChannels.paidChannels && project.gtmOutput.marketingChannels.paidChannels.length > 0 && (
+                      <div className="space-y-4">
+                        {/* Ideal Customer Profile */}
+                        {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile && (
                           <div>
-                            <p className="text-sm"><strong>Paid Channels:</strong></p>
-                            <div className="space-y-2 mt-1">
-                              {project.gtmOutput.marketingChannels.paidChannels.map((channel: any, index: number) => (
-                                <div key={index} className="bg-muted rounded-lg p-2">
-                                  <p className="text-sm font-medium">{channel.channel}</p>
-                                  <p className="text-xs text-muted-foreground">Budget: {channel.budget} | Expected ROI: {channel.expectedROI}</p>
+                            <p className="text-sm font-medium mb-2">Ideal Customer Profile</p>
+                            <div className="bg-muted rounded-lg p-3 space-y-2">
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.primarySegment && (
+                                <p className="text-sm"><strong>Primary Segment:</strong> {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.primarySegment}</p>
+                              )}
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.customerJobs && (
+                                <p className="text-sm"><strong>Customer Jobs:</strong> {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.customerJobs}</p>
+                              )}
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.painPoints && Array.isArray(project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.painPoints) && (
+                                <div>
+                                  <p className="text-sm"><strong>Pain Points:</strong></p>
+                                  <ul className="text-sm text-muted-foreground ml-4 list-disc">
+                                    {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.painPoints.map((point: string, index: number) => (
+                                      <li key={index}>{point}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.buyingProcess && (
+                                <p className="text-sm"><strong>Buying Process:</strong> {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.buyingProcess}</p>
+                              )}
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.budget && (
+                                <p className="text-sm"><strong>Budget Range:</strong> {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.budget}</p>
+                              )}
+                              {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.decisionCriteria && (
+                                <p className="text-sm"><strong>Decision Criteria:</strong> {project.gtmOutput.customerAcquisitionFramework.idealCustomerProfile.decisionCriteria}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Acquisition Channels */}
+                        {project.gtmOutput.customerAcquisitionFramework.acquisitionChannels && Array.isArray(project.gtmOutput.customerAcquisitionFramework.acquisitionChannels) && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Acquisition Channels</p>
+                            <div className="space-y-3">
+                              {project.gtmOutput.customerAcquisitionFramework.acquisitionChannels.map((channel: any, index: number) => (
+                                <div key={index} className="border border-muted rounded-lg p-3">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <p className="text-sm font-medium">{channel.channelName || 'Channel'}</p>
+                                    <Badge variant="secondary" className="text-xs">{channel.channelType || 'Type'}</Badge>
+                                  </div>
+                                  {channel.implementation && (
+                                    <p className="text-xs text-muted-foreground mb-2">{channel.implementation}</p>
+                                  )}
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    {channel.monthlyInvestment && (
+                                      <p><strong>Investment:</strong> {channel.monthlyInvestment}</p>
+                                    )}
+                                    {channel.cac && (
+                                      <p><strong>CAC:</strong> {channel.cac}</p>
+                                    )}
+                                  </div>
+                                  {channel.expectedResults && (
+                                    <div className="mt-2 text-xs">
+                                      <p><strong>Expected Results:</strong></p>
+                                      <div className="ml-2 text-muted-foreground">
+                                        {channel.expectedResults.month1 && <p>Month 1: {channel.expectedResults.month1}</p>}
+                                        {channel.expectedResults.month3 && <p>Month 3: {channel.expectedResults.month3}</p>}
+                                        {channel.expectedResults.month6 && <p>Month 6: {channel.expectedResults.month6}</p>}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {channel.conversionPath && (
+                                    <p className="text-xs text-muted-foreground mt-1"><strong>Conversion:</strong> {channel.conversionPath}</p>
+                                  )}
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
-                        {project.gtmOutput.marketingChannels.organicChannels && project.gtmOutput.marketingChannels.organicChannels.length > 0 && (
-                          <div>
-                            <p className="text-sm"><strong>Organic Channels:</strong></p>
-                            <div className="space-y-2 mt-1">
-                              {project.gtmOutput.marketingChannels.organicChannels.map((channel: any, index: number) => (
-                                <div key={index} className="bg-muted rounded-lg p-2">
-                                  <p className="text-sm font-medium">{channel.channel}</p>
-                                  <p className="text-xs text-muted-foreground">Investment: {channel.investment} | Expected: {channel.expectedTraffic}</p>
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Monthly Execution Plan */}
+                  {project.gtmOutput.monthlyExecutionPlan && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        📅 Monthly Execution Plan
+                      </h4>
+                      <div className="grid gap-4 md:grid-cols-3">
+                        {/* Month 1 */}
+                        {project.gtmOutput.monthlyExecutionPlan.month1 && (
+                          <div className="border border-muted rounded-lg p-3">
+                            <div className="text-sm font-bold text-primary mb-2">Month 1</div>
+                            {project.gtmOutput.monthlyExecutionPlan.month1.primaryFocus && (
+                              <p className="text-xs font-medium mb-2">{project.gtmOutput.monthlyExecutionPlan.month1.primaryFocus}</p>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month1.keyActivities && Array.isArray(project.gtmOutput.monthlyExecutionPlan.month1.keyActivities) && (
+                              <div className="mb-2">
+                                <p className="text-xs font-medium">Key Activities:</p>
+                                <ul className="text-xs text-muted-foreground ml-2 list-disc">
+                                  {project.gtmOutput.monthlyExecutionPlan.month1.keyActivities.map((activity: string, index: number) => (
+                                    <li key={index}>{activity}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics && (
+                              <div className="text-xs">
+                                <p className="font-medium">Target Metrics:</p>
+                                <div className="text-muted-foreground">
+                                  {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.newCustomers && <p>Customers: {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.newCustomers}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.mrr && <p>MRR: {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.mrr}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.pipeline && <p>Pipeline: {project.gtmOutput.monthlyExecutionPlan.month1.targetMetrics.pipeline}</p>}
                                 </div>
-                              ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Month 3 */}
+                        {project.gtmOutput.monthlyExecutionPlan.month3 && (
+                          <div className="border border-muted rounded-lg p-3">
+                            <div className="text-sm font-bold text-primary mb-2">Month 3</div>
+                            {project.gtmOutput.monthlyExecutionPlan.month3.primaryFocus && (
+                              <p className="text-xs font-medium mb-2">{project.gtmOutput.monthlyExecutionPlan.month3.primaryFocus}</p>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month3.keyActivities && Array.isArray(project.gtmOutput.monthlyExecutionPlan.month3.keyActivities) && (
+                              <div className="mb-2">
+                                <p className="text-xs font-medium">Key Activities:</p>
+                                <ul className="text-xs text-muted-foreground ml-2 list-disc">
+                                  {project.gtmOutput.monthlyExecutionPlan.month3.keyActivities.map((activity: string, index: number) => (
+                                    <li key={index}>{activity}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics && (
+                              <div className="text-xs">
+                                <p className="font-medium">Target Metrics:</p>
+                                <div className="text-muted-foreground">
+                                  {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.newCustomers && <p>Customers: {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.newCustomers}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.mrr && <p>MRR: {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.mrr}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.customerSuccess && <p>Success: {project.gtmOutput.monthlyExecutionPlan.month3.targetMetrics.customerSuccess}</p>}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Month 6 */}
+                        {project.gtmOutput.monthlyExecutionPlan.month6 && (
+                          <div className="border border-muted rounded-lg p-3">
+                            <div className="text-sm font-bold text-primary mb-2">Month 6</div>
+                            {project.gtmOutput.monthlyExecutionPlan.month6.primaryFocus && (
+                              <p className="text-xs font-medium mb-2">{project.gtmOutput.monthlyExecutionPlan.month6.primaryFocus}</p>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month6.keyActivities && Array.isArray(project.gtmOutput.monthlyExecutionPlan.month6.keyActivities) && (
+                              <div className="mb-2">
+                                <p className="text-xs font-medium">Key Activities:</p>
+                                <ul className="text-xs text-muted-foreground ml-2 list-disc">
+                                  {project.gtmOutput.monthlyExecutionPlan.month6.keyActivities.map((activity: string, index: number) => (
+                                    <li key={index}>{activity}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                            {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics && (
+                              <div className="text-xs">
+                                <p className="font-medium">Target Metrics:</p>
+                                <div className="text-muted-foreground">
+                                  {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.newCustomers && <p>Customers: {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.newCustomers}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.mrr && <p>MRR: {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.mrr}</p>}
+                                  {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.efficiency && <p>Efficiency: {project.gtmOutput.monthlyExecutionPlan.month6.targetMetrics.efficiency}</p>}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Sales Playbook */}
+                  {project.gtmOutput.salesPlaybook && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        💼 Sales Playbook
+                      </h4>
+                      <div className="space-y-4">
+                        {/* Sales Process */}
+                        {project.gtmOutput.salesPlaybook.salesProcess && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Sales Process</p>
+                            <div className="space-y-2">
+                              {project.gtmOutput.salesPlaybook.salesProcess.prospectQualification && (
+                                <div className="bg-muted rounded-lg p-2">
+                                  <p className="text-xs"><strong>Qualification:</strong> {project.gtmOutput.salesPlaybook.salesProcess.prospectQualification}</p>
+                                </div>
+                              )}
+                              {project.gtmOutput.salesPlaybook.salesProcess.demoStrategy && (
+                                <div className="bg-muted rounded-lg p-2">
+                                  <p className="text-xs"><strong>Demo Strategy:</strong> {project.gtmOutput.salesPlaybook.salesProcess.demoStrategy}</p>
+                                </div>
+                              )}
+                              {project.gtmOutput.salesPlaybook.salesProcess.closingTechniques && (
+                                <div className="bg-muted rounded-lg p-2">
+                                  <p className="text-xs"><strong>Closing:</strong> {project.gtmOutput.salesPlaybook.salesProcess.closingTechniques}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Sales Targets */}
+                        {project.gtmOutput.salesPlaybook.salesTargets && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Sales Targets</p>
+                            <div className="grid gap-2 md:grid-cols-3">
+                              {project.gtmOutput.salesPlaybook.salesTargets.month1 && (
+                                <div className="bg-muted rounded-lg p-2 text-xs">
+                                  <p className="font-medium">Month 1</p>
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month1.pipeline && <p>Pipeline: {project.gtmOutput.salesPlaybook.salesTargets.month1.pipeline}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month1.closedWon && <p>Closed: {project.gtmOutput.salesPlaybook.salesTargets.month1.closedWon}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month1.averageDealSize && <p>Deal Size: {project.gtmOutput.salesPlaybook.salesTargets.month1.averageDealSize}</p>}
+                                </div>
+                              )}
+                              {project.gtmOutput.salesPlaybook.salesTargets.month3 && (
+                                <div className="bg-muted rounded-lg p-2 text-xs">
+                                  <p className="font-medium">Month 3</p>
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month3.pipeline && <p>Pipeline: {project.gtmOutput.salesPlaybook.salesTargets.month3.pipeline}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month3.closedWon && <p>Closed: {project.gtmOutput.salesPlaybook.salesTargets.month3.closedWon}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month3.averageDealSize && <p>Deal Size: {project.gtmOutput.salesPlaybook.salesTargets.month3.averageDealSize}</p>}
+                                </div>
+                              )}
+                              {project.gtmOutput.salesPlaybook.salesTargets.month6 && (
+                                <div className="bg-muted rounded-lg p-2 text-xs">
+                                  <p className="font-medium">Month 6</p>
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month6.pipeline && <p>Pipeline: {project.gtmOutput.salesPlaybook.salesTargets.month6.pipeline}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month6.closedWon && <p>Closed: {project.gtmOutput.salesPlaybook.salesTargets.month6.closedWon}</p>}
+                                  {project.gtmOutput.salesPlaybook.salesTargets.month6.averageDealSize && <p>Deal Size: {project.gtmOutput.salesPlaybook.salesTargets.month6.averageDealSize}</p>}
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -1860,81 +2566,160 @@ export default function ProjectPage() {
                     </Card>
                   )}
 
-                  {/* Sales Targets */}
-                  {project.gtmOutput.salesTargets && (
+                  {/* Budget and Investment */}
+                  {project.gtmOutput.budgetAndInvestment && (
                     <Card className="p-4">
                       <h4 className="font-medium mb-3 flex items-center gap-2">
-                        💼 Sales Targets
-                      </h4>
-                      <div className="grid gap-3 md:grid-cols-3">
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-sm font-bold text-primary">Month 1</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {project.gtmOutput.salesTargets.month1 || 'TBD'}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-sm font-bold text-primary">Month 3</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {project.gtmOutput.salesTargets.month3 || 'TBD'}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-sm font-bold text-primary">Month 6</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {project.gtmOutput.salesTargets.month6 || 'TBD'}
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Key Metrics */}
-                  {project.gtmOutput.keyMetrics && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        📊 Key Metrics
+                        💰 Budget & Investment
                       </h4>
                       <div className="space-y-3">
-                        {project.gtmOutput.keyMetrics.CAC && (
-                          <div>
-                            <p className="text-sm"><strong>Customer Acquisition Cost (CAC):</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.CAC}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.keyMetrics.LTV && (
-                          <div>
-                            <p className="text-sm"><strong>Lifetime Value (LTV):</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.LTV}</p>
-                          </div>
-                        )}
-                        {project.gtmOutput.keyMetrics.MRR && (
-                          <div>
-                            <p className="text-sm"><strong>Monthly Recurring Revenue (MRR):</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.keyMetrics.MRR}</p>
-                          </div>
-                        )}
-                      </div>
-                    </Card>
-                  )}
-
-                  {/* Budget Allocation */}
-                  {project.gtmOutput.budgetAllocation && (
-                    <Card className="p-4">
-                      <h4 className="font-medium mb-3 flex items-center gap-2">
-                        💰 Budget Allocation
-                      </h4>
-                      <div className="space-y-3">
-                        {project.gtmOutput.budgetAllocation.totalBudget && (
+                        {project.gtmOutput.budgetAndInvestment.totalGtmBudget && (
                           <div>
                             <p className="text-sm"><strong>Total GTM Budget:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.budgetAllocation.totalBudget}</p>
+                            <p className="text-sm text-muted-foreground">{project.gtmOutput.budgetAndInvestment.totalGtmBudget}</p>
                           </div>
                         )}
-                        {project.gtmOutput.budgetAllocation.channelAllocation && (
+                        
+                        {/* Channel Investment */}
+                        {project.gtmOutput.budgetAndInvestment.channelInvestment && (
                           <div>
-                            <p className="text-sm"><strong>Channel Allocation:</strong></p>
-                            <p className="text-sm text-muted-foreground">{project.gtmOutput.budgetAllocation.channelAllocation}</p>
+                            <p className="text-sm font-medium mb-2">Channel Investment</p>
+                            <div className="space-y-1">
+                              {project.gtmOutput.budgetAndInvestment.channelInvestment.contentMarketing && (
+                                <p className="text-xs text-muted-foreground">Content Marketing: {project.gtmOutput.budgetAndInvestment.channelInvestment.contentMarketing}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.channelInvestment.salesDevelopment && (
+                                <p className="text-xs text-muted-foreground">Sales Development: {project.gtmOutput.budgetAndInvestment.channelInvestment.salesDevelopment}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.channelInvestment.partnerships && (
+                                <p className="text-xs text-muted-foreground">Partnerships: {project.gtmOutput.budgetAndInvestment.channelInvestment.partnerships}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.channelInvestment.customerSuccess && (
+                                <p className="text-xs text-muted-foreground">Customer Success: {project.gtmOutput.budgetAndInvestment.channelInvestment.customerSuccess}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* ROI Projections */}
+                        {project.gtmOutput.budgetAndInvestment.roiProjections && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">ROI Projections</p>
+                            <div className="grid gap-2 md:grid-cols-2">
+                              {project.gtmOutput.budgetAndInvestment.roiProjections.month6Revenue && (
+                                <p className="text-xs text-muted-foreground">Month 6 Revenue: {project.gtmOutput.budgetAndInvestment.roiProjections.month6Revenue}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.roiProjections.blendedCAC && (
+                                <p className="text-xs text-muted-foreground">Blended CAC: {project.gtmOutput.budgetAndInvestment.roiProjections.blendedCAC}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.roiProjections.ltvCacRatio && (
+                                <p className="text-xs text-muted-foreground">LTV:CAC Ratio: {project.gtmOutput.budgetAndInvestment.roiProjections.ltvCacRatio}</p>
+                              )}
+                              {project.gtmOutput.budgetAndInvestment.roiProjections.paybackPeriod && (
+                                <p className="text-xs text-muted-foreground">Payback Period: {project.gtmOutput.budgetAndInvestment.roiProjections.paybackPeriod}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Operational Requirements */}
+                  {project.gtmOutput.operationalRequirements && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚙️ Operational Requirements
+                      </h4>
+                      <div className="space-y-3">
+                        {/* Team Structure */}
+                        {project.gtmOutput.operationalRequirements.teamStructure && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Team Structure</p>
+                            <div className="space-y-1">
+                              {project.gtmOutput.operationalRequirements.teamStructure.month1 && (
+                                <p className="text-xs text-muted-foreground">Month 1: {project.gtmOutput.operationalRequirements.teamStructure.month1}</p>
+                              )}
+                              {project.gtmOutput.operationalRequirements.teamStructure.month3 && (
+                                <p className="text-xs text-muted-foreground">Month 3: {project.gtmOutput.operationalRequirements.teamStructure.month3}</p>
+                              )}
+                              {project.gtmOutput.operationalRequirements.teamStructure.month6 && (
+                                <p className="text-xs text-muted-foreground">Month 6: {project.gtmOutput.operationalRequirements.teamStructure.month6}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tool Stack */}
+                        {project.gtmOutput.operationalRequirements.toolStack && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Tool Stack</p>
+                            <div className="space-y-1">
+                              {project.gtmOutput.operationalRequirements.toolStack.crm && (
+                                <p className="text-xs text-muted-foreground">CRM: {project.gtmOutput.operationalRequirements.toolStack.crm}</p>
+                              )}
+                              {project.gtmOutput.operationalRequirements.toolStack.marketing && (
+                                <p className="text-xs text-muted-foreground">Marketing: {project.gtmOutput.operationalRequirements.toolStack.marketing}</p>
+                              )}
+                              {project.gtmOutput.operationalRequirements.toolStack.sales && (
+                                <p className="text-xs text-muted-foreground">Sales: {project.gtmOutput.operationalRequirements.toolStack.sales}</p>
+                              )}
+                              {project.gtmOutput.operationalRequirements.toolStack.analytics && (
+                                <p className="text-xs text-muted-foreground">Analytics: {project.gtmOutput.operationalRequirements.toolStack.analytics}</p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </Card>
+                  )}
+
+                  {/* Risk Mitigation */}
+                  {project.gtmOutput.riskMitigation && (
+                    <Card className="p-4">
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        ⚠️ Risk Mitigation
+                      </h4>
+                      <div className="space-y-3">
+                        {/* Channel Risks */}
+                        {project.gtmOutput.riskMitigation.channelRisks && Array.isArray(project.gtmOutput.riskMitigation.channelRisks) && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Channel Risks</p>
+                            <div className="space-y-2">
+                              {project.gtmOutput.riskMitigation.channelRisks.map((risk: any, index: number) => (
+                                <div key={index} className="border border-muted rounded-lg p-2">
+                                  <div className="flex justify-between items-start mb-1">
+                                    <p className="text-xs font-medium">{risk.risk || 'Risk'}</p>
+                                    <div className="flex gap-1">
+                                      {risk.probability && <Badge variant="outline" className="text-xs">P: {risk.probability}</Badge>}
+                                      {risk.impact && <Badge variant="outline" className="text-xs">I: {risk.impact}</Badge>}
+                                    </div>
+                                  </div>
+                                  {risk.mitigation && (
+                                    <p className="text-xs text-muted-foreground"><strong>Mitigation:</strong> {risk.mitigation}</p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contingency Plans */}
+                        {project.gtmOutput.riskMitigation.contingencyPlans && (
+                          <div>
+                            <p className="text-sm font-medium mb-2">Contingency Plans</p>
+                            <div className="space-y-1">
+                              {project.gtmOutput.riskMitigation.contingencyPlans.underperformance && (
+                                <div className="bg-muted rounded-lg p-2">
+                                  <p className="text-xs"><strong>Underperformance:</strong> {project.gtmOutput.riskMitigation.contingencyPlans.underperformance}</p>
+                                </div>
+                              )}
+                              {project.gtmOutput.riskMitigation.contingencyPlans.overperformance && (
+                                <div className="bg-muted rounded-lg p-2">
+                                  <p className="text-xs"><strong>Overperformance:</strong> {project.gtmOutput.riskMitigation.contingencyPlans.overperformance}</p>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
