@@ -118,7 +118,7 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-          <p className="text-muted-foreground">
+          <p className="text-readable-muted">
             Manage your business planning projects and track progress
           </p>
         </div>
@@ -322,7 +322,7 @@ export default function ProjectsPage() {
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-semibold">No projects yet</h3>
-              <p className="text-muted-foreground max-w-md">
+              <p className="text-readable-muted max-w-md">
                 Create your first project to start building your business plan with AI assistance.
               </p>
             </div>

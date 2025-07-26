@@ -169,7 +169,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
+        <p className="text-readable-muted">
           Manage your account settings and preferences
         </p>
       </div>
@@ -202,9 +202,9 @@ export default function SettingsPage() {
                 type="email"
                 value={session?.user?.email || ""}
                 disabled
-                className="bg-gray-50"
+                className="bg-muted"
               />
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-readable-muted">
                 Email cannot be changed as it&apos;s linked to your OAuth account
               </p>
             </div>
@@ -227,7 +227,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Current Plan</p>
-                <p className="text-sm text-muted-foreground">Free Plan</p>
+                <p className="text-sm text-readable-muted">Free Plan</p>
               </div>
               <Badge variant="outline">
                 <Coins className="h-3 w-3 mr-1" />
@@ -242,7 +242,7 @@ export default function SettingsPage() {
                 <span className="text-sm">Forge Credits</span>
                 <span className="font-medium">100 remaining</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-secondary rounded-full h-2">
                 <div className="bg-blue-600 h-2 rounded-full" style={{ width: "80%" }} />
               </div>
             </div>
@@ -287,7 +287,7 @@ export default function SettingsPage() {
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <Label className="text-base font-medium">Persistent Storage</Label>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-readable-muted">
                     Allow your project data to be saved permanently in our secure database
                   </p>
                   <div className="flex items-center gap-2 mt-2">
@@ -344,7 +344,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label className="text-base font-medium">Analytics Opt-Out</Label>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-readable-muted">
                       Disable anonymous usage analytics
                     </p>
                   </div>
@@ -359,7 +359,7 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1">
                     <Label className="text-base font-medium">Auto-Save Projects</Label>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-readable-muted">
                       Automatically save your progress as you work
                     </p>
                   </div>
@@ -415,7 +415,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Email Notifications</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-readable-muted">
                   Receive updates about your projects via email
                 </p>
               </div>
@@ -430,7 +430,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Export Notifications</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-readable-muted">
                   Get notified when project exports are ready
                 </p>
               </div>
@@ -445,7 +445,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Marketing Updates</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-readable-muted">
                   Receive news about new features and updates
                 </p>
               </div>
@@ -472,7 +472,7 @@ export default function SettingsPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-1">
                 <Label>Theme</Label>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-readable-muted">
                   Choose your preferred color scheme
                 </p>
               </div>
@@ -502,7 +502,7 @@ export default function SettingsPage() {
                   </div>
                   <div>
                     <p className="font-medium">Google</p>
-                    <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
+                    <p className="text-sm text-readable-muted">{session?.user?.email}</p>
                   </div>
                 </div>
                 <Badge variant="secondary">Connected</Badge>

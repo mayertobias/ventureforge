@@ -93,8 +93,8 @@ export default function Dashboard() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <Sparkles className="mx-auto h-8 w-8 animate-spin" />
-          <p className="mt-2 text-muted-foreground">Loading session...</p>
-          <p className="mt-1 text-xs text-muted-foreground">Status: {status}</p>
+          <p className="mt-2 text-readable-muted">Loading session...</p>
+          <p className="mt-1 text-xs text-readable-muted">Status: {status}</p>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ export default function Dashboard() {
           <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
             Welcome back, {session.user?.name?.split(' ')[0] || 'Entrepreneur'}
           </h1>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-readable-muted">
             Ready to build your next venture? Let&apos;s turn your ideas into reality.
           </p>
         </div>
@@ -147,14 +147,14 @@ export default function Dashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Projects</CardTitle>
+            <CardTitle className="text-sm font-medium text-readable-muted">Total Projects</CardTitle>
             <div className="p-2 bg-blue-50 rounded-lg">
               <BarChart3 className="h-4 w-4 text-blue-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{userStats?.projects.length || 0}</div>
-            <p className="text-xs text-gray-500 flex items-center mt-1">
+            <div className="text-3xl font-bold text-high-contrast">{userStats?.projects.length || 0}</div>
+            <p className="text-xs text-readable-muted flex items-center mt-1">
               <TrendingUp className="h-3 w-3 mr-1" />
               {userStats?.projects.length ? `${userStats.projects.length} project${userStats.projects.length > 1 ? 's' : ''} created` : 'Ready to start your journey'}
             </p>
@@ -163,14 +163,14 @@ export default function Dashboard() {
         
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Forge Credits</CardTitle>
+            <CardTitle className="text-sm font-medium text-readable-muted">Forge Credits</CardTitle>
             <div className="p-2 bg-amber-50 rounded-lg">
               <Coins className="h-4 w-4 text-amber-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{userStats?.credits || 0}</div>
-            <p className="text-xs text-gray-500 flex items-center mt-1">
+            <div className="text-3xl font-bold text-high-contrast">{userStats?.credits || 0}</div>
+            <p className="text-xs text-readable-muted flex items-center mt-1">
               <Zap className="h-3 w-3 mr-1" />
               {userStats?.credits ? `${userStats.credits} credits remaining` : 'Loading credits...'}
             </p>
@@ -179,14 +179,14 @@ export default function Dashboard() {
         
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Ideas Generated</CardTitle>
+            <CardTitle className="text-sm font-medium text-readable-muted">Ideas Generated</CardTitle>
             <div className="p-2 bg-purple-50 rounded-lg">
               <Sparkles className="h-4 w-4 text-purple-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{userStats?.totalIdeas || 0}</div>
-            <p className="text-xs text-gray-500 flex items-center mt-1">
+            <div className="text-3xl font-bold text-high-contrast">{userStats?.totalIdeas || 0}</div>
+            <p className="text-xs text-readable-muted flex items-center mt-1">
               <Lightbulb className="h-3 w-3 mr-1" />
               {userStats?.totalIdeas ? `${userStats.totalIdeas} idea${userStats.totalIdeas > 1 ? 's' : ''} generated` : 'Start your first project'}
             </p>
@@ -195,14 +195,14 @@ export default function Dashboard() {
         
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm hover:shadow-xl transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Current Plan</CardTitle>
+            <CardTitle className="text-sm font-medium text-readable-muted">Current Plan</CardTitle>
             <div className="p-2 bg-green-50 rounded-lg">
               <Trophy className="h-4 w-4 text-green-600" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">Free</div>
-            <p className="text-xs text-gray-500 flex items-center mt-1">
+            <div className="text-3xl font-bold text-high-contrast">Free</div>
+            <p className="text-xs text-readable-muted flex items-center mt-1">
               <Target className="h-3 w-3 mr-1" />
               Upgrade for more features
             </p>
@@ -220,8 +220,8 @@ export default function Dashboard() {
                 <Sparkles className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <CardTitle className="text-2xl font-bold text-gray-900">Ready to Build Something Amazing?</CardTitle>
-                <CardDescription className="text-base text-gray-600 mt-1">
+                <CardTitle className="text-2xl font-bold text-high-contrast">Ready to Build Something Amazing?</CardTitle>
+                <CardDescription className="text-base text-readable-muted mt-1">
                   Transform your business idea into a complete venture plan with AI-powered insights
                 </CardDescription>
               </div>
@@ -230,11 +230,11 @@ export default function Dashboard() {
           <CardContent className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-3">
-                <h3 className="font-semibold text-gray-900 flex items-center">
+                <h3 className="font-semibold text-high-contrast flex items-center">
                   <Target className="h-4 w-4 mr-2 text-blue-600" />
                   What You&apos;ll Get:
                 </h3>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <ul className="space-y-2 text-sm text-readable">
                   <li className="flex items-center">
                     <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
                     Market research & competitive analysis
@@ -256,8 +256,8 @@ export default function Dashboard() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="text-center p-4 bg-white/60 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">⚡</div>
-                  <p className="text-sm font-medium text-gray-700">Just 5 minutes</p>
-                  <p className="text-xs text-gray-500">From idea to business plan</p>
+                  <p className="text-sm font-medium text-readable">Just 5 minutes</p>
+                  <p className="text-xs text-readable-muted">From idea to business plan</p>
                 </div>
                 <div className="new-project-button">
                   <NewProjectDialog hasExistingProjects={userStats?.projects && userStats.projects.length > 0} />
@@ -270,7 +270,7 @@ export default function Dashboard() {
         {/* Recent Activity - Takes 1/3 width */}
         <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900 flex items-center">
+            <CardTitle className="text-xl font-bold text-high-contrast flex items-center">
               <BarChart3 className="h-5 w-5 mr-2 text-gray-600" />
               Recent Activity
             </CardTitle>
@@ -284,7 +284,7 @@ export default function Dashboard() {
                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Sparkles className="h-8 w-8 text-gray-400" />
                 </div>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-readable-muted mb-4">
                   No activity yet. Create your first project to get started!
                 </p>
                 <div className="space-y-2">
@@ -320,7 +320,7 @@ export default function Dashboard() {
                 </div>
                 
                 <div className="border-t pt-4">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Recent Projects</h4>
+                  <h4 className="text-sm font-medium text-readable mb-3">Recent Projects</h4>
                   <div className="space-y-3">
                     {getRecentProjects().map((project) => {
                       const progress = getProjectProgress(project);
@@ -329,7 +329,7 @@ export default function Dashboard() {
                           <div className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
                             <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center space-x-2">
-                                <h5 className="text-sm font-medium text-gray-900 truncate">{project.name}</h5>
+                                <h5 className="text-sm font-medium text-high-contrast truncate">{project.name}</h5>
                                 <div className="group relative">
                                   <Lock className="h-3 w-3 text-green-600" />
                                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
@@ -337,12 +337,12 @@ export default function Dashboard() {
                                   </div>
                                 </div>
                               </div>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs text-readable-muted">
                                 {progress.completed}/{progress.total}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-xs text-gray-500 flex items-center">
+                              <span className="text-xs text-readable-muted flex items-center">
                                 <Calendar className="h-3 w-3 mr-1" />
                                 {new Date(project.createdAt).toLocaleDateString()}
                               </span>
@@ -388,8 +388,8 @@ export default function Dashboard() {
                 <Target className="h-4 w-4 text-green-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 text-sm">Be Specific</h4>
-                <p className="text-xs text-gray-600 mt-1">
+                <h4 className="font-semibold text-high-contrast text-sm">Be Specific</h4>
+                <p className="text-xs text-readable-muted mt-1">
                   The more detailed your idea, the better our AI can help you plan
                 </p>
               </div>
@@ -399,8 +399,8 @@ export default function Dashboard() {
                 <TrendingUp className="h-4 w-4 text-blue-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 text-sm">Think Market</h4>
-                <p className="text-xs text-gray-600 mt-1">
+                <h4 className="font-semibold text-high-contrast text-sm">Think Market</h4>
+                <p className="text-xs text-readable-muted mt-1">
                   Consider your target audience and their pain points
                 </p>
               </div>
@@ -410,8 +410,8 @@ export default function Dashboard() {
                 <Zap className="h-4 w-4 text-purple-600" />
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 text-sm">Start Small</h4>
-                <p className="text-xs text-gray-600 mt-1">
+                <h4 className="font-semibold text-high-contrast text-sm">Start Small</h4>
+                <p className="text-xs text-readable-muted mt-1">
                   Focus on one core feature or service initially
                 </p>
               </div>

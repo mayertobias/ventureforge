@@ -144,7 +144,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
             <Lightbulb className="h-8 w-8 text-blue-600 mx-auto" />
           </div>
           <DialogTitle className="text-2xl font-bold text-gray-900">Turn Your Idea Into Reality</DialogTitle>
-          <DialogDescription className="text-base text-gray-600">
+          <DialogDescription className="text-base text-readable-muted">
             Give your project a memorable name. This will be the foundation of your business venture.
           </DialogDescription>
         </DialogHeader>
@@ -165,7 +165,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
                 }
               }}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-readable-muted">
               Choose a name that reflects your vision and target market
             </p>
           </div>
@@ -187,7 +187,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
                         Memory Only (Recommended)
                       </div>
                     </Label>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-readable-muted mt-1">
                       Maximum privacy - your data is stored temporarily in memory only
                     </p>
                   </div>
@@ -211,7 +211,7 @@ export function NewProjectDialog({ hasExistingProjects = false }: NewProjectDial
                         )}
                       </div>
                     </Label>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-readable-muted mt-1">
                       {userPreferences?.allowPersistentStorage 
                         ? "Your data will be saved in our secure database for easy access"
                         : "Enable persistent storage in your account settings to use this option"
